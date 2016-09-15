@@ -28,6 +28,8 @@ kills = 0
 level = 1
 score = 0
 
+debug = False
+
 lcd_time = .07	# frame-rate of entire game (CONSTANT)
 beast_steps = int(beast_speed / lcd_time)	# global inter-enemy asyncronicity
 monster_steps = int(monster_speed / lcd_time)	# global inter-enemy asyncronicity
@@ -46,7 +48,7 @@ player = []
 board = []
 move = ''
 
-dir_dist = ['u','d','l','r','ul','ur','dl','dr']
+dirlist = ['u','d','l','r','ul','ur','dl','dr']
 
 ###################-- formatted game-piece ascii characters
 
@@ -76,14 +78,9 @@ def build_blank_board(): #{
 def print_board(): #{
 	for rowi in range(board_rows):
 		print('\r' + left_margin + ''.join(board[rowi]))
-	
-	print('\r' + left_margin + '             SCORE: ' + str(score) + '                LIVES: ' + str(lives) + '                 LEVEL: ' + str(level)) 
-#}
-
-
-
-def print_debug():
-	print('\nPlayer: ' + str(player) + '\nBeasts: ' + str(beasts) + '\nBSeeds: ' + str(beast_seeds) + '\nBeast Stepper: ' + str(beast_stepper) + '\nBeast Steps: ' + str(beast_steps)) 
+	print('\r' + left_margin + '   SCORE: ' + str(score) + '   LIVES: ' + str(lives) + '    LEVEL: ' + str(level)) 
+	if(debug):
+		print('\nPlayer: ' + str(player) + '\nBeasts: ' + str(beasts) + '\nBSeeds: ' + str(beast_seeds) + '\nBeast Stepper: ' + str(beast_stepper) + '\nBeast Steps: ' + str(beast_steps)) 
 
 
 ###############################################################
@@ -197,183 +194,105 @@ def unlist_piece(index, char):
 	elif (char == egg_chr):
 		del eggs_chr[index]
 	
-#############################################################################
-#############################################-- box rules --#################
-#############################################################################
-
 
 ##############################################################################
-##############################################-- move players --##############
+##############################################-- move pieces --##############
 ##############################################################################
+
+
+
+
+def move_piece(godir, piece, index, char, tug):
+	global bakgrd_chr, box_chr
+	row = piece[index]['ro']
+	col = piece[index]['co']
+	fow = row
+	fol = col
+	rtug = row
+	ctug = col
+	if godir == 'l': # LEFT
+		fow = row
+		fol = col - 1
+		rtug = row
+		ctug = col + 1
+	elif (godir == 'r'): # RIGHT
+		fow = row
+		fol = col + 1
+		rtug = row
+		ctug = col - 1
+	elif (godir == 'd'): # DOWN
+		fow = row + 1
+		fol = col
+		rtug = row - 1
+		ctug = col
+	elif (godir == 'u'): # UP
+		fow = row - 1
+		fol = col
+		rtug = row + 1
+		ctug = col
+	elif (godir == 'ul'): # D - UP n LEFT
+		fow = row - 1
+		fol = col - 1
+	elif (godir == 'ur'): # D - UP n RIGHT
+		fow = row - 1
+		fol = col + 1
+	elif (godir == 'dl'): # D - DOWN n LEFT
+		fow = row + 1
+		fol = col - 1
+	elif (godir == 'dr'): # D - DOWN n RIGHT
+		fow = row + 1
+		fol = col + 1
+	if (board[fow][fol] == bakgrd_chr):
+		board[fow][fol] = char 
+		if (tug) & (board[rtug][ctug] == box_chr):
+			board[rtug][ctug] = bakgrd_chr
+			board[row][col] = box_chr
+		else:
+			board[row][col] = bakgrd_chr
+		piece[index]['ro'] = fow
+		piece[index]['co'] = fol
+	
+
 
 
 def move_dist_enemies(): #{
-	global beast_seeds
-	global monster_seeds
-	global beast_stepper
-	global monster_stepper
+	global beast_seeds, monster_seeds, beast_stepper, monster_stepper
 	# pick one of the beasts to move
 	for bi in range(len(beasts)):
 		if beast_seeds[bi] == beast_stepper:
-			row = beasts[bi]['ro']
-			col = beasts[bi]['co']
-			fol = 0
-			fow = 0
-			dirindex = randint(0, len(dir_dist) - 1) # randomly pick a direction to go
-			direction = dir_dist[dirindex]
-			if direction == 'l': # LEFT
-				fol = col - 1
-				if (board[row][fol] == bakgrd_chr):
-					board[row][col] = bakgrd_chr
-					col -= 1
-					board[row][col] = beast_chr
-					beasts[bi]['co'] = col
-			elif (direction == 'r'): # D - RIGHT
-				row = beasts[bi]['ro']
-				col = beasts[bi]['co']
-				fol = col + 1
-				if (board[row][fol] == bakgrd_chr):
-					board[row][col] = bakgrd_chr
-					col += 1
-					board[row][col] = beast_chr
-					beasts[bi]['co'] = col
-			elif (direction == 'd'): # S - DOWN
-				row = beasts[bi]['ro']
-				col = beasts[bi]['co']
-				fow = row + 1
-				if (board[fow][col] == bakgrd_chr):
-					board[row][col] = bakgrd_chr
-					row += 1
-					board[row][col] = beast_chr
-					beasts[bi]['ro'] = row
-			elif (direction == 'r'): # D - RIGHT
-				row = beasts[bi]['ro']
-				col = beasts[bi]['co']
-				fow = row - 1
-				if (board[fow][col] == bakgrd_chr):
-					board[row][col] = bakgrd_chr
-					row -= 1
-					board[row][col] = beast_chr
-					beasts[bi]['ro'] = row
-			elif (direction == 'ul'): # D - UP n LEFT
-				row = beasts[bi]['ro']
-				col = beasts[bi]['co']
-				fow = row - 1
-				fol = col - 1
-				if (board[fow][fol] == bakgrd_chr):
-					board[row][col] = bakgrd_chr
-					row -= 1
-					col -= 1
-					board[row][col] = beast_chr
-					beasts[bi]['ro'] = row
-					beasts[bi]['co'] = col
-			elif (direction == 'ur'): # D - UP n RIGHT
-				row = beasts[bi]['ro']
-				col = beasts[bi]['co']
-				fow = row - 1
-				fol = col + 1
-				if (board[fow][fol] == bakgrd_chr):
-					board[row][col] = bakgrd_chr
-					row -= 1
-					col += 1
-					board[row][col] = beast_chr
-					beasts[bi]['ro'] = row
-					beasts[bi]['co'] = col 
-			elif (direction == 'dl'): # D - DOWN n LEFT
-				row = beasts[bi]['ro']
-				col = beasts[bi]['co']
-				fow = row + 1
-				fol = col - 1
-				if (board[fow][fol] == bakgrd_chr):
-					board[row][col] = bakgrd_chr
-					row = +1
-					col -= 1
-					board[row][col] = beast_chr
-					beasts[bi]['ro'] = row
-					beasts[bi]['co'] = col
-			elif (direction == 'dr'): # D - DOWN n RIGHT
-				row = beasts[bi]['ro']
-				col = beasts[bi]['co']
-				fow = row + 1
-				fol = col + 1
-				if (board[fow][fol] == bakgrd_chr):
-					board[row][col] = bakgrd_chr
-					row += 1
-					col += 1
-					board[row][col] = beast_chr
-					beasts[bi]['ro'] = row
-					beasts[bi]['co'] = col
-		
-		
-
-	
-# def move_close_enemies():
-def move_player(direction):
-	pull = False
-	row = 0
-	col = 0
-	fow = 0
-	fol = 0
-	global move
-	global board
-	global player
-	if (direction == ' '):
-		pull = True
-		direction = inkey(1)
-	if (direction == 'a'):   #A - LEFT
-		row = player[0]['ro']
-		col = player[0]['co']
-		fol = col - 1
-		if (board[row][fol] == bakgrd_chr):
-			if pull & (board[row][(col + 1)] == box_chr): # pull block if its there and spacebar was pressed 
-				board[row][col] = box_chr
-				board[row][(col + 1)] = bakgrd_chr
-			else:
-				board[row][col] = bakgrd_chr
-			col -= 1
-			board[row][col] = player_chr
-			player[0]['co'] = col
-	elif (direction == 'd'): # D - RIGHT
-		row = player[0]['ro']
-		col = player[0]['co']
-		fol = col + 1
-		if (board[row][fol] == bakgrd_chr):
-			if pull & (board[row][(col - 1)] == box_chr): # pull block if its there and spacebar was pressed
-				board[row][col] = box_chr
-				board[row][(col - 1)] = bakgrd_chr
-			else:
-				board[row][col] = bakgrd_chr
-			col += 1
-			board[row][col] = player_chr
-			player[0]['co'] = col
-	elif (direction == 's'): # S - DOWN
-		row = player[0]['ro']
-		col = player[0]['co']
-		fow = row + 1
-		if (board[fow][col] == bakgrd_chr):
-			if pull & (board[(row - 1)][col] == box_chr): 
-				board[row][col] = box_chr
-				board[(row - 1)][col] = bakgrd_chr
-			else:
-				board[row][col] = bakgrd_chr
-			row += 1
-			board[row][col] = player_chr
-			player[0]['ro'] = row
-	elif (direction == 'w'): # D - UP
-		row = player[0]['ro']
-		col = player[0]['co']
-		fow = row - 1
-		if (board[fow][col] == bakgrd_chr):
-			if pull & (board[(row + 1)][col] == box_chr):
-				board[row][col] = box_chr
-				board[(row + 1)][col] = bakgrd_chr
-			else:
-				board[row][col] = bakgrd_chr
-			row -= 1
-			board[row][col] = player_chr
-			player[0]['ro'] = row
+			dirindex = randint(0, len(dirlist) - 1) # randomly pick a direction to go
+			direction = dirlist[dirindex]
+			move_piece(direction, beasts, bi, beast_chr, False)
+#}
 
 
+
+def move_player():
+	global player, move, player_chr
+	if move == 'w':
+		move_piece('u', player, 0, player_chr, False)
+	elif move == 'a':
+		move_piece('l', player, 0, player_chr, False)
+	elif move == 's':
+		move_piece('d', player, 0, player_chr, False)
+	elif move == 'd':
+		move_piece('r', player, 0, player_chr, False) 
+
+
+
+
+def player_pull():	
+	global player, move, player_chr 
+	while(move == ' '):
+		move = inkey(1)
+		if (move == 'w'):
+			move_piece('u', player, 0, player_chr, True)
+		elif (move == 'a'):
+			move_piece('l', player, 0, player_chr, True)
+		elif (move == 's'):
+			move_piece('d', player, 0, player_chr, True)
+		elif (move == 'd'): 
+			move_piece('r', player, 0, player_chr, True)
 
 ###################################################################
 ###################################################################
@@ -407,24 +326,26 @@ player = place_pieces(player, 1, player_chr)
 
 
 def takeInput():
-	game = True
-	global move
-	while(game):
+	global debug, move
+	while(True):
 		move = inkey(1)
 		if move == 'q':
 			os.system('clear')
 			exit()
-		elif move == 'p':
-			print_debug()
 		elif move == 'b':
-			break
+			if debug == True:
+				debug = False
+			else:
+				debug = True
+
+		elif move == ' ':
+			player_pull()
 		else:
-			move_player(move)
-	
-	return
+			move_player()
 
 
-#initialize how you want
+
+
 move = 0 
 t = threading.Thread(target=takeInput)
 t.start()
@@ -433,11 +354,7 @@ t.start()
 
 
 
-
-
-game = True
-
-while game:
+while(True):
 	os.system('clear')
 	if move == 'q':
 		exit()
