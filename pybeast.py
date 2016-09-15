@@ -80,7 +80,7 @@ def print_board(): #{
 		print('\r' + left_margin + ''.join(board[rowi]))
 	print('\r' + left_margin + '   SCORE: ' + str(score) + '   LIVES: ' + str(lives) + '    LEVEL: ' + str(level)) 
 	if(debug):
-		print('\nPlayer: ' + str(player) + '\nBeasts: ' + str(beasts) + '\nBSeeds: ' + str(beast_seeds) + '\nBeast Stepper: ' + str(beast_stepper) + '\nBeast Steps: ' + str(beast_steps)) 
+		print('\n\rPlayer: ' + str(player) + '\n\rBeasts: ' + str(beasts) + '\n\rBSeeds: ' + str(beast_seeds) + '\n\rBeast Stepper: ' + str(beast_stepper) + '\n\rBeast Steps: ' + str(beast_steps)) 
 
 
 ###############################################################
@@ -113,7 +113,7 @@ def draw_borders():
 
 
 ###############################################################
-####################################--block_cnt--#################
+####################################--block_cnt--##############
 ###############################################################
 ###############################################################
 
@@ -337,7 +337,6 @@ def takeInput():
 				debug = False
 			else:
 				debug = True
-
 		elif move == ' ':
 			player_pull()
 		else:
