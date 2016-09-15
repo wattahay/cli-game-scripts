@@ -203,7 +203,7 @@ def unlist_piece(index, char):
 
 
 ##############################################################################
-##############################################-- move player --##############
+##############################################-- move players --##############
 ##############################################################################
 
 
@@ -309,18 +309,27 @@ def move_dist_enemies(): #{
 	
 # def move_close_enemies():
 def move_player(direction):
+	pull = False
 	row = 0
 	col = 0
 	fow = 0
 	fol = 0
+	global move
 	global board
 	global player
+	if (direction == ' '):
+		pull = True
+		direction = inkey(1)
 	if (direction == 'a'):   #A - LEFT
 		row = player[0]['ro']
 		col = player[0]['co']
 		fol = col - 1
 		if (board[row][fol] == bakgrd_chr):
-			board[row][col] = bakgrd_chr
+			if pull & (board[row][(col + 1)] == box_chr): # pull block if its there and spacebar was pressed 
+				board[row][col] = box_chr
+				board[row][(col + 1)] = bakgrd_chr
+			else:
+				board[row][col] = bakgrd_chr
 			col -= 1
 			board[row][col] = player_chr
 			player[0]['co'] = col
@@ -329,7 +338,11 @@ def move_player(direction):
 		col = player[0]['co']
 		fol = col + 1
 		if (board[row][fol] == bakgrd_chr):
-			board[row][col] = bakgrd_chr
+			if pull & (board[row][(col - 1)] == box_chr): # pull block if its there and spacebar was pressed
+				board[row][col] = box_chr
+				board[row][(col - 1)] = bakgrd_chr
+			else:
+				board[row][col] = bakgrd_chr
 			col += 1
 			board[row][col] = player_chr
 			player[0]['co'] = col
@@ -338,20 +351,27 @@ def move_player(direction):
 		col = player[0]['co']
 		fow = row + 1
 		if (board[fow][col] == bakgrd_chr):
-			board[row][col] = bakgrd_chr
+			if pull & (board[(row - 1)][col] == box_chr): 
+				board[row][col] = box_chr
+				board[(row - 1)][col] = bakgrd_chr
+			else:
+				board[row][col] = bakgrd_chr
 			row += 1
 			board[row][col] = player_chr
 			player[0]['ro'] = row
-	elif (direction == 'w'): # D - RIGHT
+	elif (direction == 'w'): # D - UP
 		row = player[0]['ro']
 		col = player[0]['co']
 		fow = row - 1
 		if (board[fow][col] == bakgrd_chr):
-			board[row][col] = bakgrd_chr
+			if pull & (board[(row + 1)][col] == box_chr):
+				board[row][col] = box_chr
+				board[(row + 1)][col] = bakgrd_chr
+			else:
+				board[row][col] = bakgrd_chr
 			row -= 1
 			board[row][col] = player_chr
 			player[0]['ro'] = row
-	
 
 
 
