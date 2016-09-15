@@ -29,6 +29,7 @@ level = 1
 score = 0
 
 debug = False
+pause = False
 
 lcd_time = .07	# frame-rate of entire game (CONSTANT)
 beast_steps = int(beast_speed / lcd_time)	# global inter-enemy asyncronicity
@@ -359,6 +360,8 @@ while(True):
 		exit()
 	move_dist_enemies()
 	print_board()
+	if move == 'p':
+		input()
 	if beast_stepper == beast_steps:
 		beast_stepper = 0
 	else:
