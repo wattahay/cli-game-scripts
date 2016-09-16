@@ -1,3 +1,4 @@
+# ubuntu: sudo apt-get install python3 colorama
 from colorama import Fore, Back, Style
 from time import sleep
 import os
