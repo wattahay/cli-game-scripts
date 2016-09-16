@@ -1,3 +1,5 @@
+# This file tests the visuality of the eggs counting down and hatching into monsters
+
 # ubuntu: sudo apt-get install python3 colorama
 from colorama import Fore, Back, Style
 from time import sleep
