@@ -7,7 +7,7 @@ Python(3) script based on the 1984 DOS game, BEAST
 ###################################################
 ############-- For Best Results --#################
 ###################################################
-* xfce4-terminal produces better font styling than gnome-terminal
+* xfce4-terminal produces drastically better font styling than gnome-terminal
 * Use Mono fonts (Ubuntu Mono looks pretty good)
  	* Ubuntu Mono
  	* Liberation Mono
