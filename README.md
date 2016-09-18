@@ -7,9 +7,14 @@ Python(3) script based on the 1984 DOS game, BEAST
 ###################################################
 ############-- For Best Results --#################
 ###################################################
-
+* xfce4-terminal produces better font styling than gnome-terminal
 * Use Mono fonts (Ubuntu Mono looks pretty good)
-* Temporarily change font sizes for bigger players
+ 	* Ubuntu Mono
+ 	* Liberation Mono
+ 	* DeJaVu Sans Mono
+ 	* FreeMono (ok)
+ 	* Tlwg Mono looks . . . interesting
+* Enlargen font sizes for varied results
 * Run in a termainal that can:
 	* change between Mono fonts
 	* change color schemes
