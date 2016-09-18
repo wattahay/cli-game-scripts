@@ -19,8 +19,8 @@ screen_cols = int(ttyCols / 2)#####################-- global settings --#####
 
 ##################################-- tty dynamic board size settings 
 
-max_play_rows = 40	# alter max game height here
-max_play_cols = 70 	# alter max game width here
+max_play_rows = 35	# alter max game height here
+max_play_cols = 35 	# alter max game width here
 max_beast_cnt = 10	# alter max beasts here
 
 ##################################-- starting game statistics
@@ -57,7 +57,7 @@ REGGX = re.compile('\u2B2C.') 	# use re.match(REGGX, char) to see if a piece is 
 
 EGG = 		Fore.WHITE + 	Style.BRIGHT + 	chr(11052) + chr(egg2nd) + Style.RESET_ALL
 BAKGRD = 					'  ' 
-BORDER =	Back.YELLOW + 	Style.NORMAL + 	'  ' + 			Style.RESET_ALL
+BLOCK =	Back.YELLOW + 	Style.NORMAL + 	'  ' + 			Style.RESET_ALL
 BOX = 		Fore.GREEN + 			chr(9618) + chr(9618) + Style.RESET_ALL
 BEAST = 	Fore.RED + 	Style.NORMAL + 	chr(9500) + chr(9508) + Style.RESET_ALL
 MONSTER = 	Fore.RED + 	Style.NORMAL + 	chr(9568) + chr(9571) + Style.RESET_ALL
@@ -74,16 +74,16 @@ MOVES = {
 'DR': {	'di':'DR', 	'ra':1, 	'ca':1}
 }
 
-U = 'U'
-D = 'D'
-L = 'L'
-R = 'R'
-UL = 'UL'
-UR = 'UR'
-DL = 'DL'
-DR = 'DR'
+MVU = 'U'
+MVD = 'D'
+MVL = 'L'
+MVR = 'R'
+MVUL = 'UL'
+MVUR = 'UR'
+MVDL = 'DL'
+MVDR = 'DR'
 
-DIR_LIS = (U, D, L, R, UL, UR, DL, DR)
+DIR_LIS = (MVU, MVD, MVL, MVR, MVUL, MVUR, MVDL, MVDR)
 
 ####################################################################################################
 move = '' ###################################################-- frame-scale globals-- ##############
@@ -181,12 +181,16 @@ def plan_the_board(): #{
 		# this condition tests to see if the board is in the middle range of the fill size
 		# if it is true, then the board should fill the terminal, but have a slim boarder
 		if ((screen_rows <= (max_play_rows + fill_margin)) & (screen_rows > (min_play_rows + fill_margin))):
-			play_rows = int((screen_rows - fill_margin) / 3) * int(3)
+			play_rows = int((screen_rows - fill_margin - stat_rows) / 3) * int(3)
+			if (play_rows > max_play_rows):
+				play_rows = max_play_rows
 			board_rows = play_rows + 2
 			used_rows = play_rows + fill_margin + stat_rows
 			top_margin = int((screen_rows - used_rows) / 2)
 		else: # if the board is either small or huge 
-			play_rows = int((screen_rows - set_margin) / 3) * int(3)
+			play_rows = int((screen_rows - set_margin - stat_rows) / 3) * int(3)
+			if (play_rows > max_play_rows):
+				play_rows = max_play_rows
 			board_rows = play_rows + 2
 			used_rows = board_rows + set_margin + stat_rows
 			top_margin = int((screen_rows - used_rows) / 2)
@@ -194,11 +198,15 @@ def plan_the_board(): #{
 
 		if ((screen_cols <= (max_play_cols + fill_margin)) & (screen_cols > (min_play_cols + fill_margin))):
 			play_cols = int((screen_cols - fill_margin) / 3) * int(3)
+			if (play_cols > max_play_cols):
+				play_cols = max_play_cols
 			board_cols = play_cols + 2
 			used_cols = play_cols + fill_margin
 			left_margin = int((ttyCols - used_cols*2) / 2)
 		else: # if the board is either small or huge 
 			play_cols = int((screen_cols - set_margin) / 3) * int(3)
+			if (play_cols > max_play_cols):
+				play_cols = max_play_cols
 			board_cols = play_rows + 2
 			used_cols = board_cols + set_margin
 			left_margin = int((ttyCols - used_cols*2) / 2)
@@ -221,7 +229,7 @@ def build_the_board(): #{
 	for rowi in range(board_rows): # draws the game boarders on the board
 		for coli in range(board_cols):
 			if(rowi == 0) | (rowi == (board_rows - 1)) | (coli == 0) | (coli == (board_cols - 1)):
-				board[rowi][coli] = BORDER
+				board[rowi][coli] = BLOCK
 
 	
 
@@ -231,25 +239,73 @@ def build_the_board(): #{
 def print_board(): #{
 
 	global ttyCols, top_margin, left_margin, score, lives, level, board_rows, board_cols
+	
+	bottom_margin = top_margin - 3
 
+	#
+	#
+	#
+	#
+	#
+	#
+	#
+	#
+	###########-- Print Top Margin	
 	print('\n'*top_margin)
-	for rowi in range(board_rows):
-		print('\r' + ' '*left_margin + ''.join(board[rowi]))
+	
+					#########################################
+					#					#
+					#	H				#
+	##########-- Print Board	#		H	<>		#
+	for rowi in range(board_rows):	#					#
+		print('\r' + ' '*left_margin + ''.join(board[rowi]))		#
+					#				H	#
+					#					#
+					#	H				#
+					#########################################
+
+	############-- Print Game Stats
 	print('\r' + ' '*left_margin + '   SCORE: ' + str(score) + '   LIVES: ' + str(lives) + '    LEVEL: ' + str(level)) 
+
+	############-- Print Debug Stats
 	if(debug):
 		print('\n\r' + ' '*left_margin + 'Player: ' + str(player) + '\n\rBeasts: ' + str(beasts) + '\n\rBSeeds: '  + '\n\rBeast Stepper: ' + str(beasts[0][stpr]) ) 
+
+	############-- Move Cursor Down
+	print('\n'*bottom_margin + '\r')	
+	#
+	#
+	#
+	#
+	#
+	#
+	#
+	
 
 
 
 ###############################################################
 ####################################--block_cnt--##############
 ###############################################################
+def place_randomly(char, count):
+
+	step = 1	
+
+	while(step < count):
+		row = randint(1, (board_rows - 1))
+		col = randint(1, (board_cols - 1))
+		if(board[row][col] == BAKGRD):
+			board[row][col] = char
+		step += 1	
+
+
+
 
 
 # fills the board with appropriate number of yellow block_cnt
 def place_blocks(): #{
 
-	global play_rows, play_cols
+	global play_rows, play_cols, BLOCK
 
 
 	row_ranges = []
@@ -265,58 +321,29 @@ def place_blocks(): #{
 		rowi = 0
 		coli = 0
 	else:
-		row_loop = int(play_rows / 3)
-		col_loop = int(play_cols / 3)
-		if row_loop < col_loop:
-			step = row_loop - 1
-		else:
-			step = col_loop - 1
+		block_cnt = round(play_rows * play_cols / 90 )
 		
-		for i in range(row_loop):
-			row_ranges.append([i, i + 2])
-
-		for i in range(col_loop):
-			col_ranges.append([i, i + 2])
-
-	
-	while(step >= 0):
-		# 1st, randomly select a row range to use
-		row_range_index = randint(0, step)
-		# 2nd, randomly select a number from that range to be the row index of the block
-		rowi = randint(row_ranges[row_range_index][0], row_ranges[row_range_index][1])
-		# 1st randomly select a col range to use
-		col_range_index = randint(0, step)
-		# 2nd randomly select a number from that range to be the col index of the block
-		coli = randint(col_ranges[col_range_index][0], col_ranges[col_range_index][1])
-		# Finally, set the board place equal to the yellow border color
-		board[rowi][coli] = BORDER
-		step -= 1
-		del col_ranges[col_range_index]
-		del row_ranges[row_range_index]
-		
+		place_randomly(BLOCK, block_cnt)
 				
 #}
 
 def place_boxes():
 	
-	global play_rows, play_cols, classic_board
+	global play_rows, play_cols, classic_board, BOX
 
 	if (classic_board):
 		box_cnt = randint(210,225)
 	else:
 		prerange = int(play_rows * play_cols / 4)
-		lower = prerange + int(prerange / 20)
-		upper = prerange + (int(prerange / 20) * 2)
+		
+		lower = prerange + (int(prerange / 20))
+		
+		upper = prerange + (int(prerange / 20 * 2))
+		
 		box_cnt = randint(lower,upper)
-	
-	step = 1
-	while(step < box_cnt):
-		row = randint(1, (board_rows - 1))
-		col = randint(1, (board_cols - 1))
-		if(board[row][col] == BAKGRD):
-			board[row][col] = BOX
-		step += 1	
-
+	        
+		place_randomly(BOX, box_cnt)	
+			
 
 	
 #############################################################################
@@ -325,7 +352,7 @@ def place_boxes():
 
 
 
-def place_pieces(pieces, count):
+def place_pawns(pieces, count):
 
 	pawn = pieces[0]['chr']
 	step = 0 
@@ -351,8 +378,8 @@ def place_pieces(pieces, count):
 
 
 
-def move_piece(godir, pieces, index):
-	global BAKGRD, BOX, U, L, R, D, UL, UR, DL, DR
+def move_pawns(godir, pieces, index):
+	global BAKGRD, BOX, MVU, MVL, MVR, MVD, MVUL, MVUR, MVDL, MVDR
 	
 	char = pieces[0]['chr']
 
@@ -362,36 +389,36 @@ def move_piece(godir, pieces, index):
 	fol = col
 	rtug = row
 	ctug = col
-	if godir == L: # LEFT
+	if godir == MVL: # LEFT
 		fow = row
 		fol = col - 1
 		rtug = row
 		ctug = col + 1
-	elif (godir == R): # RIGHT
+	elif (godir == MVR): # RIGHT
 		fow = row
 		fol = col + 1
 		rtug = row
 		ctug = col - 1
-	elif (godir == D): # DOWN
+	elif (godir == MVD): # DOWN
 		fow = row + 1
 		fol = col
 		rtug = row - 1
 		ctug = col
-	elif (godir == U): # UP
+	elif (godir == MVU): # UP
 		fow = row - 1
 		fol = col
 		rtug = row + 1
 		ctug = col
-	elif (godir == UL): # D - UP n LEFT
+	elif (godir == MVUL): # D - UP n LEFT
 		fow = row - 1
 		fol = col - 1
-	elif (godir == UR): # D - UP n RIGHT
+	elif (godir == MVUR): # D - UP n RIGHT
 		fow = row - 1
 		fol = col + 1
-	elif (godir == DL): # D - DOWN n LEFT
+	elif (godir == MVDL): # D - DOWN n LEFT
 		fow = row + 1
 		fol = col - 1
-	elif (godir == DR): # D - DOWN n RIGHT
+	elif (godir == MVDR): # D - DOWN n RIGHT
 		fow = row + 1
 		fol = col + 1
 	if (board[fow][fol] == BAKGRD):
@@ -413,39 +440,40 @@ def move_dist_enemies(pieces): #{
 		if pieces[bi]['seed'] == pieces[0]['frame']:
 			dirindex = randint(0, len(DIR_LIS) - 1) # randomly pick a direction to go
 			direction = DIR_LIS[dirindex]
-			move_piece(direction, pieces, bi)
+			move_pawns(direction, pieces, bi)
 #}
 
 
-##################################3
+#
+
+
+
+
+
+#################################3
 ################################################3
 def inkey(key_buffer):###############-- inkey --##########3
 	fd = sys.stdin.fileno()#################################3
 	remember_attributes = termios.tcgetattr(fd)#################3
 	tty.setraw(sys.stdin.fileno())#################################3
 	character = sys.stdin.read(key_buffer)###########################3
-	termios.tcsetattr(fd, termios.TCSADRAIDI, remember_attributes)####3
+	termios.tcsetattr(fd, termios.TCSADRAIN, remember_attributes)####3
 	return character##################################################3
 #########################################################################3
 #####################################################################3
 
-def move_player():	
+def move_player(mv):	
 
-	global player, move, PLAYER
+	global player, MVU, MVL, MVD, MVR
 
-	while (move == ' '):
-		player[1]['tug'] = True
-		move = inkey(1)
-
-
-	if (move == 'w'):
-		move_piece(U, player, 1)
-	elif (move == 'a'):
-		move_piece(L, player, 1)
-	elif (move == 's'):
-		move_piece(D, player, 1)
-	elif (move == 'd'): 
-		move_piece(R, player, 1)
+	if (mv == 'w'):
+		move_pawns(MVU, player, 1)
+	elif (mv == 'a'):
+		move_pawns(MVL, player, 1)
+	elif (mv == 's'):
+		move_pawns(MVD, player, 1)
+	elif (mv == 'd'): 
+		move_pawns(MVR, player, 1)
 
 
 
@@ -483,8 +511,10 @@ def intro():
 			)
 		if (introquestion == 't'):
 			classic = False
+			os.system('clear')
 		elif (introquestion == 'c'):
 			classic = True 
+			os.system('clear')
 		elif (introquestion == 'q'):
 			os.system('clear')
 			exit()
@@ -504,11 +534,11 @@ build_the_board()
 place_blocks()
 place_boxes()
 
-beasts = place_pieces(beasts, beast_cnt)
-monsters = place_pieces(monsters, monster_cnt)
-eggs = place_pieces(eggs, egg_cnt)
+beasts = place_pawns(beasts, beast_cnt)
+monsters = place_pawns(monsters, monster_cnt)
+#eggs = place_pawns(eggs, egg_cnt)
 
-player = place_pieces(player, 1 )
+player = place_pawns(player, 1 )
 
 
 
@@ -517,7 +547,7 @@ player = place_pieces(player, 1 )
 ############################-- the main loop that waits for key presses
 
 def takeInput():
-	global debug, move
+	global debug, move, player
 	while(True):
 		move = inkey(1)
 		if move == 'q':
@@ -529,10 +559,12 @@ def takeInput():
 			else:
 				debug = True
 		elif move == ' ':
-			move_player()
-		else:
-			move_player()
-
+			while (move == ' '):
+				move = inkey(1)
+				player[1]['tug'] = True
+				sleep(lcd_time)
+		move_player(move)
+		sleep(lcd_time)
 
 
 # start the thread that runs the input loop
@@ -550,8 +582,6 @@ while(True):
 	if move == 'q':
 		exit()
 	move_dist_enemies(beasts)
-	move_dist_enemies(monsters)
-	move_dist_enemies(eggs)
 	print_board()
 	if move == 'p':
 		input()
