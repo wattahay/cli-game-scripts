@@ -1,7 +1,6 @@
 # pybeast
 Python(3) script based on the 1984 DOS game, BEAST
 * The game was created in Linux Mint, using xfce4-terminal
-* The only special installation is colorama (sudo apt-get install python3 colorama)
 
 
 ###################################################
