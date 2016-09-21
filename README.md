@@ -19,7 +19,7 @@ Python(3) script based on the 1984 DOS game, BEAST
 	* change between Mono fonts
 	* change color schemes
 	* change font sizes
-* Set max_board_size to smaller than 50 by 50 to prevent screen glitching
+* Set max_board_size to 90 by 90 to prevent screen glitching
 
 
 
@@ -28,14 +28,11 @@ Python(3) script based on the 1984 DOS game, BEAST
 ###################################################
 (The game runs in the terminal)
 
-1. run an update
-	* run: sudo apt-get update
-2. run: sudo apt-get install python3 colorama
-3. download or save the pybeast.py
-4. navigate to the folder of the downloaded file
-5. run: chmod +x pybeast.py
-6. run: python3 pybeast.py
-7. set the board option to 'c' for classic mode or 't' for dynamic terminal sizing
+1. download or save the pybeast.py
+2. navigate to the folder of the downloaded file
+3. run: chmod +x pybeast.py
+4. run: python3 pybeast.py
+5. set the board option to 'c' for classic mode or 't' for dynamic terminal sizing
 
 
 ###################################################
