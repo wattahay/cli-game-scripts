@@ -585,12 +585,12 @@ t.start()
 
 while(True):
 	os.system('clear')
-	if keypress == 'q':
+	if keypress == ord('q'):
 		os.system('reset')
 		exit()
 	move_dist_enemies(beasts)
 	print_board()
-	if keypress == 'p':
+	if keypress == ord('p'):
 		input()
 	if beasts[0]['frame'] == beasts[0]['frames']:
 		beasts[0]['frame'] = 0
