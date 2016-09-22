@@ -1,9 +1,9 @@
+import curses
 from random import randint
-import sys
+#import sys
 import os
 from time import sleep
-import termios
-import tty
+#import tty
 import threading
 import re
 #################################
@@ -18,8 +18,8 @@ screen_cols = int(ttyCols / 2)#####################-- global settings --#####
 
 ##################################-- tty dynamic board size settings 
 
-max_play_rows = 99	# alter max game height here
-max_play_cols = 99 	# alter max game width here
+max_play_rows = 35 	# alter max game height here
+max_play_cols = 65 	# alter max game width here
 max_beast_cnt = 10	# alter max beasts here
 
 ##################################-- starting game statistics
@@ -466,13 +466,14 @@ def move_player(mv):
 
 	global player, MVU, MVL, MVD, MVR
 
-	if (mv == 'o'):
+	if (mv == curses.KEY_UP):
 		move_pawns(MVU, player, 1)
-	elif (mv == 'k'):
+	elif (mv == curses.KEY_LEFT):
 		move_pawns(MVL, player, 1)
-	elif (mv == 'l'):
+	elif (mv == curses.KEY_DOWN):
 		move_pawns(MVD, player, 1)
-	elif (mv == ';'): move_pawns(MVR, player, 1)
+	elif (mv == curses.KEY_RIGHT):
+		move_pawns(MVR, player, 1)
 
 
 
@@ -545,31 +546,33 @@ player = place_pawns(player, 1 )
 
 ############################-- the main loop that waits for key presses
 
+
 def takeInput():
 	global debug, keypress, player
+
+	stdscr = curses.initscr() 
+	curses.cbreak()
+	stdscr.keypad(1)
+	stdscr.refresh()
+
 	while(True):
-		keypress = inkey(1)
-		if keypress == 'q':
+		keypress = stdscr.getch()
+		if keypress == ord('q'):
 			os.system('clear')
 			exit()
-		elif keypress == 'b':
+		elif keypress == ord('b'):
 			if debug == True:
 				debug = False
 			else:
 				debug = True
-		elif keypress == ' ':
-			while (keypress == ' '):
-				player[1]['tug'] = True
-				keypress = inkey(1)
-				if (keypress != ' '):
+		elif keypress == ord(' '):
+			while (keypress == ord(' ')):
+				keypress = stdscr.getch()
+				player[1]['tug'] = not player[1]['tug']
+				if (keypress != ord(' ')):
 					move_player(keypress)
-					player[1]['tug'] = True
-					sleep(lcd_time - .02)
-		else:
-#			player[1]['tug'] = False
+		elif keypress != ord(' '):
 			move_player(keypress)
-			sleep(lcd_time - .02)
-
 
 # start the thread that runs the input loop
 
