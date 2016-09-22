@@ -1,11 +1,10 @@
-from colorama import Fore, Back, Style
 from time import sleep
 import os
 import re
 
 sub = 8329
 brokegg = (chr(65857) + chr(65856))
-monster = Fore.RED + Style.NORMAL + chr(9568) + chr(9571) + Style.RESET_ALL
+monster = '\033[31m' + chr(9568) + chr(9571) + '\33[0m'
 
 reggex = re.compile('\u2B2C.')
 space = ''
