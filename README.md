@@ -13,7 +13,7 @@ Python(3) script based on the 1984 DOS game, BEAST
  	* DeJaVu Sans Mono
  	* FreeMono (ok)
  	* Tlwg Mono looks . . . interesting
-* Enlargen font sizes for varied results
+* Enlarge font sizes for varied results
 * Run in a termainal that can:
 	* change between Mono fonts
 	* change color schemes
