@@ -1,15 +1,14 @@
 import curses
 from random import randint
-#import sys
-import os
+import tty
+from os import system, popen
 from time import sleep
-#import tty
 import threading
 import re
 #################################
 #####-- get tty sizes --#########################
 #############################################################
-ttyRows, ttyCols = os.popen('stty size', 'r').read().split()######
+ttyRows, ttyCols = popen('stty size', 'r').read().split()######
 ttyRows = int(ttyRows)################################################
 ttyCols = int(ttyCols)###################################################
 screen_rows = ttyRows########################################################
@@ -39,6 +38,15 @@ monster_scr = 6		# points for killing monsters
 death_scr = -10		# point loss for dying
 
 ##################################-- game time parameters
+# framerate of the whole game
+# best results between .05 and .08
+# settings may have varied results between terminal and console
+# settings may have varied results with OS screen refresh
+# to check Ubuntu screen refresh in hz (refreshes per second), type 'xrandr' in terminal
+# 1 (second) / 60.02 = ~.01666111... ???? not sure whether it makes a difference.
+lcd_time = .01666111 * 4
+
+###############################
 
 beast_speed = 1.5	# seconds between enemy moves
 monster_speed = 1.5	# seconds between enemy moves
@@ -47,7 +55,7 @@ egg_speed = 4		# seconds between countdowns
 min_incubate = 5	# minimum time before eggs start counting down
 max_incubate = 30	# maximum time before eggs start counting down
 
-lcd_time = .06
+
 		# frame-rate of entire game (CODISTADIT)
 
 ####################################-- pawn move constants
@@ -241,7 +249,7 @@ def print_board(): #{
 
 
 	# Hide the cursor
-	os.system('tput civis')
+	system('tput civis')
 	
 	bottom_margin = top_margin - 3
 
@@ -448,20 +456,6 @@ def move_dist_enemies(pieces): #{
 
 
 
-
-
-#################################3
-################################################3
-def inkey(key_buffer):###############-- inkey --##########3
-	fd = sys.stdin.fileno()#################################3
-	remember_attributes = termios.tcgetattr(fd)#################3
-	tty.setraw(sys.stdin.fileno())#################################3
-	character = sys.stdin.read(key_buffer)###########################3
-	termios.tcsetattr(fd, termios.TCSADRAIN, remember_attributes)####3
-	return character##################################################3
-#########################################################################3
-#####################################################################3
-
 def move_player(mv):	
 
 	global player, MVU, MVL, MVD, MVR
@@ -492,7 +486,7 @@ def intro():
 	introquestion = ''
 	
 	while(introquestion != 't') & (introquestion != 'c'):
-		os.system('clear')
+		system('clear')
 		print('\n'*(int(ttyRows/2) - 10))
 		print('\r' + ' '*introleft + '\u250C' + '\u2500'*(introright - introleft - 1) + '\u2510')
 		print('\r' + ' '*introright + '\u2502'+ '\r' + ' '*introleft + '\u2502' + 'tty rows:' + ' '*11 + str(ttyRows))
@@ -511,12 +505,12 @@ def intro():
 			)
 		if (introquestion == 't'):
 			classic = False
-			os.system('clear')
+			system('clear')
 		elif (introquestion == 'c'):
 			classic = True 
-			os.system('clear')
+			system('clear')
 		elif (introquestion == 'q'):
-			os.system('clear')
+			system('clear')
 			exit()
 
 	return classic
@@ -526,7 +520,7 @@ def intro():
 #####################################################################################################
 
 classic_board = intro()
-os.system('reset')
+system('reset')
 
 plan_the_board()
 build_the_board()
@@ -558,7 +552,7 @@ def takeInput():
 	while(True):
 		keypress = stdscr.getch()
 		if keypress == ord('q'):
-			os.system('clear')
+			system('clear')
 			exit()
 		elif keypress == ord('b'):
 			if debug == True:
@@ -584,9 +578,9 @@ t.start()
 ############################-- the main game clock and print loop
 
 while(True):
-	os.system('clear')
+	system('clear')
 	if keypress == ord('q'):
-		os.system('reset')
+		system('reset')
 		exit()
 	move_dist_enemies(beasts)
 	print_board()
