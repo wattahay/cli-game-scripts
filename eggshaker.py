@@ -1,5 +1,23 @@
 from time import sleep
 from os import system
+
+#######################################################################################
+
+# This file demonstrates how to clear and print characters from their tty location
+# rather than re-printing the entire array of the board every split second
+
+
+# this is about fixing speed and screen glitches in the terminal and console
+
+
+# this method fixes the console issue
+
+#######################################################################################
+
+# the shaker() method shows how the \033[<x>;<y> ANSI sequence allows printing to a specific location on the screen
+# by first moving to that position and printing over it with spaces
+# then moving to the position again and printing over it.
+
 board_rows = 9
 board_cols = 9
 board = []
