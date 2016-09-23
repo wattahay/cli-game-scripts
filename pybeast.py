@@ -561,10 +561,15 @@ def takeInput():
 		elif keypress == ord(' '):
 			while (keypress == ord(' ')):
 				keypress = stdscr.getch()
-				player[1]['tug'] = not player[1]['tug']
+				player[1]['tug'] = True
 				if (keypress != ord(' ')):
-					move_player(keypress)
-		elif keypress != ord(' '):
+					keyspan = keypress
+					while (keyspan == keypress):
+						move_player(keypress)
+						player[1]['tug'] = True
+						keypress = stdscr.getch()				
+		if keypress != ord(' '):
+			player[1]['tug'] = False
 			move_player(keypress)
 
 # start the thread that runs the input loop
