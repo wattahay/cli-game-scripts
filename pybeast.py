@@ -561,10 +561,10 @@ def takeInput():
 		elif keypress == ord(' '):
 			while (keypress == ord(' ')):
 				keypress = stdscr.getch()
-				player[1]['tug'] = True
+				player[1]['tug'] = not player[1]['tug']
 				if (keypress != ord(' ')):
-					keyspan = keypress
-					while (keyspan == keypress):
+					tugspan = keypress # logs the present direction to compare for direction change
+					while (tugspan == keypress): # this ensures the player has pull function until direction key changes.
 						move_player(keypress)
 						player[1]['tug'] = True
 						keypress = stdscr.getch()				
