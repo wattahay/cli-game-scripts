@@ -1,6 +1,5 @@
 import curses
 from random import randint
-import tty
 from os import system, popen
 from time import sleep
 import threading
