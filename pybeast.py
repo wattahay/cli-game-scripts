@@ -235,6 +235,14 @@ def build_the_board(): #{
 			if(rowi == 0) | (rowi == (board_rows - 1)) | (coli == 0) | (coli == (board_cols - 1)):
 				board[rowi][coli] = BLOCK
 
+
+	intro = board
+	roster = board
+	controls = board
+	info = board
+
+	global intro, roster, controls, info
+
 #}
 
 
@@ -242,7 +250,7 @@ def build_the_board(): #{
 
 
 
-def print_board(): #{
+def print_board(board_array, stats): #{
 
 	global ttyCols, top_margin, left_margin, score, lives, level, board_rows, board_cols
 
@@ -260,30 +268,30 @@ def print_board(): #{
 	#     V
 	#     |
 	#     V
-	####-- Print Top Margin	
+	#########-- Print Top Margin	
 	print('\n'*top_margin)
 	
-					#########################################
-					#					#
-	####-- Print Left Margin ->->-> #	H				#
-	####-- Print Board		#		H	<>		#
-	for rowi in range(board_rows):	#					#
-		print('\r' + ' '*left_margin + ''.join(board[rowi]))		#
-					#				H	#
-					#					#
-					#	H				#
-					#########################################
-	####-- Print Game Stats ------>  Score: 200  Lives: 4  Level: 3
-	print('\r' + ' '*left_margin + '   SCORE: ' + str(score) + '   LIVES: ' + str(lives) + '    LEVEL: ' + str(level)) 
+						#########################################
+						#					#
+	#########-- Print Left Margin ->->->->	#	H				#
+	#########-- Print Board			#		H	<>		#
+	for rowi in range(board_rows):		#					#
+		print('\r' + ' '*left_margin + ''.join(board_array[rowi]))		#
+						#				H	#
+						#					#
+						#	H				#
+						#########################################
+	#########-- Print Game Stats -------->  Score: 200  Lives: 4  Level: 3
+	if (stats):
+		print('\r' + ' '*left_margin + '   SCORE: ' + str(score) + '   LIVES: ' + str(lives) + '    LEVEL: ' + str(level)) 
 
-	####-- Print Debug Stats
-	if(debug):
+	########-- Print Debug Stats
+	if (debug):
 		print(
 			'\n\r Player: ' + str(player) +
 			'\n\rBeasts: ' + str(beasts) +
 			'\n\rBeast Stepper: ' + str(beasts[0]['frame'])
 		 ) 
-
 
 	
 
@@ -571,7 +579,6 @@ def takeInput():
 		if keypress != ord(' '):
 			player[1]['tug'] = False
 			move_player(keypress)
-
 # start the thread that runs the input loop
 
 t = threading.Thread(target=takeInput)
@@ -587,7 +594,7 @@ while(True):
 		system('reset')
 		exit()
 	move_dist_enemies(beasts)
-	print_board()
+	print_board(board, True)
 	if keypress == ord('p'):
 		input()
 	if beasts[0]['frame'] == beasts[0]['frames']:
