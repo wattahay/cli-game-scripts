@@ -479,48 +479,23 @@ def move_player(mv):
 
 
 
-######################################################################
-########################-- question user about board-size --##########
-######################################################################
 
+def pause():
 
-
-def intro():
 	global ttyRows, ttyCols, screen_cols
-	introhalf = 13
-	introleft = int((ttyCols/2) - introhalf)
-	introright = int((ttyCols/2) + introhalf)
-	introquestion = ''
-	
-	while(introquestion != 't') & (introquestion != 'c'):
-		system('clear')
-		print('\n'*(int(ttyRows/2) - 10))
-		print('\r' + ' '*introleft + '\u250C' + '\u2500'*(introright - introleft - 1) + '\u2510')
-		print('\r' + ' '*introright + '\u2502'+ '\r' + ' '*introleft + '\u2502' + 'tty rows:' + ' '*11 + str(ttyRows))
-		print('\r'+ ' '*introright + '\u2502' + '\r' + ' '*introleft + '\u2502' + 'tty columns:' + ' '*8 + str(ttyCols))
-		print('\r'+ ' '*introright + '\u2502' + '\r' + ' '*introleft + '\u2502' + 'game columns:' + ' '*7 + str(screen_cols))
-		print('\r'+ ' '*introleft + '\u2514' + '\u2500'*(introright - introleft - 1) + '\u2518')
-		print('\n'*4)
-	
-		introquestion = input(
-			' '*(introleft - 7)
-			+ 'Enter \'t\' to play a terminal-size board.\n\n\r' 
-			+ ' '*(introleft - 7)
-			+ 'Enter \'c\' to play a classic sized board. . . '
-			+ '\n\n\r' 
-			+ ' '*int(ttyCols/2)
-			)
-		if (introquestion == 't'):
-			classic = False
-			system('clear')
-		elif (introquestion == 'c'):
-			classic = True 
-			system('clear')
-		elif (introquestion == 'q'):
-			system('clear')
-			exit()
 
-	return classic
+	pauseleft = (int(ttyCols/2) - 8)
+	pausetop = (int(ttyRows/2) - 4) - (int(board_rows / 4))
+	
+	print('\033[' + str(pausetop) + ';' + str(pauseleft) + 'H' + ' '*16)
+	print('\033[' + str(pausetop + 1) + ';' + str(pauseleft) + 'H' + ' ' + chr(9556) + chr(9552)*12 + chr(9559) + ' ')
+	print('\033[' + str(pausetop + 2) + ';' + str(pauseleft) + 'H' + ' ' + chr(9553) + '            ' + chr(9553) + ' ')
+	print('\033[' + str(pausetop + 3) + ';' + str(pauseleft) + 'H' + ' ' + chr(9553) + '   PAUSED   ' + chr(9553) + ' ')
+	print('\033[' + str(pausetop + 4) + ';' + str(pauseleft) + 'H' + ' ' + chr(9553) + '            ' + chr(9553) + ' ')
+	print('\033[' + str(pausetop + 5) + ';' + str(pauseleft) + 'H' + ' ' + chr(9562) + chr(9552)*12 + chr(9565) + ' ')
+	print('\033[' + str(pausetop + 6) + ';' + str(pauseleft) + 'H' + ' '*16)
+
+
 
 #####################################################################################################
 #######################################################-- main function calls -######################
@@ -588,24 +563,26 @@ t.start()
 
 ############################-- the main game clock and print loop
 
+
 while(True):
-	system('clear')
 	if keypress == ord('q'):
 		system('reset')
 		exit()
-	move_dist_enemies(beasts)
-	print_board(board, True)
-	if keypress == ord('p'):
-		input()
-	if beasts[0]['frame'] == beasts[0]['frames']:
-		beasts[0]['frame'] = 0
+	elif keypress == ord('p'):
+		pause()
+		while(keypress == ord('p')):
+			sleep(.5)
+		game_pause = 0
 	else:
-		beasts[0]['frame'] += 1
-	if monsters[0]['frame'] == monsters[0]['frames']:
-		monsters[0]['frame'] = 0
-	else:
-		monsters[0]['frame'] += 1
+		system('clear')
+		if beasts[0]['frame'] == beasts[0]['frames']:
+			beasts[0]['frame'] = 0
+		else:
+			beasts[0]['frame'] += 1
+		if monsters[0]['frame'] == monsters[0]['frames']:
+			monsters[0]['frame'] = 0
+		else:
+			monsters[0]['frame'] += 1
+		move_dist_enemies(beasts)
+		print_board(board, True)
 	sleep(lcd_time)
-
-
-	######################
