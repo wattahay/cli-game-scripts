@@ -772,6 +772,9 @@ def takeInput():
 		if keypress == ord('q'):
 			system('clear')
 			exit()
+		elif keypress == ord('p'):
+			keypress = stdscr.getch()
+			keypress = ' '						 
 		elif keypress == ord('b'):
 			if debug == True:
 				debug = False
