@@ -106,6 +106,7 @@ REGGX = re.compile('\u2B2C.') 	# use re.match(REGGX, char) to see if a piece is 
 # (ANSI styles)	 FG   + 	BG   + 		Style +		Characters +			Reset
 BAKGRD = 							'  ' 
 BLOCK =		       		'\033[43m' +         		'  ' + 				'\033[0m'
+KILLBLOCK = 			'\033[43m' +	'\033[1m' +	'  ' + 				'\033[0m'
 BOX = 		'\033[32m' +					chr(9618) + chr(9618) +		'\033[0m'
 EGG = 		'\033[37m' +					chr(11052) + chr(egg2nd) + 	'\033[0m'
 BEAST = 	'\033[31m' +					chr(9500) + chr(9508) +		'\033[0m'
@@ -195,6 +196,9 @@ min_play_cols = 9
 board_rows = play_rows + 2
 board_cols = play_cols + 2
 debug = False
+
+
+
 
 def plan_the_board(): #{
 
@@ -452,12 +456,14 @@ def start_level():
 
 
 def game_intro():
+
 	global intro, roster, controls, info
 
 
 
 
 def win_level():
+
 	global score, points, level, beasts, monsters, eggs, player, beast_cnt, monster_cnt, egg_cnt
 	
 	score += points
@@ -469,6 +475,7 @@ def win_level():
 
 
 def lose_level():
+
 	global score, points, level, beasts, monsters, eggs, player, beast_cnt, monster_cnt, egg_cnt
 	
 	score += points
@@ -511,46 +518,37 @@ def move_enemies(pawns): #{
 
 	move_priority = []
 			
-	for plyri in range(1, len(pawns)): 	# in a given frame, loops through all pawns in a list
+	for pwni in range(1, len(pawns)): 	# in a given frame, loops through all pawns in a list
 						# if the pawn is staggered to move in the present frame,
 						# the pawn moves to a space
-		if (pawns[plyri][STG] == pawns[0]['frame']):
-			rdistance = player[1][RO] - pawns[plyri][RO]
-			cdistance = player[1][CO] - pawns[plyri][CO]
+		if (pawns[pwni][STG] == pawns[0]['frame']):
+			rdistance = player[1][RO] - pawns[pwni][RO]
+			cdistance = player[1][CO] - pawns[pwni][CO]
 	
 			distance_ratio = rdistance / cdistance
-
 			if ((rdistance > 0) & (cdistance < 0) & (distance_ratio < -.5) & (distance_ratio > -2)):
-				#DL stuff
-				move_priority = ( MVDL, MVD, MVL, MVUL, MVDR, MVU, MVR, MVUR )
+				move_priority = ( MVDL, MVD, MVL, MVUL, MVDR, MVU, MVR, MVUR ) # DOWN LEFT range priorities
 			elif ((rdistance > 0) & (cdistance > 0) & (distance_ratio > .5) & (distance_ratio < -2)):
-				#DR stuff
-				move_priority = ( MVDR, MVD, MVR, MVDL, MVUR, MVU, MVL, MVUL )
+				move_priority = ( MVDR, MVD, MVR, MVDL, MVUR, MVU, MVL, MVUL ) # DOWN RIGHT range priorities
 			elif ((rdistance < 0) & (cdistance > 0) & (distance_ratio < -.5) & (distance_ratio > -2)):
-				#UR stuff
-				move_priority = ( MVUR, MVU, MVR, MVUL, MVDR, MVL, MVDL, MVD )
+				move_priority = ( MVUR, MVU, MVR, MVUL, MVDR, MVL, MVDL, MVD ) # UPPER RIGHT range priorities
 			elif ((rdistance < 0) & (cdistance < 0) & (distance_ratio > -.5) & (distance_ratio < 2)):
-				#UL stuff
-				move_priority = ( MVUL, MVU, MVL, MVDL, MVUR, MVD, MVR, MVDR )
+				move_priority = ( MVUL, MVU, MVL, MVDL, MVUR, MVD, MVR, MVDR ) # UPPER LEFT range priorities
 			elif ((rdistance < 0) & ((abs(distance_ratio) > 2) | (distance_ratio == 0))):
-				#U stuff
-				move_priority = ( MVU, MVUL, MVUR, MVL, MVR, MVDL, MVDR, MVD )
+				move_priority = ( MVU, MVUL, MVUR, MVL, MVR, MVDL, MVDR, MVD ) # UPWARD range priorities
 			elif ((rdistance > 0) & ((abs(distance_ratio) >= 2) | (distance_ratio == 0))):
-				#D stuff
-				move_priority = ( MVD, MVDL, MVDR, MVL, MVR, MVUL, MVUR, MVU )
+				move_priority = ( MVD, MVDL, MVDR, MVL, MVR, MVUL, MVUR, MVU ) # DOWNWARD range priorities
 			elif ((cdistance > 0) & ((abs(distance_ratio) <= .5) | (distance_ratio == 0))):
-				#R stuff
-				move_priority = ( MVR, MVUR, MVDR, MVU, MVD, MVUL, MVDL, MVL )
+				move_priority = ( MVR, MVUR, MVDR, MVU, MVD, MVUL, MVDL, MVL ) # RIGHT range priorities
 			elif ((cdistance < 0) & ((abs(distance_ratio) < .5) | (distance_ratio == 0))):
-				#L stuff
-				move_priority = ( MVL, MVUL, MVDL, MVU, MVD, MVUR, MVDR, MVR )
+				move_priority = ( MVL, MVUL, MVDL, MVU, MVD, MVUR, MVDR, MVR ) # LEFT range priorities
 
-			priorities(		#247
-				(74, True),	#174		**********************************************
-				(15, True),	#27 or 54	* These values determine the odds of moves   *
-				(15, True),	#27 or 54	* for an enemy if those moves are available. *
-				(4, True),	#7 or 14	* If a move has an equivalent priority to    *
-				(4, True),	#7 or 14	* another, but it is a box, then its odds    *
+			priority_odds(		#199
+				(150, True),	#150		**********************************************
+				(18, True),	#18 or 36	* These values determine the odds of moves   *
+				(18, True),	#18 or 36	* for an enemy if those moves are available. *
+				(4, True),	#4 or 8		* If a move has an equivalent priority to    *
+				(4, True),	#4 or 8		* another, but it is a box, then its odds    *
 				(1, True),	#2 or 4		* are absorbed by the other.		     *
 				(1, True),	#2 or 4		* DO NOT CHANGE NUMBER OF PRIORITIES!!!!!!!  *	
 				(1, True)	#1		**********************************************
@@ -558,35 +556,34 @@ def move_enemies(pawns): #{
 
 			likely_move = ''
 
-
-			for priopti in range(len(move_priority) - 1):
-				if (board[][] == PLAYER): # if the first priority move is a box, then remove that move from the list
+			for priopti in range(len(move_priority) - 1): 
+				# if the first priority move is the player, then take that move
+				if (board[pawns[pwni][RO] + MOVES[move_priority[0]][ 'ra' ]][pawns[pwni][CO] + MOVES[move_priority[0]][ 'ca' ]] == PLAYER):
 					pawns[plyr][MV] = move_priority[priopti]
 					pawns[plyr][RO] = player[1][RO]
 					pawns[plyr][CO] = player[1][CO]
+					kill_player()
 					board[pawns[plyr][RO]][pawns[plyr][CO]] = pawns[0]['chr']
-					# kill_player()
 				#elif ((player == BEAST) & (board[][] == MONSTER)) | ((player == MONSTER) & ((board[][] == MONSTER) | (board[][] == BEAST))):
 					#lay_egg()
-				elif (board[][] != BAKGRD):
-					priorities[pri][1] = False
-
-
+				# else if the first priority move is not available, then mark it as unavailable
+				elif (board[pawns[pwni][RO] + MOVES[move_priority[0]][ 'ra' ]][pawns[pwni][CO] + MOVES[move_priority[0]][ 'ca' ]] != BAKGRD):
+					priority_odds[priopti][1] = False
 				
-			for prioddi in range(len(priorities) - 1): # loop through priorities to add them to likely_moves if available
-				if (priorities[prioddi][1])): # if it is true that the priority move is a blank space, then loop through and fill out the likely_moves list
-					for i in range(priorities[prioddi][0]): # loop through by number in "priorities" loop, to fill out likely_moves list
-						if ((prioddi % 2) == 0) & (prioddi != 0) & (not priorities[prioddi - 1])):
+			for prioddi in range(len(priority_odds) - 1): # loop through priorities to add them to likely_moves if available
+				if (priority_odds[prioddi][1])): # if it is true that the priority move is a blank space, then loop through and fill out the likely_moves list
+					for i in range(priority_odds[prioddi][0]): # loop through by number in "priorities" loop, to fill out likely_moves list
+						if ((prioddi % 2) == 0) & (prioddi != 0) & (not priority_odds[prioddi - 1])):
 						# if the even priority is the only available move for that priority, then double the even priority
-							for i in range(priorities[prioddi][0]):
+							for i in range(priority_odds[prioddi][0]):
  								likely_move.append(move_priorites(prioddi))
 						if ((prioddi % 2) == 1) & (prioddi != 7) & (not priorities[prioddi + 1])):
 						# if the odd priority is the only available move for that priority, then double the odd priority
 							for i in range(priorities[prioddi][0]):
-								likely_move.append(move_priorites(prioddi))
+								likely_move.append(move_priority(prioddi))
 						else:
 						# otherwise, add the even or odd move the normal amount for its singular availability
-							likely_move.append(move_priorities(prioddi) 
+							likely_move.append(move_priority(prioddi))
 
 			# we have calculated 
 			pawns[plyr][MV] = likely_move(randint(0, len(likely_move - 1))
@@ -595,8 +592,14 @@ def move_enemies(pawns): #{
 
 #}
 
-def box_push(push_eggs):
 
+
+	
+
+def box_push(push_eggs, explode):
+
+	# if explode = True
+		# if leading space is an egg
 
 def push_tree():
 
@@ -608,9 +611,11 @@ def push_tree():
 	push_eggs = []	
 	probe_row = 0
 	probe_col = 0
+	explode = False
 
 	while (loop):
 		# if space is a bakgrd
+		
 			# make board space same as preceeding space
 			# make player fol and fow the player
 			# move_player()
@@ -621,9 +626,16 @@ def push_tree():
 		# if space is a border
 			# exit loop (loop = False)
 			# clear push_eggs list
+		# if space is a killblock
+			# delete any leading egg from push_eggs AND eggs list
+			# increment all other eggs in push_eggs
+			# move_player()
+			# make old player space a bakgrd
+			# 
 		# if space is a egg
 			# if next block after egg is a border
 				# del egg from global egg list
+				# add egg kill points to level points
 				# make space same as preceeding space
 				# move_player()
 				# increment all push_eggs
@@ -634,6 +646,7 @@ def push_tree():
 		# if space is a beast
 			# if the next block after the beast is a box or border
 				# delete beast from list
+				# add beast level kill points
 				# make board space same as preceeding space
 				# make player fol and fow the player
 				# move_player()
@@ -642,11 +655,12 @@ def push_tree():
 		# if space is a monster	
 			# if the next block is a border
 				# delete monster from list
+				# add monster level kill points
 				# make board space same as preceeding space
 				# make board space for player fol and fow the player
 				# move_player()
 				# increment all push_eggs
-				# 
+				#  
 
 
 
@@ -730,6 +744,7 @@ def intro():
 	return classic
 
 
+
 def pause():
 
 	global ttyRows, ttyCols, screen_cols
@@ -745,6 +760,8 @@ def pause():
 	print('\033[' + str(pausetop + 5) + ';' + str(pauseleft) + 'H' + ' ' + chr(9562) + chr(9552)*12 + chr(9565) + ' ')
 	print('\033[' + str(pausetop + 6) + ';' + str(pauseleft) + 'H' + ' '*16)
 
+	system('play -q audio/pause.ogg')
+
 #####################################################################################################
 #######################################################-- main function calls -######################
 #####################################################################################################
@@ -753,7 +770,19 @@ classic_board = intro()
 system('reset')
 
 plan_the_board()
-start_level()
+build_the_board()
+
+place_blocks()
+place_boxes()
+
+beasts = place_pawns(beasts, beast_cnt)
+monsters = place_pawns(monsters, monster_cnt)
+#eggs = place_pawns(eggs, egg_cnt)
+
+player = place_pawns(player, 1 )
+
+
+
 #####################################################-- main loop threads --#########################
 
 ############################-- the main loop that waits for key presses
@@ -774,7 +803,7 @@ def takeInput():
 			exit()
 		elif keypress == ord('p'):
 			keypress = stdscr.getch()
-			keypress = ' '						 
+			keypress = ''
 		elif keypress == ord('b'):
 			if debug == True:
 				debug = False
@@ -787,21 +816,20 @@ def takeInput():
 				if (keypress != ord(' ')):
 					tugspan = keypress # logs the present direction to compare for direction change
 					while (tugspan == keypress): # this ensures the player has pull function until direction key changes.
-						player_move(keypress)
+						move_player(keypress)
 						player[1]['tug'] = True
 						keypress = stdscr.getch()				
 		if keypress != ord(' '):
 			player[1]['tug'] = False
-			player_move(keypress)
-
+			move_player(keypress)
 # start the thread that runs the input loop
 
-t = threading.Thread(target=takeInput)
-t.start()
+threading.Thread(target=takeInput).start()
 
 
 
 ############################-- the main game clock and print loop
+
 
 while(True):
 	if keypress == ord('q'):
@@ -810,8 +838,7 @@ while(True):
 	elif keypress == ord('p'):
 		pause()
 		while(keypress == ord('p')):
-			sleep(.5)
-		game_pause = 0
+			sleep(.05)
 	else:
 		system('clear')
 		if beasts[0]['frame'] == beasts[0]['frames']:
