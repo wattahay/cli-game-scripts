@@ -47,7 +47,7 @@ lcd_time = .01666111 * 4
 
 ###############################
 
-beast_speed = 2.5	# seconds between enemy moves
+beast_speed = 1.0	# seconds between enemy moves
 monster_speed = 1.0	# seconds between enemy moves
 egg_speed = 4		# seconds between countdowns
 
@@ -729,9 +729,8 @@ build_the_board()
 place_blocks(BLOCK)
 place_boxes()
 
-monsters = place_pawns(monsters, monster_cnt)
-#beasts = place_pawns(beasts, beast_cnt)
-beasts = place_pawns(beasts, 1)
+#monsters = place_pawns(monsters, monster_cnt)
+beasts = place_pawns(beasts, beast_cnt)
 #eggs = place_pawns(eggs, egg_cnt)
 
 player = place_pawns(player, 1 )

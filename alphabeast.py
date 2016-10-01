@@ -22,7 +22,7 @@ max_beast_cnt = 10	# alter max beasts here
 
 ##################################-- starting game statistics
 
-beast_cnt = 4 		# starting beasts
+beast_cnt = 4 		# starting beasts	
 lives = 5		# starting lives
 
 squish_boxes = False	# boxes shuv into nothing against blocks
@@ -47,8 +47,8 @@ lcd_time = .01666111 * 4
 
 ###############################
 
-beast_speed = 1.5	# seconds between enemy moves
-monster_speed = 1.5	# seconds between enemy moves
+beast_speed = 1.0	# seconds between enemy moves
+monster_speed = 1.0	# seconds between enemy moves
 egg_speed = 4		# seconds between countdowns
 
 min_incubate = 5	# minimum time before eggs start counting down
@@ -58,31 +58,17 @@ max_incubate = 30	# maximum time before eggs start counting down
 		# frame-rate of entire game (CODISTADIT)
 
 ####################################-- pawn move constants
-# di - direction
-# ra - row adjustment
-# ca - column adjustment
-# mm - move multiplier for converting absolute values
-# tr - tug row adder if the palyer is moving that direction
-# tc - tug col adder if the player is moving that direction
-
 
 MOVES = {
-'U': {	'di':'U', 	'ra':-1, 	'ca':0, 	'tr':1,		'tc':0,		'mm':-1},
-'D': {	'di':'D', 	'ra':1, 	'ca':0, 	'tr':-1,	'tc':0,		'mm':1},
-'L': {	'di':'L', 	'ra':0, 	'ca':-1, 	'tr':0,		'tc':1,		'mm':-1},
-'R': {	'di':'R',	'ra':0, 	'ca':1, 	'tr':0,		'tc':-1,	'mm':1},
+'U': {	'di':'U', 	'ra':-1, 	'ca':0, 	'mm':-1},
+'D': {	'di':'D', 	'ra':1, 	'ca':0, 	'mm':1},
+'L': {	'di':'L', 	'ra':0, 	'ca':-1, 	'mm':-1},
+'R': {	'di':'R',	'ra':0, 	'ca':1, 	'mm':1},
 'UL': {	'di':'UL',	'ra':-1, 	'ca':-1},
 'UR': {	'di':'UR', 	'ra':-1, 	'ca':1},
 'DL': {	'di':'DL', 	'ra':1, 	'ca':-1},
 'DR': {	'di':'DR', 	'ra':1, 	'ca':1}
 }
-
-RA = 'ra'
-CA = 'ca'
-TR = 'tr'
-TC = 'tc'
-MM = 'mm'
-DI = 'di'
 
 MVU = 'U'
 MVD = 'D'
@@ -105,8 +91,8 @@ REGGX = re.compile('\u2B2C.') 	# use re.match(REGGX, char) to see if a piece is 
 
 # (ANSI styles)	 FG   + 	BG   + 		Style +		Characters +			Reset
 BAKGRD = 							'  ' 
-BLOCK =		       		'\033[43m' +         		'  ' + 				'\033[0m'
-KILLBLOCK = 			'\033[43m' +	'\033[1m' +	'  ' + 				'\033[0m'
+BLOCK =		       		'\033[43m' +	       		'  ' + 				'\033[0m'
+KILLBLOCK = 	'\033[31m'	'\033[43m' + 			chr(9618) + chr(9618) + 	'\033[0m'
 BOX = 		'\033[32m' +					chr(9618) + chr(9618) +		'\033[0m'
 EGG = 		'\033[37m' +					chr(11052) + chr(egg2nd) + 	'\033[0m'
 BEAST = 	'\033[31m' +					chr(9500) + chr(9508) +		'\033[0m'
@@ -119,31 +105,22 @@ PLAYER = 	'\033[34m' +					chr(9664) + chr(9654) +		'\033[0m'
 
 # pawn lists dynamically grows and shrink with 
 
-RO = 'ro'
-CO = 'co'
-FOW = 'fow'
-FOL = 'fol'
-STG = 'stag'
-MV = 'mv'
-PSH = 'push'
-TUG = 'tug'
-
 beasts = [{
-	'chr': BEAST, 
+	'frames': ((int(beast_speed / lcd_time)) - 1),
 	'frame':0,
-	'frames': ((int(beast_speed / lcd_time)) - 1)
+	'chr': BEAST 
 	}]
 
 monsters = [{
-	'chr': MONSTER, 
+	'frames': ((int(beast_speed / lcd_time)) - 1),
 	'frame':0,
-	'frames': ((int(beast_speed / lcd_time)) - 1)
+	'chr': MONSTER
 	}]
 
 eggs = [{
-	'chr': EGG, 
+	'frames': ((int(beast_speed / lcd_time)) - 1),
 	'frame':0,
-	'frames': ((int(beast_speed / lcd_time)) - 1)
+	'chr': EGG
 	}]
 
 # 'sub'		updated digital unicode reference to subscript character
@@ -172,7 +149,11 @@ level = 1	# change in order to start on a specific level
 score = 0	# in-game total score
 points = 0	# in-game level points added at end of level
 
-game_pause = 0
+
+
+
+stop_take_input = False
+
 
 ################################################################################################
 board = [] #########################################################-- board setup --###########
@@ -196,9 +177,6 @@ min_play_cols = 9
 board_rows = play_rows + 2
 board_cols = play_cols + 2
 debug = False
-
-
-
 
 def plan_the_board(): #{
 
@@ -265,12 +243,13 @@ def build_the_board(): #{
 				board[rowi][coli] = BLOCK
 
 
-	#intro = board
-	#roster = board
-	#controls = board
-	#info = board
+#	intro = board
+#	roster = board
+#	controls = board
+#	info = board
+#
+#	global intro, roster, controls, info
 
-	#global intro, roster, controls, info
 #}
 
 
@@ -286,7 +265,6 @@ def print_board(board_array, stats): #{
 	# Hide the cursor
 	system('tput civis')
 	
-	bottom_margin = top_margin - 3
 
 	#     |
 	#     V
@@ -315,12 +293,11 @@ def print_board(board_array, stats): #{
 
 	########-- Print Debug Stats
 	if (debug):
-		print(
-			'\n\r Player: ' + str(player) +
-			'\n\rBeasts: ' + str(beasts) +
-			'\n\rBeast Stepper: ' + str(beasts[0]['frame'])
-		 ) 
-	#}
+		print('\rPlayer: ' + str(player) + '\n')
+		print('\rBeasts: ' + str(beasts[0]))
+		for i in range(1, len(beasts)):
+			print('\r\tBeast ' + str(i) + ' :' + str(beasts[i]))
+		 
 
 	
 
@@ -345,9 +322,9 @@ def place_randomly(char, count):
 
 
 # fills the board with appropriate number of yellow block_cnt
-def place_blocks(): #{
+def place_blocks(blocks): #{
 
-	global play_rows, play_cols, BLOCK
+	global play_rows, play_cols
 
 	row_ranges = []
 	col_ranges = []
@@ -366,13 +343,13 @@ def place_blocks(): #{
 			rowi = randint(row_ranges[row_range_index][0], row_ranges[row_range_index][1])
 			col_range_index = randint(0, step)
 			coli = randint(col_ranges[col_range_index][0], col_ranges[col_range_index][1])
-			board[rowi][coli] = BLOCK
+			board[rowi][coli] = blocks
 			step -= 1
 			del col_ranges[col_range_index]
 			del row_ranges[row_range_index]
 	else:
 		block_cnt = round(play_rows * play_cols / 90 )
-		place_randomly(BLOCK, block_cnt)
+		place_randomly(blocks, block_cnt)
 				
 #}
 
@@ -383,9 +360,9 @@ def place_boxes():
 	if (classic_board):
 		box_cnt = randint(210,225)
 	else:
-		prerange = int(play_rows * play_cols / 4)
-		lower = prerange + (int(prerange / 20))
-		upper = prerange + (int(prerange / 20 * 2))
+		prerange = int(play_rows * play_cols / 6)
+		lower = prerange - (int(prerange * .05))
+		upper = prerange + (int(prerange * .05))
 		box_cnt = randint(lower,upper)
 	place_randomly(BOX, box_cnt)
 			
@@ -397,209 +374,202 @@ def place_boxes():
 
 
 
-def place_pawns(pieces, count):
+def place_pawns(pawns, count):
 
-	pawn = pieces[0]['chr']
+	pawn = pawns[0]['chr']
 	step = 0 
 	while(step < count):
 		row = randint(1, (board_rows - 1))
 		col = randint(1, (board_cols - 1))
 		if(board[row][col] == BAKGRD):
 			board[row][col] = pawn 
-			pieces.append({'ro':row, 'co':col, 'tug':False, 'stag':0})
-			if (pawn != PLAYER):
-				pieces[step]['stag'] = randint(1, (pieces[0]['frames']))
+			pawns.append({'ro':row, 'co':col, 'tug':False, 'stg':0 })
 			step += 1
+			if (pawn != PLAYER):
+				pawns[step]['stg'] = randint(1, (pawns[0]['frames']))
 
-	return pieces
-	
-
-##############################################################################
-##############################################-- move pieces --##############
-##############################################################################
-def start_level():
-
-	global beasts, monsters, eggs, player, board
-
-	build_the_board()
-	sleep(.3)
-	print_board(board, False)
-	place_blocks()
-	sleep(.3)
-	system('clear')
-	print_board(board, False)
-	place_boxes()
-	sleep(.3)
-	system('clear')
-	print_board(board, False)
-	sleep(.3)
-	beasts = place_pawns(beasts, beast_cnt)
-	sleep(.3)
-	system('clear')
-	print_board(board, False)
-	monsters = place_pawns(monsters, monster_cnt)
-	sleep(.3)
-	system('clear')
-	print_board(board, False)
-	eggs = place_pawns(eggs, egg_cnt)
-	sleep(.3)
-	system('clear')
-	print_board(board, False)
-	player = place_pawns(player, 1 )
-	sleep(.3)
-	system('clear')
-	print_board(board, True)
-	sleep(.3)
+	return pawns
 	
 
 
 
-
-def game_intro():
-
-	global intro, roster, controls, info
-
-
-
-
-def win_level():
-
-	global score, points, level, beasts, monsters, eggs, player, beast_cnt, monster_cnt, egg_cnt
-	
-	score += points
-	points = 0
-	level += 1
-
-
-
-
-
-def lose_level():
-
-	global score, points, level, beasts, monsters, eggs, player, beast_cnt, monster_cnt, egg_cnt
-	
-	score += points
-	points = 0
-	level -= 1
-	if (level == 0):
-		game_intro()
-	else:
-		start_level()
-
-
-
-
-##############################################################################
-##############################################-- move pieces --##############
-##############################################################################
 
 
 def kill_player():
 
-	global board, player, lives, score, points
+	global lives, board, stop_take_input
+
+#	stop_take_input = True
+#
+#	tele1 = '\033[0m\033[37m' + chr(9664) + chr(9654) + '\033[0m' 
+#	tele2 = '\033[1m\033[37m' + chr(9664) + chr(9654) + '\033[0m'
+#	tele3 = '\033[0m\033[37m' + chr(9666) + chr(9656) + '\033[0m'
+#	tele4 = '\033[0m\033[37m' + chr(9668) + chr(9658) + '\033[0m'
+#	tele5 = PLAYER
 
 	lives -= 1
-	points += death_scr
-	board[player[1][RO]][player[1][CO]] = BAKGRD
+	del player[1]
+	place_pawns(player, 1)
 	
-	if (lives == 0):
-		lose_level() 
-	else:
-		del player[1]
-		place_pawns(player)
+	def audio_kill():
+		system('play -q audio/loss2.ogg')
+	
+	threading.Thread(target=audio_kill).start()
 
-
-def move_player():
-
+#	row = player[1]['ro']
+#	col = player[1]['co']
+#	###############################################
+#	for i in range(3):
+#		sleep(lcd_time)
+#		board[row][col] = tele1
+#		system('clear')
+#		print_board(board, True)
+#		sleep(lcd_time) 
+#		board[row][col] = tele2
+#		system('clear')
+#		print_board(board, True)
+#		sleep(lcd_time) 
+#		board[row][col] = tele3
+#		system('clear')
+#		print_board(board, True)
+#		sleep(lcd_time) 
+#		board[row][col] = tele4
+#		system('clear')
+#		print_board(board, True)
+#		sleep(lcd_time) 
+#		board[row][col] = tele3
+#		system('clear')
+#		print_board(board, True)
+#		sleep(lcd_time) 
+#		board[row][col] = tele2
+#		system('clear')
+#		print_board(board, True)
+#		sleep(lcd_time) 
+#		board[row][col] = tele1
+#		system('clear')
+#		print_board(board, True)
+#		sleep(lcd_time) 
+#	board[row][col] = tele5
+#	sleep(.4)
+#	system('clear')
+#	print_board(board, True)
+#	system('clear')
+#
+#	# re start the input thread to take keyboard input
+#	threading.Thread(target=take_input).start()
+	###############################################
 
 
 def move_enemies(pawns): #{
 
-	global board, player, MVU, MVL, MVD, MVR, MVUL, MVUR, MVDL, MVDR
+	global board, player, MVU, MVL, MVD, MVR, MVUL, MVUR, MVDL, MVDR, MOVES
 
 	move_priority = []
-			
-	for pwni in range(1, len(pawns)): 	# in a given frame, loops through all pawns in a list
-						# if the pawn is staggered to move in the present frame,
-						# the pawn moves to a space
-		if (pawns[pwni][STG] == pawns[0]['frame']):
-			rdistance = player[1][RO] - pawns[pwni][RO]
-			cdistance = player[1][CO] - pawns[pwni][CO]
-	
-			distance_ratio = rdistance / cdistance
-			if ((rdistance > 0) & (cdistance < 0) & (distance_ratio < -.5) & (distance_ratio > -2)):
-				move_priority = ( MVDL, MVD, MVL, MVUL, MVDR, MVU, MVR, MVUR ) # DOWN LEFT range priorities
-			elif ((rdistance > 0) & (cdistance > 0) & (distance_ratio > .5) & (distance_ratio < -2)):
-				move_priority = ( MVDR, MVD, MVR, MVDL, MVUR, MVU, MVL, MVUL ) # DOWN RIGHT range priorities
-			elif ((rdistance < 0) & (cdistance > 0) & (distance_ratio < -.5) & (distance_ratio > -2)):
-				move_priority = ( MVUR, MVU, MVR, MVUL, MVDR, MVL, MVDL, MVD ) # UPPER RIGHT range priorities
-			elif ((rdistance < 0) & (cdistance < 0) & (distance_ratio > -.5) & (distance_ratio < 2)):
-				move_priority = ( MVUL, MVU, MVL, MVDL, MVUR, MVD, MVR, MVDR ) # UPPER LEFT range priorities
-			elif ((rdistance < 0) & ((abs(distance_ratio) > 2) | (distance_ratio == 0))):
-				move_priority = ( MVU, MVUL, MVUR, MVL, MVR, MVDL, MVDR, MVD ) # UPWARD range priorities
-			elif ((rdistance > 0) & ((abs(distance_ratio) >= 2) | (distance_ratio == 0))):
-				move_priority = ( MVD, MVDL, MVDR, MVL, MVR, MVUL, MVUR, MVU ) # DOWNWARD range priorities
-			elif ((cdistance > 0) & ((abs(distance_ratio) <= .5) | (distance_ratio == 0))):
-				move_priority = ( MVR, MVUR, MVDR, MVU, MVD, MVUL, MVDL, MVL ) # RIGHT range priorities
-			elif ((cdistance < 0) & ((abs(distance_ratio) < .5) | (distance_ratio == 0))):
-				move_priority = ( MVL, MVUL, MVDL, MVU, MVD, MVUR, MVDR, MVR ) # LEFT range priorities
+	move = ''
 
-			priority_odds(		#197
-				(150, True),	#150		**********************************************
-				(18, True),	#18 or 36	* These values determine the odds of moves   *
-				(18, True),	#18 or 36	* for an enemy if those moves are available. *
-				(4, True),	#4 or 8		* If a move has an equivalent priority to    *
-				(4, True),	#4 or 8		* another, but it is a box, then its odds    *
-				(1, True),	#1 or 2		* are absorbed by the other.		     *
-				(1, True),	#1 or 2		* DO NOT CHANGE NUMBER OF PRIORITIES!!!!!!!  *	
-				(1, True)	#1		**********************************************
-			)
+	breakloop = False
+	lay = False
+	likely_moves = []
 
-			likely_move = ''
+	for pwni in range(1, (len(pawns))): # in a given frame, loops through all pawns in a list if the pawn is staggered to move in the present frame, the pawn moves to a space
+		if (pawns[pwni]['stg'] == pawns[0]['frame']):
+			rdistance = player[1]['ro'] - pawns[pwni]['ro'] # player row minus beast row
+			cdistance = player[1]['co'] - pawns[pwni]['co'] # player column minus beast column
 
-			for priopti in range(len(move_priority) - 1): 
+			if (rdistance == 0) | (cdistance == 0): # avoid division by zero
+				distance_ratio = 0.0 # if the player is on the same row or column, the distance ratio is zero
+			else:
+				distance_ratio = rdistance / cdistance # division of row distance by column distance
+
+			if ((rdistance < 0.0) & (cdistance < 0.0) & (distance_ratio >= .5) & (distance_ratio <= 2.0)):
+				move_priority = [ MVUL, MVU, MVL, MVDL, MVUR, MVD, MVR, MVDR ] # UPPER LEFT range priorities
+			elif ((rdistance < 0.0) & (cdistance > 0.0) & (distance_ratio <= -.5) & (distance_ratio >= -2.0)):
+				move_priority = [ MVUR, MVU, MVR, MVUL, MVDR, MVL, MVDL, MVD ] # UPPER RIGHT range priorities
+			elif ((rdistance > 0.0) & (cdistance > 0.0) & (distance_ratio >= .5) & (distance_ratio <= 2.0)):
+				move_priority = [ MVDR, MVD, MVR, MVDL, MVUR, MVU, MVL, MVUL ] # DOWN RIGHT range priorities
+			elif ((rdistance > 0.0) & (cdistance < 0.0) & (distance_ratio <= -.5) & (distance_ratio >= -2.0)):
+				move_priority = [ MVDL, MVD, MVL, MVUL, MVDR, MVU, MVR, MVUR ] # DOWN LEFT range priorities
+			elif ((rdistance < 0.0) & ((abs(distance_ratio) > 2.0) | (distance_ratio == 0.0))):
+				move_priority = [ MVU, MVUL, MVUR, MVL, MVR, MVDL, MVDR, MVD ] # UPWARD range priorities
+			elif ((cdistance > 0.0) & ((abs(distance_ratio) < .5) | (distance_ratio == 0.0))):
+				move_priority = [ MVR, MVUR, MVDR, MVU, MVD, MVUL, MVDL, MVL ] # RIGHT range priorities
+			elif ((rdistance > 0.0) & ((abs(distance_ratio) > 2.0) | (distance_ratio == 0.0))):
+				move_priority = [ MVD, MVDL, MVDR, MVL, MVR, MVUL, MVUR, MVU ] # DOWNWARD range priorities
+			elif ((cdistance < 0.0) & ((abs(distance_ratio) < .5) | (distance_ratio == 0.0))):
+				move_priority = [ MVL, MVUL, MVDL, MVU, MVD, MVUR, MVDR, MVR ] # LEFT range priorities
+
+			priority_odds = [	#197
+				[150, False],	#150		**********************************************
+				[18, False],	#18 or 36	* These values determine the odds of moves   *
+				[18, False],	#18 or 36	* for an enemy if those moves are available. *
+				[4, False],	#4 or 8		* If a move has an equivalent priority to    *
+				[4, False],	#4 or 8		* another, but it is a box, then its odds    *
+				[1, False],	#1 or 2		* are absorbed by the other.		     *
+				[1, False],	#1 or 2		* DO NOT CHANGE NUMBER OF PRIORITIES!!!!!!!  *	
+				[1, False]	#1		**********************************************
+			]
+
+			for priopti in range(8): 
 				# if the first priority move is the player, then take that move
-				if (board[pawns[pwni][RO] + MOVES[move_priority[0]][ 'ra' ]][pawns[pwni][CO] + MOVES[move_priority[0]][ 'ca' ]] == PLAYER):
-					pawns[pwni][MV] = move_priority[priopti]
-					pawns[pwni][RO] = player[1][RO]
-					pawns[pwni][CO] = player[1][CO]
+				if ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ]) == PLAYER ):
+					move = move_priority[0]
+					board[pawns[pwni]['ro']][pawns[pwni]['co']] = BAKGRD
+					pawns[pwni]['ro'] = player[1]['ro']
+					pawns[pwni]['co'] = player[1]['co']
+					board[pawns[pwni]['ro']][pawns[pwni]['co']] = pawns[0]['chr']
 					kill_player()
-					board[pawns[pwni][RO]][pawns[pwni][CO]] = pawns[0]['chr']
-				#elif ((player == BEAST) & (board[][] == MONSTER)) | ((player == MONSTER) & ((board[][] == MONSTER) | (board[][] == BEAST))):
-					#lay_egg()
-				# else if the first priority move is not available, then mark it as unavailable
-				elif (board[pawns[pwni][RO] + MOVES[move_priority[0]][ 'ra' ]][pawns[pwni][CO] + MOVES[move_priority[0]][ 'ca' ]] != BAKGRD):
+					breakloop = True
+					break
+				# else if the priority move is not available, then mark it as unavailable
+				elif ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[priopti]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[priopti]]['ca'])) ]) == BAKGRD ):
+					priority_odds[priopti][1] = True
+					system('echo \"Priority ' + str(priopti) + ': ' + str((priority_odds[priopti][1])) + '\" >> move_lists.txt')
+				else:
 					priority_odds[priopti][1] = False
-				
-			for prioddi in range(len(priority_odds) - 1): # loop through priorities to add them to likely_moves if available
-				if (priority_odds[prioddi][1])): # if it is true that the priority move is a blank space, then loop through and fill out the likely_moves list
-					for i in range(priority_odds[prioddi][0]): # loop through by number in "priorities" loop, to fill out likely_moves list
-						if ((prioddi % 2) == 0) & (prioddi != 0) & (not priority_odds[prioddi - 1])):
-						# if the even priority is the only available move for that priority, then double the even priority
-							for i in range(priority_odds[prioddi][0]):
- 								likely_move.append(move_priorites(prioddi))
-						if ((prioddi % 2) == 1) & (prioddi != 7) & (not priorities[prioddi + 1])):
-						# if the odd priority is the only available move for that priority, then double the odd priority
-							for i in range(priorities[prioddi][0]):
-								likely_move.append(move_priority(prioddi))
-						else:
-						# otherwise, add the even or odd move the normal amount for its singular availability
-							likely_move.append(move_priority(prioddi))
+					system('echo \"Priority ' + str(priopti) + ': ' + str((priority_odds[priopti][1])) + '\" >> move_lists.txt')
+				# if the pawn is a monster, and there is a monster or beast in the space, then lay an egg
+				if ((pawns[0]['chr'] == MONSTER) & ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == MONSTER) | (board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == BEAST))):
+					lay = True
+
+			if (breakloop):
+				break
+	
+			for prioddi in range(8): # loop through priorities to add them to likely_moves if available
+				if (priority_odds[prioddi][1] == True): # if it is true that the priority move is a blank space, then loop through and fill out the likely_moves list
+					for ti in range(priority_odds[prioddi][0]): # loop through by number in "priorities" loop, to fill out likely_moves list
+						likely_moves.append(move_priority[prioddi])
+				if ((prioddi == 2) | (prioddi == 4) | (prioddi == 6)):
+					if ((not priority_odds[prioddi - 1][1]) & (priority_odds[prioddi][1] == True)):
+						for ti in range(priority_odds[prioddi][0]):
+							likely_moves.append(move_priority[prioddi])
+
 
 			# the move is finally decided out of the available set in the list
-			pawns[pwni][MV] = likely_move(randint(0, len(likely_move - 1))
-			# pawn row plus move row adjustment
-			# pawn col plus move col adjustment
-			board[pawns[pwni][RO + MOVES[pwni][MV]]['ra'][pawns[pwni][CO] + MOVES[pawns[pwni][MV]['ca']] = pawn[0]['chr']
-			# pawn row and pawn col = bakgrd
-			board[pawns[pwni][RO]][pawns[pwni][CO]] = BAKGRD
-			# pawn[pawni] row and col = new row and col
-			pawns[pwni][RO] = pawns[pwni][RO] + MOVES[pwni][MV]['ra']
-			pawns[pwni][CO] = pawns[pwni][CO] + MOVES[pwni][MV]['ca']
-
+			if (len(likely_moves) > 0):
+				move = likely_moves[randint(0, (len(likely_moves)) - 1)]
+				likely_moves = []
+				# pawn row plus move row adjustment
+				# pawn col plus move col adjustment
+				board[ pawns[pwni]['ro'] + MOVES[move]['ra'] ][ pawns[pwni]['co'] + MOVES[move]['ca'] ] = pawns[0]['chr']
+				# pawn row and pawn col = bakgrd
+				board[ pawns[pwni]['ro'] ][ pawns[pwni]['co'] ] = BAKGRD
+				# pawn[pawni] row and col = new row and col
+				pawns[pwni]['ro'] = pawns[pwni]['ro'] + MOVES[move]['ra']
+				pawns[pwni]['co'] = pawns[pwni]['co'] + MOVES[move]['ca']
 #}
 
 
+#def move_dist_enemies(pieces): #{
+#	# pick one of the beasts to move
+#	for i in range(1, len(pieces)):
+#		if pieces[i]['stag'] == pieces[0]['frame']:
+##			dirindex = randint(0, len(DIR_LIS) - 1) # randomly pick a direction to go
+#			direction = DIR_LIS[dirindex]
+#			move_pawns(direction, pieces, i)
+#}
+
+
+#
 
 	
 
@@ -750,6 +720,10 @@ def intro():
 
 
 
+
+
+
+
 def pause():
 
 	global ttyRows, ttyCols, screen_cols
@@ -766,6 +740,7 @@ def pause():
 	print('\033[' + str(pausetop + 6) + ';' + str(pauseleft) + 'H' + ' '*16)
 
 	system('play -q audio/pause.ogg')
+	
 
 #####################################################################################################
 #######################################################-- main function calls -######################
@@ -777,25 +752,29 @@ system('reset')
 plan_the_board()
 build_the_board()
 
-place_blocks()
+place_blocks(BLOCK)
 place_boxes()
 
+#monsters = place_pawns(monsters, monster_cnt)
 beasts = place_pawns(beasts, beast_cnt)
-monsters = place_pawns(monsters, monster_cnt)
 #eggs = place_pawns(eggs, egg_cnt)
 
 player = place_pawns(player, 1 )
 
 
 
-#####################################################-- main loop threads --#########################
-
-############################-- the main loop that waits for key presses
 
 
-def takeInput():
-	global debug, keypress, player
+#############################################################################
+##################################################-- take input func -- #####
+#############################################################################
+	
 
+
+def take_input():
+	global debug, keypress, player, stop_take_input
+	
+	stop_take_input = False
 	stdscr = curses.initscr() 
 	curses.cbreak()
 	stdscr.keypad(1)
@@ -803,6 +782,9 @@ def takeInput():
 
 	while(True):
 		keypress = stdscr.getch()
+		if (stop_take_input):
+			while(stop_take_input):
+				sleep(lcd_time)
 		if keypress == ord('q'):
 			system('clear')
 			exit()
@@ -827,13 +809,12 @@ def takeInput():
 		if keypress != ord(' '):
 			player[1]['tug'] = False
 			move_player(keypress)
-# start the thread that runs the input loop
-
-threading.Thread(target=takeInput).start()
 
 
+#########################################################################################################
+threading.Thread(target=take_input).start()  ###############-- the main game clock and print loop --#####
+#########################################################################################################
 
-############################-- the main game clock and print loop
 
 
 while(True):
@@ -843,7 +824,8 @@ while(True):
 	elif keypress == ord('p'):
 		pause()
 		while(keypress == ord('p')):
-			sleep(.05)
+			sleep(.5)
+		game_pause = 0
 	else:
 		system('clear')
 		if beasts[0]['frame'] == beasts[0]['frames']:
@@ -854,6 +836,8 @@ while(True):
 			monsters[0]['frame'] = 0
 		else:
 			monsters[0]['frame'] += 1
-		move_dist_enemies(beasts)
+		move_enemies(beasts)
 		print_board(board, True)
 	sleep(lcd_time)
+
+
