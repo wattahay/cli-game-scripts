@@ -47,7 +47,7 @@ lcd_time = .01666111 * 4
 
 ###############################
 
-beast_speed = 1.0	# seconds between enemy moves
+beast_speed = 2.5	# seconds between enemy moves
 monster_speed = 1.0	# seconds between enemy moves
 egg_speed = 4		# seconds between countdowns
 
@@ -526,6 +526,9 @@ def move_enemies(pawns): #{
 	move_priority = []
 	move = ''
 
+	breakloop = False
+	lay = False
+	likely_moves = []
 
 	for pwni in range(1, (len(pawns))): # in a given frame, loops through all pawns in a list if the pawn is staggered to move in the present frame, the pawn moves to a space
 		if (pawns[pwni]['stg'] == pawns[0]['frame']):
@@ -539,46 +542,35 @@ def move_enemies(pawns): #{
 
 			if ((rdistance < 0.0) & (cdistance < 0.0) & (distance_ratio >= .5) & (distance_ratio <= 2.0)):
 				move_priority = [ MVUL, MVU, MVL, MVDL, MVUR, MVD, MVR, MVDR ] # UPPER LEFT range priorities
-
 			elif ((rdistance < 0.0) & (cdistance > 0.0) & (distance_ratio <= -.5) & (distance_ratio >= -2.0)):
 				move_priority = [ MVUR, MVU, MVR, MVUL, MVDR, MVL, MVDL, MVD ] # UPPER RIGHT range priorities
-
 			elif ((rdistance > 0.0) & (cdistance > 0.0) & (distance_ratio >= .5) & (distance_ratio <= 2.0)):
 				move_priority = [ MVDR, MVD, MVR, MVDL, MVUR, MVU, MVL, MVUL ] # DOWN RIGHT range priorities
-
 			elif ((rdistance > 0.0) & (cdistance < 0.0) & (distance_ratio <= -.5) & (distance_ratio >= -2.0)):
 				move_priority = [ MVDL, MVD, MVL, MVUL, MVDR, MVU, MVR, MVUR ] # DOWN LEFT range priorities
-
 			elif ((rdistance < 0.0) & ((abs(distance_ratio) > 2.0) | (distance_ratio == 0.0))):
 				move_priority = [ MVU, MVUL, MVUR, MVL, MVR, MVDL, MVDR, MVD ] # UPWARD range priorities
-
 			elif ((cdistance > 0.0) & ((abs(distance_ratio) < .5) | (distance_ratio == 0.0))):
 				move_priority = [ MVR, MVUR, MVDR, MVU, MVD, MVUL, MVDL, MVL ] # RIGHT range priorities
-
 			elif ((rdistance > 0.0) & ((abs(distance_ratio) > 2.0) | (distance_ratio == 0.0))):
 				move_priority = [ MVD, MVDL, MVDR, MVL, MVR, MVUL, MVUR, MVU ] # DOWNWARD range priorities
-
 			elif ((cdistance < 0.0) & ((abs(distance_ratio) < .5) | (distance_ratio == 0.0))):
 				move_priority = [ MVL, MVUL, MVDL, MVU, MVD, MVUR, MVDR, MVR ] # LEFT range priorities
-			
 
 			priority_odds = [	#197
-				[150, True],	#150		**********************************************
-				[18, True],	#18 or 36	* These values determine the odds of moves   *
-				[18, True],	#18 or 36	* for an enemy if those moves are available. *
-				[4, True],	#4 or 8		* If a move has an equivalent priority to    *
-				[4, True],	#4 or 8		* another, but it is a box, then its odds    *
-				[1, True],	#1 or 2		* are absorbed by the other.		     *
-				[1, True],	#1 or 2		* DO NOT CHANGE NUMBER OF PRIORITIES!!!!!!!  *	
-				[1, True]	#1		**********************************************
+				[150, False],	#150		**********************************************
+				[18, False],	#18 or 36	* These values determine the odds of moves   *
+				[18, False],	#18 or 36	* for an enemy if those moves are available. *
+				[4, False],	#4 or 8		* If a move has an equivalent priority to    *
+				[4, False],	#4 or 8		* another, but it is a box, then its odds    *
+				[1, False],	#1 or 2		* are absorbed by the other.		     *
+				[1, False],	#1 or 2		* DO NOT CHANGE NUMBER OF PRIORITIES!!!!!!!  *	
+				[1, False]	#1		**********************************************
 			]
-			breakloop = False
-			lay = False
-			likely_moves = []
 
-			for priopti in range(7): 
+			for priopti in range(8): 
 				# if the first priority move is the player, then take that move
-				if ( (board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ]) == PLAYER ):
+				if ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ]) == PLAYER ):
 					move = move_priority[0]
 					board[pawns[pwni]['ro']][pawns[pwni]['co']] = BAKGRD
 					pawns[pwni]['ro'] = player[1]['ro']
@@ -588,33 +580,33 @@ def move_enemies(pawns): #{
 					breakloop = True
 					break
 				# else if the priority move is not available, then mark it as unavailable
-				elif ( (board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ]) != BAKGRD ):
-					priority_odds[priopti][1] = False
-				elif ( (board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ]) == BAKGRD ):
+				elif ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[priopti]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[priopti]]['ca'])) ]) == BAKGRD ):
 					priority_odds[priopti][1] = True
+					system('echo \"Priority ' + str(priopti) + ': ' + str((priority_odds[priopti][1])) + '\" >> move_lists.txt')
+				else:
+					priority_odds[priopti][1] = False
+					system('echo \"Priority ' + str(priopti) + ': ' + str((priority_odds[priopti][1])) + '\" >> move_lists.txt')
 				# if the pawn is a monster, and there is a monster or beast in the space, then lay an egg
 				if ((pawns[0]['chr'] == MONSTER) & ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == MONSTER) | (board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == BEAST))):
 					lay = True
+
 			if (breakloop):
 				break
-			for prioddi in range(7): # loop through priorities to add them to likely_moves if available
-				if (priority_odds[prioddi][1]): # if it is true that the priority move is a blank space, then loop through and fill out the likely_moves list
+	
+			for prioddi in range(8): # loop through priorities to add them to likely_moves if available
+				if (priority_odds[prioddi][1] == True): # if it is true that the priority move is a blank space, then loop through and fill out the likely_moves list
 					for ti in range(priority_odds[prioddi][0]): # loop through by number in "priorities" loop, to fill out likely_moves list
-						if ((prioddi % 2) == 0) & (prioddi != 0) & (not priority_odds[prioddi - 1]):
-						# if the even priority is the only available move for that priority, then double the even priority
-							for li in range(priority_odds[prioddi][0]):
- 								likely_moves.append(move_priority[prioddi])
-						if ((prioddi % 2) == 1) & (prioddi != 7) & (not priority_odds[prioddi + 1]):
-						# if the odd priority is the only available move for that priority, then double the odd priority
-							for lli in range(priorities[prioddi][0]):
-								likely_moves.append(move_priority[prioddi])
-						else:
-						# otherwise, add the even or odd move the normal amount for its singular availability
+						likely_moves.append(move_priority[prioddi])
+				if ((prioddi == 2) | (prioddi == 4) | (prioddi == 6)):
+					if ((not priority_odds[prioddi - 1][1]) & (priority_odds[prioddi][1] == True)):
+						for ti in range(priority_odds[prioddi][0]):
 							likely_moves.append(move_priority[prioddi])
+
 
 			# the move is finally decided out of the available set in the list
 			if (len(likely_moves) > 0):
 				move = likely_moves[randint(0, (len(likely_moves)) - 1)]
+				likely_moves = []
 				# pawn row plus move row adjustment
 				# pawn col plus move col adjustment
 				board[ pawns[pwni]['ro'] + MOVES[move]['ra'] ][ pawns[pwni]['co'] + MOVES[move]['ca'] ] = pawns[0]['chr']
@@ -623,7 +615,6 @@ def move_enemies(pawns): #{
 				# pawn[pawni] row and col = new row and col
 				pawns[pwni]['ro'] = pawns[pwni]['ro'] + MOVES[move]['ra']
 				pawns[pwni]['co'] = pawns[pwni]['co'] + MOVES[move]['ca']
-
 #}
 
 
@@ -738,8 +729,9 @@ build_the_board()
 place_blocks(BLOCK)
 place_boxes()
 
-beasts = place_pawns(beasts, beast_cnt)
 monsters = place_pawns(monsters, monster_cnt)
+#beasts = place_pawns(beasts, beast_cnt)
+beasts = place_pawns(beasts, 1)
 #eggs = place_pawns(eggs, egg_cnt)
 
 player = place_pawns(player, 1 )
