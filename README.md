@@ -8,7 +8,8 @@ Python(3) script based on the 1984 DOS game, BEAST
 ###################################################
 * xfce4-terminal produces drastically better font styling than gnome-terminal
 * Use Mono fonts (Ubuntu Mono looks pretty good)
- 	* Ubuntu Mono
+ 	* WenQuanYi Micro Hei Mono
+	* Ubuntu Mono
  	* Liberation Mono
  	* DeJaVu Sans Mono
  	* FreeMono (ok)
