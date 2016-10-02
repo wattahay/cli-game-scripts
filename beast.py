@@ -16,8 +16,8 @@ screen_cols = int(ttyCols / 2)#####################-- global settings --#####
 
 ##################################-- tty dynamic board size settings 
 
-max_play_rows = 35 	# alter max game height here
-max_play_cols = 65 	# alter max game width here
+max_play_rows = 40 	# alter max game height here
+max_play_cols = 80 	# alter max game width here
 max_beast_cnt = 10	# alter max beasts here
 
 ##################################-- starting game statistics
@@ -43,16 +43,14 @@ death_scr = -10		# point loss for dying
 # settings may have varied results with OS screen refresh
 # to check Ubuntu screen refresh in hz (refreshes per second), type 'xrandr' in terminal
 # 1 (second) / 60.02 = ~.01666111... ???? not sure whether it makes a difference.
-lcd_time = .01666111 * 4
+lcd_time = .03
 
 ###############################
 
-beast_speed = 1.0	# seconds between enemy moves
-monster_speed = 1.0	# seconds between enemy moves
+beast_speed = 1.3	# seconds between enemy moves
+monster_speed = 1.3	# seconds between enemy moves
 egg_speed = 4		# seconds between countdowns
 
-min_incubate = 5	# minimum time before eggs start counting down
-max_incubate = 30	# maximum time before eggs start counting down
 
 
 		# frame-rate of entire game (CODISTADIT)
@@ -150,6 +148,9 @@ score = 0	# in-game total score
 points = 0	# in-game level points added at end of level
 
 
+
+
+stop_take_input = False
 
 
 ################################################################################################
@@ -253,11 +254,40 @@ def build_the_board(): #{
 
 
 
-
 def print_board(board_array, stats): #{
 
 	global ttyCols, top_margin, left_margin, score, lives, level, board_rows, board_cols
 
+	# Hide the cursor
+	system('tput civis')
+	
+	print('\033[' + str(top_margin)  + ';' + str(left_margin) + 'H\033[s')
+						
+	for rowi in range(board_rows + 1):	
+		print('\033[u' + '\033[' + str(rowi) +  'B' + ''.join(board_array[rowi - 1]))		
+	
+	if (stats):
+		print('\033[u' + '\033[' + str(len(board) + 2) + 'B' + '   SCORE: ' + str(score) + '   LIVES: ' + str(lives) + '    LEVEL: ' + str(level)) 
+
+	if (debug):
+		print('\033[u' + '\033[' + str(len(board) + 4) + 'B' + '\rPlayer: ' + str(player) )
+		print('\033[u' + '\033[' + str(len(board) + 5) + 'B' + '\rBeasts: ' + str(beasts[0]))
+		for i in range(1, len(beasts)):
+			print('\033[u' + '\033[' + str(len(board) + 6) + 'B' + '\r\tBeast ' + str(i) + ' :' + str(beasts[i]))
+		 
+	print('\033[H\033[8m')
+
+
+
+
+
+
+
+def clear_print_board(board_array, stats): #{
+
+	global ttyCols, top_margin, left_margin, score, lives, level, board_rows, board_cols
+
+	system('clear')
 
 	# Hide the cursor
 	system('tput civis')
@@ -295,6 +325,7 @@ def print_board(board_array, stats): #{
 		for i in range(1, len(beasts)):
 			print('\r\tBeast ' + str(i) + ' :' + str(beasts[i]))
 		 
+	print('\033[H\033[8m')
 
 	
 
@@ -398,10 +429,12 @@ def place_pawns(pawns, count):
 
 
 
+
 def kill_player():
 
-	global lives, board, stop_take_input
+	global BAKGRD, player, lives, board, stop_take_input
 
+	board[ player[1]['ro'] ][ player[1]['co'] ] = BAKGRD
 	lives -= 1
 	del player[1]
 	place_pawns(player, 1)
@@ -410,8 +443,6 @@ def kill_player():
 		system('play -q audio/loss2.ogg')
 	
 	threading.Thread(target=audio_kill).start()
-
-	###############################################
 
 
 def move_enemies(pawns): #{
@@ -452,8 +483,8 @@ def move_enemies(pawns): #{
 			elif ((cdistance < 0.0) & ((abs(distance_ratio) < .5) | (distance_ratio == 0.0))):
 				move_priority = [ MVL, MVUL, MVDL, MVU, MVD, MVUR, MVDR, MVR ] # LEFT range priorities
 
-			priority_odds = [	#197
-				[150, False],	#150		**********************************************
+			priority_odds = [	#145 total
+				[100, False],	#98		**********************************************
 				[18, False],	#18 or 36	* These values determine the odds of moves   *
 				[18, False],	#18 or 36	* for an enemy if those moves are available. *
 				[4, False],	#4 or 8		* If a move has an equivalent priority to    *
@@ -470,17 +501,15 @@ def move_enemies(pawns): #{
 					board[pawns[pwni]['ro']][pawns[pwni]['co']] = BAKGRD
 					pawns[pwni]['ro'] = player[1]['ro']
 					pawns[pwni]['co'] = player[1]['co']
-					board[pawns[pwni]['ro']][pawns[pwni]['co']] = pawns[0]['chr']
 					kill_player()
+					board[pawns[pwni]['ro']][pawns[pwni]['co']] = pawns[0]['chr']
 					breakloop = True
 					break
 				# else if the priority move is not available, then mark it as unavailable
 				elif ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[priopti]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[priopti]]['ca'])) ]) == BAKGRD ):
 					priority_odds[priopti][1] = True
-					system('echo \"Priority ' + str(priopti) + ': ' + str((priority_odds[priopti][1])) + '\" >> move_lists.txt')
 				else:
 					priority_odds[priopti][1] = False
-					system('echo \"Priority ' + str(priopti) + ': ' + str((priority_odds[priopti][1])) + '\" >> move_lists.txt')
 				# if the pawn is a monster, and there is a monster or beast in the space, then lay an egg
 				if ((pawns[0]['chr'] == MONSTER) & ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == MONSTER) | (board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == BEAST))):
 					lay = True
@@ -526,42 +555,56 @@ def move_enemies(pawns): #{
 #
 
 
+def move_player(direction):
+	global player, board, MOVES, BAKGRD, BOX, MVU, MVL, MVR, MVD
 
-def move_player(tap):	
+	pawns = player	
+	index = 1
+	char = player[0]['chr']
+	row = player[1]['ro']
+	col = player[1]['co']
+	fow = row + MOVES[direction]['ra'] 
+	fol = col + MOVES[direction]['ca']
+	rtug = row - MOVES[direction]['ra']
+	ctug = col - MOVES[direction]['ca']
+	board[fow][fol] = char 
+	if (pawns[index]['tug']) & (board[rtug][ctug] == BOX):
+		board[rtug][ctug] = BAKGRD
+		board[row][col] = BOX
+	else:
+		board[row][col] = BAKGRD
+	player[index]['ro'] = fow
+	player[index]['co'] = fol
 
-	global player, board, MOVES, MVU, MVL, MVD, MVR, BAKGRD, BOX
-	
-	move = ''
+
+
+def direct_move(direction):
+
+	global player, MOVES, board
+
+	space = board[player[1]['ro'] +  MOVES[direction]['ra'] ][ player[1]['co'] + MOVES[direction]['ca'] ]
+
+	if (space == BAKGRD):
+		move_player(direction)
+#	elif (space == BOX):
+#		push_tree(direction)
+	elif (space == MONSTER) | (space == BEAST) | (space == KILLBLOCK):
+		kill_player()
+
+
+
+def direct_keypress(tap):	
+
+	global player, MOVES, board
 
 	if (tap == curses.KEY_UP):
-		#player[1]['mv'] = MVU
-		move = MVU
+		direct_move('U')
 	elif (tap == curses.KEY_LEFT):
-		#player[1]['mv'] = MVL
-		move = MVL
+		direct_move('L')
 	elif (tap == curses.KEY_DOWN):
-		#player[1]['mv'] = MVD
-		move = MVD
+		direct_move('D')
 	elif (tap == curses.KEY_RIGHT):
-		#player[1]['mv'] = MVR
-		move = MVR
-
-	fow = player[1]['ro'] + MOVES[move]['ra'] 
-	fol = player[1]['co'] + MOVES[move]['ca'] 
-	rtug = player[1]['ro'] - (MOVES[move]['ra'])
-	ctug = player[1]['co'] - (MOVES[move]['ca'])
-
-
-	if ( board[fow][fol] == BAKGRD):
-		board[fow][fol] = player[0]['chr'] 
-		if ((player[1]['tug'] == True) & (board[rtug][ctug] == BOX)):
-			board[rtug][ctug] = BAKGRD
-			board[player[1]['ro'] ][ player[1]['co'] ] = BOX
-		else:
-			board[player[1]['ro'] ][ player[1]['co'] ] = BAKGRD
-		player[1]['ro'] = fow
-		player[1]['co'] = fol
-
+		direct_move('R')
 
 
 
@@ -619,9 +662,15 @@ def pause():
 
 	global ttyRows, ttyCols, screen_cols
 
+	def audio_pause():
+		system('play -q audio/pause.ogg')
+
+	threading.Thread(target=audio_pause).start()
+
 	pauseleft = (int(ttyCols/2) - 8)
 	pausetop = (int(ttyRows/2) - 4) - (int(board_rows / 4))
-	
+	print('\033[0m')	
+
 	print('\033[' + str(pausetop) + ';' + str(pauseleft) + 'H' + ' '*16)
 	print('\033[' + str(pausetop + 1) + ';' + str(pauseleft) + 'H' + ' ' + chr(9556) + chr(9552)*12 + chr(9559) + ' ')
 	print('\033[' + str(pausetop + 2) + ';' + str(pauseleft) + 'H' + ' ' + chr(9553) + '            ' + chr(9553) + ' ')
@@ -629,9 +678,10 @@ def pause():
 	print('\033[' + str(pausetop + 4) + ';' + str(pauseleft) + 'H' + ' ' + chr(9553) + '            ' + chr(9553) + ' ')
 	print('\033[' + str(pausetop + 5) + ';' + str(pauseleft) + 'H' + ' ' + chr(9562) + chr(9552)*12 + chr(9565) + ' ')
 	print('\033[' + str(pausetop + 6) + ';' + str(pauseleft) + 'H' + ' '*16)
-
-	system('play -q audio/pause.ogg')
 	
+	print('\033[H\033[8m')
+
+		
 
 #####################################################################################################
 #######################################################-- main function calls -######################
@@ -646,7 +696,7 @@ build_the_board()
 place_blocks(BLOCK)
 place_boxes()
 
-#monsters = place_pawns(monsters, monster_cnt)
+monsters = place_pawns(monsters, monster_cnt)
 beasts = place_pawns(beasts, beast_cnt)
 #eggs = place_pawns(eggs, egg_cnt)
 
@@ -665,7 +715,6 @@ player = place_pawns(player, 1 )
 def take_input():
 	global debug, keypress, player, stop_take_input
 	
-	stop_take_input = False
 	stdscr = curses.initscr() 
 	curses.cbreak()
 	stdscr.keypad(1)
@@ -673,9 +722,6 @@ def take_input():
 
 	while(True):
 		keypress = stdscr.getch()
-		if (stop_take_input):
-			while(stop_take_input):
-				sleep(lcd_time)
 		if keypress == ord('q'):
 			system('clear')
 			exit()
@@ -685,6 +731,7 @@ def take_input():
 		elif keypress == ord('b'):
 			if debug == True:
 				debug = False
+				system('clear')
 			else:
 				debug = True
 		elif keypress == ord(' '):
@@ -694,12 +741,12 @@ def take_input():
 				if (keypress != ord(' ')):
 					tugspan = keypress # logs the present direction to compare for direction change
 					while (tugspan == keypress): # this ensures the player has pull function until direction key changes.
-						move_player(keypress)
+						direct_keypress(keypress)
 						player[1]['tug'] = True
 						keypress = stdscr.getch()				
 		if keypress != ord(' '):
 			player[1]['tug'] = False
-			move_player(keypress)
+			direct_keypress(keypress)
 
 
 #########################################################################################################
@@ -715,10 +762,9 @@ while(True):
 	elif keypress == ord('p'):
 		pause()
 		while(keypress == ord('p')):
-			sleep(.5)
+			sleep(.05)
 		game_pause = 0
 	else:
-		system('clear')
 		if beasts[0]['frame'] == beasts[0]['frames']:
 			beasts[0]['frame'] = 0
 		else:
@@ -730,5 +776,3 @@ while(True):
 		move_enemies(beasts)
 		print_board(board, True)
 	sleep(lcd_time)
-
-
