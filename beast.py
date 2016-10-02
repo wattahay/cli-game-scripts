@@ -152,9 +152,6 @@ points = 0	# in-game level points added at end of level
 
 
 
-stop_take_input = False
-
-
 ################################################################################################
 board = [] #########################################################-- board setup --###########
 ################################################################################################
@@ -399,72 +396,11 @@ def place_pawns(pawns, count):
 
 
 
-def move_pawns(godir, pawns, index):
-	global BAKGRD, BOX, MVU, MVL, MVR, MVD, MVUL, MVUR, MVDL, MVDR
-	
-	char = pawns[0]['chr']
-	row = pawns[index]['ro']
-	col = pawns[index]['co']
-	fow = row
-	fol = col
-	rtug = row
-	ctug = col
-	if godir == MVL: # LEFT
-		fow = row
-		fol = col - 1
-		rtug = row
-		ctug = col + 1
-	elif (godir == MVR): # RIGHT
-		fow = row
-		fol = col + 1
-		rtug = row
-		ctug = col - 1
-	elif (godir == MVD): # DOWN
-		fow = row + 1
-		fol = col
-		rtug = row - 1
-		ctug = col
-	elif (godir == MVU): # UP
-		fow = row - 1
-		fol = col
-		rtug = row + 1
-		ctug = col
-	elif (godir == MVUL): # D - UP n LEFT
-		fow = row - 1
-		fol = col - 1
-	elif (godir == MVUR): # D - UP n RIGHT
-		fow = row - 1
-		fol = col + 1
-	elif (godir == MVDL): # D - DOWN n LEFT
-		fow = row + 1
-		fol = col - 1
-	elif (godir == MVDR): # D - DOWN n RIGHT
-		fow = row + 1
-		fol = col + 1
-	if (board[fow][fol] == BAKGRD):
-		board[fow][fol] = char 
-		if (pawns[index]['tug']) & (board[rtug][ctug] == BOX):
-			board[rtug][ctug] = BAKGRD
-			board[row][col] = BOX
-		else:
-			board[row][col] = BAKGRD
-		pawns[index]['ro'] = fow
-		pawns[index]['co'] = fol
-
-
 
 
 def kill_player():
 
 	global lives, board, stop_take_input
-
-#	stop_take_input = True
-#
-#	tele1 = '\033[0m\033[37m' + chr(9664) + chr(9654) + '\033[0m' 
-#	tele2 = '\033[1m\033[37m' + chr(9664) + chr(9654) + '\033[0m'
-#	tele3 = '\033[0m\033[37m' + chr(9666) + chr(9656) + '\033[0m'
-#	tele4 = '\033[0m\033[37m' + chr(9668) + chr(9658) + '\033[0m'
-#	tele5 = PLAYER
 
 	lives -= 1
 	del player[1]
@@ -475,47 +411,6 @@ def kill_player():
 	
 	threading.Thread(target=audio_kill).start()
 
-#	row = player[1]['ro']
-#	col = player[1]['co']
-#	###############################################
-#	for i in range(3):
-#		sleep(lcd_time)
-#		board[row][col] = tele1
-#		system('clear')
-#		print_board(board, True)
-#		sleep(lcd_time) 
-#		board[row][col] = tele2
-#		system('clear')
-#		print_board(board, True)
-#		sleep(lcd_time) 
-#		board[row][col] = tele3
-#		system('clear')
-#		print_board(board, True)
-#		sleep(lcd_time) 
-#		board[row][col] = tele4
-#		system('clear')
-#		print_board(board, True)
-#		sleep(lcd_time) 
-#		board[row][col] = tele3
-#		system('clear')
-#		print_board(board, True)
-#		sleep(lcd_time) 
-#		board[row][col] = tele2
-#		system('clear')
-#		print_board(board, True)
-#		sleep(lcd_time) 
-#		board[row][col] = tele1
-#		system('clear')
-#		print_board(board, True)
-#		sleep(lcd_time) 
-#	board[row][col] = tele5
-#	sleep(.4)
-#	system('clear')
-#	print_board(board, True)
-#	system('clear')
-#
-#	# re start the input thread to take keyboard input
-#	threading.Thread(target=take_input).start()
 	###############################################
 
 
@@ -632,18 +527,40 @@ def move_enemies(pawns): #{
 
 
 
-def move_player(mv):	
+def move_player(tap):	
 
-	global player, MVU, MVL, MVD, MVR
+	global player, board, MOVES, MVU, MVL, MVD, MVR, BAKGRD, BOX
+	
+	move = ''
 
-	if (mv == curses.KEY_UP):
-		move_pawns(MVU, player, 1)
-	elif (mv == curses.KEY_LEFT):
-		move_pawns(MVL, player, 1)
-	elif (mv == curses.KEY_DOWN):
-		move_pawns(MVD, player, 1)
-	elif (mv == curses.KEY_RIGHT):
-		move_pawns(MVR, player, 1)
+	if (tap == curses.KEY_UP):
+		#player[1]['mv'] = MVU
+		move = MVU
+	elif (tap == curses.KEY_LEFT):
+		#player[1]['mv'] = MVL
+		move = MVL
+	elif (tap == curses.KEY_DOWN):
+		#player[1]['mv'] = MVD
+		move = MVD
+	elif (tap == curses.KEY_RIGHT):
+		#player[1]['mv'] = MVR
+		move = MVR
+
+	fow = player[1]['ro'] + MOVES[move]['ra'] 
+	fol = player[1]['co'] + MOVES[move]['ca'] 
+	rtug = player[1]['ro'] - (MOVES[move]['ra'])
+	ctug = player[1]['co'] - (MOVES[move]['ca'])
+
+
+	if ( board[fow][fol] == BAKGRD):
+		board[fow][fol] = player[0]['chr'] 
+		if ((player[1]['tug'] == True) & (board[rtug][ctug] == BOX)):
+			board[rtug][ctug] = BAKGRD
+			board[player[1]['ro'] ][ player[1]['co'] ] = BOX
+		else:
+			board[player[1]['ro'] ][ player[1]['co'] ] = BAKGRD
+		player[1]['ro'] = fow
+		player[1]['co'] = fol
 
 
 

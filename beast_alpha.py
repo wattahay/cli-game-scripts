@@ -110,17 +110,16 @@ beasts = [{
 	}]
 
 monsters = [{
-	'frames': ((int(beast_speed / lcd_time)) - 1),
+	'frames': ((int(monster_speed / lcd_time)) - 1),
 	'frame':0,
 	'chr': MONSTER
 	}]
 
 eggs = [{
-	'frames': ((int(beast_speed / lcd_time)) - 1),
+	'frames': ((int(egg_speed / lcd_time)) - 1),
 	'frame': 0,
-	'incu_frames': (int(1 / lcd_time)) - 1),
+	'incu_frames': (int(1 / lcd_time)),
 	'incu_frame': 0,
-	'chr': EGG
 	}]
 
 push_eggs = [] # this is a list if indeces for eggs to be moved when the player is pushing boxes
@@ -391,6 +390,16 @@ def place_beasts(count):
 
 ##################################################################
 
+def hatch_monster(row, col):
+
+	global monsters, board
+	
+	board[row][col] = MONSTER
+	monsters.append({'ro':row, 'co':col,'stg':0 })
+	monsters[step]['stg'] = randint(1, (monsters[0]['frames']))
+
+
+
 def place_monsters(count):
 
 	global monsters, board
@@ -400,12 +409,10 @@ def place_monsters(count):
 		row = randint(1, (board_rows - 1))
 		col = randint(1, (board_cols - 1))
 		if(board[row][col] == BAKGRD):
-			board[row][col] = pawn 
-			monsters.append({'ro':row, 'co':col,'stg':0 })
-			steps += 1
-			monsters[step]['stg'] = randint(1, (monsters[0]['frames']))
+			hatch_monster(row, col)
+			step += 1
 
-##################################################################
+
 
 #######################################################################################################
 ###################################################################################-- Eggs! --#########
@@ -415,12 +422,13 @@ def lay_egg(row, col):
 
 	global monsters, beasts, eggs, board
 
-	wait_time = (len(beasts) + len(monsters)) * (randint(4, 16)) # this should be something like egg_speed, lcd_time, 
-	stag = randint(1, eggs[0]['frames']) 
-	board[row][col] = EGG
-	eggs.append({'ro': row, 'co': col, 'wait': wait_time, 'stg': stag, 'sub':32})
+	wait_time = (len(beasts) + len(monsters)) * (randint(4, 16)) # seconds of wait time before egg starts counting down 
+	wait_frames = wait_time * eggs[0]['incu_frames'] # see line ~120 (frames in one second) times (random wait seconds)
+	stag = randint(1, eggs[0]['frames']) # the frame that the egg counts down on
+	board[row][col] = EGG(32)
+	eggs.append({'ro': row, 'co': col, 'wait': wait_frames, 'stg': stag, 'sub':32})
 
-######################################################################
+
 
 def place_eggs(pawns, count):
 
@@ -433,6 +441,7 @@ def place_eggs(pawns, count):
 		if(board[row][col] == BAKGRD):
 			lay_egg(row, col)
 			step += 1
+
 
 #####################################################################
 
@@ -448,22 +457,28 @@ def egg_push(move):
 	
 #####################################################################
 
-def time_eggs():
+def hatch_eggs():
 	# this function runs through all the eggs, and increments their time
 	# it transition eggs from wait phase, to countdown, to Monster
 	# wait_time is number of enemies at the time of creation times 4-16 (in seconds)
 	# egg_speed is usually between 2 and 4 seconds. It is the time between countdown numbers
-	global eggs, board, egg_speed
+	global eggs, board, egg_speed, lcd_time
 
-	if (eggs[i]['wait'] > 0):
-		eggs[i]['wait'] -= 1
-
-	for i in range(1, len(eggs)):
-		if (eggs[i]['stg'] == eggs[0]['frame']):
-
-		elif (eggs[i]['wait'] == 0 ) & (eggs[i]['sub'] == 32 ):
+	# egg_speed, incu_frames, incu_frame, frames, frame, wait, stg
+	# each egg: wait, stg
+	for i in range(1, (len(eggs))):
+		if (eggs[i]['wait'] > 0):
+			eggs[i]['wait'] -= 1
+		elif (eggs[i]['wait'] == 0) & (eggs[i]['sub'] == 32):
 			eggs[i]['sub'] = 8329
-		
+		elif (eggs[i]['wait'] == 0) :
+			if (eggs[i]['stg'] == eggs[0]['frame']) & (eggs[i]['sub'] > 8320)):
+				eggs[i]['sub'] -= 1
+			elif ((eggs[i]['sub'] == 8320) & (eggs[i]['stg'] == eggs[0]['frame'])):
+				hatch_monster(eggs[i]['ro'], eggs[i]['co'])
+				del eggs[i])
+				
+	
 
 #####################################################################
 
@@ -479,7 +494,7 @@ def place_player():
 		col = randint(1, (board_cols - 1))
 		if(board[row][col] == BAKGRD):
 			board[row][col] = pawn 
-			player.append({'ro':row, 'co':col, 'tug':False})
+			player.append({'ro':row, 'co':col, 'mv':'', 'tug':False})
 			step += 1
 
 
@@ -503,6 +518,7 @@ def kill_player():
 #######################################################################################################
 ###############################################################-- Beasts and Monsters --###############
 #######################################################################################################
+
 
 def move_enemies(pawns): #{
 
@@ -587,7 +603,6 @@ def move_enemies(pawns): #{
 						for ti in range(priority_odds[prioddi][0]):
 							likely_moves.append(move_priority[prioddi])
 
-
 			# the move is finally decided out of the available set in the list
 			if (len(likely_moves) > 0):
 				move = likely_moves[randint(0, (len(likely_moves)) - 1)]
@@ -603,14 +618,6 @@ def move_enemies(pawns): #{
 #}
 
 
-#def move_dist_enemies(pieces): #{
-#	# pick one of the beasts to move
-#	for i in range(1, len(pieces)):
-#		if pieces[i]['stag'] == pieces[0]['frame']:
-#			dirindex = randint(0, len(DIR_LIS) - 1) # randomly pick a direction to go
-#			direction = DIR_LIS[dirindex]
-#			move_pawns(direction, pieces, i)
-#}
 
 
 #
@@ -619,28 +626,47 @@ def move_enemies(pawns): #{
 #######################################################################################################
 #####################################################################-- Movement and Pushing--#########
 #######################################################################################################
+def move_player():
 
+	global player, board, MOVES, MVU, MVR, MVL, MVD
 	
+	fow = player[1]['ro'] + MOVES[player[1]['mv']]['ra'] 
+	fol = player[1]['co'] + MOVES[player[1]['mv']]['ca'] 
+	rtug = player[1]['ro'] - MOVES[player[1]['mv']]['ra'] 
+	ctug = player[1]['ro'] - MOVES[player[1]['mv']]['ca'] 
 
-def box_push(push_eggs, explode):
+		if ( board[fow][fol] == BAKGRD):
+			board[fow][fol] = player[0]['chr'] 
+			if (player[1]['tug']) & (board[rtug][ctug] == BOX):
+				board[rtug][ctug] = BAKGRD
+				board[player[1]['ro'] ][ player[1]['co'] ] = BOX
+			else:
+				board[player[1]['ro'] ][ player[1]['co'] ] = BAKGRD
+			player[1]['ro'] = fow
+			player[1]['co'] = fol
+
+
+
+
+#def box_push(push_eggs, explode):
 
 	# if explode = True
 		# if leading space is an egg
 
-def push_tree():
-
-	global MVU, MVL, MVD, MVR, MOVES 
-
-	probe = 1
-	egg = False
-	loop = True
-	push_eggs = []	
-	probe_row = 0
-	probe_col = 0
-	explode = False
-
-	while (loop):
-		# if space is a bakgrd
+#def push_tree():
+#
+#	global MVU, MVL, MVD, MVR, MOVES 
+#
+#	probe = 1
+#	egg = False
+#	loop = True
+#	push_eggs = []	
+#	probe_row = 0
+#	probe_col = 0
+#	explode = False
+#
+#	while (loop):
+		# if space is 
 			# make board space same as preceeding space
 			# make player fol and fow the player
 			# move_player()
@@ -691,26 +717,19 @@ def push_tree():
 
 
 
+def direct_player(tap):	
 
-def player_move(tap):	
-
-	global board, player, MVU, MVL, MVD, MVR
+	global board, player, MOVES, MVU, MVL, MVD, MVR, BAKGRD, BOX
 
 	if (tap == curses.KEY_UP):
-		player[1][MV] = MVU
+		player[1]['mv'] = MVU
 	elif (tap == curses.KEY_LEFT):
-		player[1][MV] = MVL
+		player[1]['mv'] = MVL
 	elif (tap == curses.KEY_DOWN):
-		player[1][MV] = MVD
+		player[1]['mv'] = MVD
 	elif (tap == curses.KEY_RIGHT):
-		player[1][MV] = MVR
+		player[1]['mv'] = MVR
 
-	player[1][FOW] = player[1][RO] + MOVES[player[1][MV]][RA] # prospective row move for player
-	player[1][FOL] = player[1][CO] + MOVES[player[1][MV]][CA] # prospective column move for player
-	
-	if (player[1][TUG]):
-		player[1][TOW] = player[1][RO] + MOVES[player[1][MV]][TR] # prospective row move for player
-		player[1][TOL] = player[1][CO] + MOVES[player[1][MV]][TC] # prospective column move for player
 	
 	if (board[player[1][FOW]][player[1][FOL]] == BAKGRD):
 		move_player()
@@ -852,12 +871,12 @@ def take_input():
 				if (keypress != ord(' ')):
 					tugspan = keypress # logs the present direction to compare for direction change
 					while (tugspan == keypress): # this ensures the player has pull function until direction key changes.
-						move_player(keypress)
+						direct_player(keypress)
 						player[1]['tug'] = True
 						keypress = stdscr.getch()				
 		if keypress != ord(' '):
 			player[1]['tug'] = False
-			move_player(keypress)
+			direct_player(keypress)
 
 
 #########################################################################################################
