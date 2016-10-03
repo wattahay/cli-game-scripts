@@ -83,20 +83,25 @@ keypress = ''
 
 ##################################-- formatted character constants
 
-eggsub = 8329			# unicode key for subscript 9 (8328 = 8, and so on)
-egg2nd = 32			# unicode key for a space character 
-REGGX = re.compile('\u2B2C.') 	# use re.match(REGGX, char) to see if a piece is an egg
 
 # (ANSI styles)	 FG   + 	BG   + 		Style +		Characters +			Reset
 BAKGRD = 							'  ' 
 BLOCK =		       		'\033[43m' +	       		'  ' + 				'\033[0m'
 KILLBLOCK = 	'\033[31m'	'\033[43m' + 			chr(9618) + chr(9618) + 	'\033[0m'
 BOX = 		'\033[32m' +					chr(9618) + chr(9618) +		'\033[0m'
-EGG = 		'\033[37m' +					chr(11052) + chr(egg2nd) + 	'\033[0m'
+XPBOX = 	'\033[32m' + 			'\033[2m' +	chr(9618) + chr(9618) + 	'\033[0m'
 BEAST = 	'\033[31m' +					chr(9500) + chr(9508) +		'\033[0m'
 MONSTER = 	'\033[31m' +					chr(9568) + chr(9571) +		'\033[0m'
 PLAYER = 	'\033[34m' +					chr(9664) + chr(9654) +		'\033[0m'
 # http://wiki.bash-hackers.org/scripting/terminalcodes
+
+eggsub = 8329			# unicode key for subscript 9 (8328 = 8, and so on)
+egg2nd = 32			# unicode key for a space character 
+REGGX = re.compile('\u2B2C.') 	# use re.match(REGGX, char) to see if a piece is an egg
+
+def EGG(sub):
+	return '\033[37m\033[2m' + chr(11052) + chr(sub) + '\033[0m'
+
 
 ###################################-- Pawn Classes (Dictionaries)
 ##################################-- Pawn Lists 
@@ -106,25 +111,30 @@ PLAYER = 	'\033[34m' +					chr(9664) + chr(9654) +		'\033[0m'
 beasts = [{
 	'frames': ((int(beast_speed / lcd_time)) - 1),
 	'frame':0,
-	'chr': BEAST 
+	'chr': BEAST,
+	'pnts': 2 
 	}]
 
 monsters = [{
-	'frames': ((int(beast_speed / lcd_time)) - 1),
+	'frames': ((int(monster_speed / lcd_time)) - 1),
 	'frame':0,
-	'chr': MONSTER
+	'chr': MONSTER,
+	'pnts': 6
 	}]
 
 eggs = [{
-	'frames': ((int(beast_speed / lcd_time)) - 1),
+	'frames': ((int(egg_speed / lcd_time)) - 1),
 	'frame':0,
-	'chr': EGG
+	'incu_frames': (int(1 / lcd_time)),
+	'incu_frame': 0,
+	'pnts': 4
 	}]
 
 # 'sub'		updated digital unicode reference to subscript character
 # 'wait'	randomized wait time before hatching countdown
 player = [{
-		'chr': PLAYER, 
+		'chr': PLAYER,
+		'pnts': 10 
 	}]
 	
 # 'push'
@@ -271,69 +281,18 @@ def print_board(board_array, stats): #{
 
 	if (debug):
 		print('\033[u' + '\033[' + str(len(board) + 4) + 'B' + '\rPlayer: ' + str(player) )
-		print('\033[u' + '\033[' + str(len(board) + 5) + 'B' + '\rBeasts: ' + str(beasts[0]))
-		for i in range(1, len(beasts)):
-			print('\033[u' + '\033[' + str(len(board) + 6) + 'B' + '\r\tBeast ' + str(i) + ' :' + str(beasts[i]))
+		print('\033[u' + '\033[' + str(len(board) + 5) + 'B' + '\rEggs: ' + str(eggs[0]))
+		for i in range(1, len(eggs)):
+			print('\033[u' + '\033[' + str(len(board) + 5 + i) + 'B' + '\r\tEgg ' + str(i) + ' :' + str(eggs[i]))
 		 
 	print('\033[H\033[8m')
-
-
-
-
-
-
-
-def clear_print_board(board_array, stats): #{
-
-	global ttyCols, top_margin, left_margin, score, lives, level, board_rows, board_cols
-
-	system('clear')
-
-	# Hide the cursor
-	system('tput civis')
-	
-
-	#     |
-	#     V
-	#     |
-	#     V
-	#     |
-	#     V
-	#     |
-	#     V
-	#########-- Print Top Margin	
-	print('\n'*top_margin)
-	
-						#########################################
-						#					#
-	#########-- Print Left Margin ->->->->	#	H				#
-	#########-- Print Board			#		H	<>		#
-	for rowi in range(board_rows):		#					#
-		print('\r' + ' '*left_margin + ''.join(board_array[rowi]))		#
-						#				H	#
-						#					#
-						#	H				#
-						#########################################
-	#########-- Print Game Stats -------->  Score: 200  Lives: 4  Level: 3
-	if (stats):
-		print('\r' + ' '*left_margin + '   SCORE: ' + str(score) + '   LIVES: ' + str(lives) + '    LEVEL: ' + str(level)) 
-
-	########-- Print Debug Stats
-	if (debug):
-		print('\rPlayer: ' + str(player) + '\n')
-		print('\rBeasts: ' + str(beasts[0]))
-		for i in range(1, len(beasts)):
-			print('\r\tBeast ' + str(i) + ' :' + str(beasts[i]))
-		 
-	print('\033[H\033[8m')
-
-	
 
 
 
 ###############################################################
 ####################################--block_cnt--##############
 ###############################################################
+
 def place_randomly(char, count):
 
 	step = 1	
@@ -381,6 +340,8 @@ def place_blocks(blocks): #{
 				
 #}
 
+
+
 def place_boxes():
 	
 	global play_rows, play_cols, classic_board, BOX
@@ -396,38 +357,136 @@ def place_boxes():
 			
 
 	
-#############################################################################
-##################################################-- place the pieces -- ####
-#############################################################################
+##########################################################################################################
+###############################################################################-- place the pieces -- ####
+##########################################################################################################
 
 
+def place_beasts(count):
 
-def place_pawns(pawns, count):
+	global beasts, board
 
-	pawn = pawns[0]['chr']
 	step = 0 
 	while(step < count):
 		row = randint(1, (board_rows - 1))
 		col = randint(1, (board_cols - 1))
 		if(board[row][col] == BAKGRD):
-			board[row][col] = pawn 
-			pawns.append({'ro':row, 'co':col, 'tug':False, 'stg':0 })
+			board[row][col] = beasts[0]['chr'] 
+			beasts.append({'ro':row, 'co':col, 'stg':0 })
 			step += 1
-			if (pawn != PLAYER):
-				pawns[step]['stg'] = randint(1, (pawns[0]['frames']))
+			beasts[step]['stg'] = randint(1, (beasts[0]['frames']))
 
-	return pawns
+###########################################################################################
+
+def hatch_monster(row, col):
+
+	global monsters, board
+
+	stagger = randint(1, (monsters[0]['frames']))	
+	board[row][col] = MONSTER
+	monsters.append({'ro':row, 'co':col,'stg':stagger })
+
+
+
+def place_monsters(count):
+
+	global monsters, board
+
+	step = 0 
+	while(step < count):
+		row = randint(1, (board_rows - 1))
+		col = randint(1, (board_cols - 1))
+		if(board[row][col] == BAKGRD):
+			hatch_monster(row, col)
+			step += 1
+
+
+###########################################################################################################
+########################################################################################-- EGGS --#########
+###########################################################################################################
+
+
+def lay_egg(row, col):
+
+	global monsters, beasts, eggs, board
+
+	wait_time = (len(beasts) + len(monsters)) * (randint(4, 8)) # seconds of wait time before egg starts counting down 
+	wait_frames = wait_time * eggs[0]['incu_frames'] # see line ~120 (frames in one second) times (random wait seconds)
+	stag = randint(1, eggs[0]['frames']) # the frame that the egg counts down on
+	board[row][col] = EGG(32)
+	eggs.append({'ro': row, 'co': col, 'wait': wait_frames, 'stg': stag, 'sub':32})
+
+
+##############################################################################################
+
+
+def place_eggs(count):
+
+	global board
+
+	step = 0 
+	while(step < count):
+		row = randint(1, (board_rows - 1))
+		col = randint(1, (board_cols - 1))
+		if(board[row][col] == BAKGRD):
+			lay_egg(row, col)
+			step += 1
+
+
+#####################################################################
+
+
+
+
+def hatch_eggs():
+	# this function runs through all the eggs, and increments their time
+	# it transition eggs from wait phase, to countdown, to Monster
+	# wait_time is number of enemies at the time of creation times 4-16 (in seconds)
+	# egg_speed is usually between 2 and 4 seconds. It is the time between countdown numbers
+	global eggs, board, egg_speed, lcd_time
+
+
+	if eggs[0]['frame'] == eggs[0]['frames']:
+		eggs[0]['frame'] = 0
+	else:
+		eggs[0]['frame'] += 1
+	if eggs[0]['incu_frame'] == eggs[0]['incu_frames']:
+		eggs[0]['incu_frame'] = 0
+	else:
+		eggs[0]['incu_frame'] += 1
+
+
+	# egg_speed, incu_frames, incu_frame, frames, frame, wait, stg
+	# each egg: wait, stg
+	for i in range(1, (len(eggs))):
+		if (eggs[i]['wait'] > 0):
+			eggs[i]['wait'] -= 1
+		elif (eggs[i]['wait'] == 0) & (eggs[i]['sub'] == 32):
+			eggs[i]['sub'] = 8329
+		elif (eggs[i]['wait'] == 0) :
+			if ((eggs[i]['stg'] == eggs[0]['frame']) & (eggs[i]['sub'] > 8320)):
+				eggs[i]['sub'] -= 1
+				board[eggs[i]['ro']][eggs[i]['co']] = EGG(eggs[i]['sub'])
+			elif ((eggs[i]['sub'] == 8320) & (eggs[i]['stg'] == eggs[0]['frame'])):
+				hatch_monster(eggs[i]['ro'], eggs[i]['co'])
+				del eggs[i]
+		
 	
 
-
 ##############################################################################
-##############################################-- move pieces --##############
+###############################################-- move pieces --##############
 ##############################################################################
-
-
-
-
-
+def place_player():
+	
+	step = 0 
+	while(step < 1):
+		row = randint(1, (board_rows - 1))
+		col = randint(1, (board_cols - 1))
+		if(board[row][col] == BAKGRD):
+			board[row][col] = player[0]['chr']
+			step += 1
+			player.append({'ro': row, 'co': col, 'tug': False })
+			step += 1
 
 
 def kill_player():
@@ -437,7 +496,7 @@ def kill_player():
 	board[ player[1]['ro'] ][ player[1]['co'] ] = BAKGRD
 	lives -= 1
 	del player[1]
-	place_pawns(player, 1)
+	place_player()
 	
 	def audio_kill():
 		system('play -q audio/loss2.ogg')
@@ -445,9 +504,20 @@ def kill_player():
 	threading.Thread(target=audio_kill).start()
 
 
+
+
+
 def move_enemies(pawns): #{
 
 	global board, player, MVU, MVL, MVD, MVR, MVUL, MVUR, MVDL, MVDR, MOVES
+
+
+	if pawns[0]['frame'] == pawns[0]['frames']:
+		pawns[0]['frame'] = 0
+	else:
+		pawns[0]['frame'] += 1
+
+
 
 	move_priority = []
 	move = ''
@@ -484,7 +554,7 @@ def move_enemies(pawns): #{
 				move_priority = [ MVL, MVUL, MVDL, MVU, MVD, MVUR, MVDR, MVR ] # LEFT range priorities
 
 			priority_odds = [	#145 total
-				[100, False],	#98		**********************************************
+				[98, False],	#98		**********************************************
 				[18, False],	#18 or 36	* These values determine the odds of moves   *
 				[18, False],	#18 or 36	* for an enemy if those moves are available. *
 				[4, False],	#4 or 8		* If a move has an equivalent priority to    *
@@ -541,18 +611,107 @@ def move_enemies(pawns): #{
 				pawns[pwni]['co'] = pawns[pwni]['co'] + MOVES[move]['ca']
 #}
 
+def push_tree(direction):
 
-#def move_dist_enemies(pieces): #{
-#	# pick one of the beasts to move
-#	for i in range(1, len(pieces)):
-#		if pieces[i]['stag'] == pieces[0]['frame']:
-##			dirindex = randint(0, len(DIR_LIS) - 1) # randomly pick a direction to go
-#			direction = DIR_LIS[dirindex]
-#			move_pawns(direction, pieces, i)
-#}
+	global player, eggs, board, MOVES, BAKGRD, BOX, MVU, MVL, MVR, MVL
+
+	push_eggs = []  # use re.match(REGGX, char)
+ 
+	stnce_r = player[1]['ro']
+	stnce_c = player[1]['co']
+	intend_r = stnce_r + MOVES[direction]['ra']
+	intend_c = stnce_c + MOVES[direction]['ca']
+	def probe_r(p_ind):
+		return player[1]['ro'] + p_ind * MOVES[direction]['ra']
+	def probe_c(p_ind):
+		return player[1]['co'] + p_ind * MOVES[direction]['ca']
+	def kill_r(p_ind):
+		return player[1]['ro'] + (p_ind + 1) * MOVES[direction]['ra']
+	def kill_c(p_ind):
+		return player[1]['co'] + (p_ind + 1) * MOVES[direction]['ca']
+	def ram_r(p_ind):
+		return player[1]['ro'] + (p_ind - 1) * MOVES[direction]['ra']
+	def ram_c(p_ind):
+		return player[1]['co'] + (p_ind - 1) * MOVES[direction]['ca']
 
 
-#
+
+	def move_eggs():
+	
+		for i in range(len(push_eggs)):
+			eggs[push_eggs[i]]['ro'] += MOVES[direction]['ra']
+			eggs[push_eggs[i]]['co'] += MOVES[direction]['ca']
+			board[ eggs[push_eggs[i]]['ro'] ][ eggs[push_eggs[i]]['co'] ] = EGG(eggs[push_eggs[i]]['sub'])
+
+	
+
+
+	def push_move():
+
+		board[probe_r(probe)][probe_c(probe)] = board[probe_r(probe - 1)][probe_c(probe - 1)]	# make board space same as preceeding space
+		player[1]['ro'] = intend_r	
+		player[1]['co'] = intend_c								# make player fol and fow the player
+		board[intend_r][intend_c] = player[0]['chr']						# move_player()
+		move_eggs(push_eggs, direction)								# increment all push_eggs
+
+
+	def kill_enemy(pawns, row, col):
+
+		global points
+
+		for i in range(1, len(pawns)):
+			if ((pawns[i]['ro'] == row) & (pawns[i]['co'] == col)):
+				del pawns[i]
+				board[row][col] = BAKGRD
+				points += pawns[0]['pnts']
+
+		
+
+
+	probe = 2
+	loop = True
+	while (loop):
+
+		space = board[probe_r(probe)][probe_c(probe)]
+		ram_space = board[ram_r(probe)][ram_c(probe)]
+		space_after = board[kill_r(probe)][kill_c(probe)]
+	
+		if (space == BOX):		# if space is a box
+			probe += 1 		# start loop over
+		elif (re.match(REGGX, space)): 	# if space is a egg
+			if (space_after == BORDER) | (space_after == KILLBLOCK):	# if next block after egg is a border
+				kill_enemy(eggs, probe_r, probe_c) 			# del egg from global egg list
+				push_move()						# make space same as preceeding space
+			else:
+				for i in range(1, len(eggs)): 				# add egg to push_eggs list
+					if ((eggs[i]['ro'] == probe_r(probe)) & (eggs[i]['co'] == probe_c(probe))):
+						push_eggs.append(i)
+				probe += 1
+		elif (space == BAKGRD): 		# if space is 
+			push_move()
+			loop = False
+		elif (space == BORDER):				# if space is a border
+			if (re.match(REGGX, (board[ram_r(probe)][ram_c(probe)]))):
+				kill_enemy(eggs, ram_r(probe), ram_c(probe))
+			loop = False
+		elif (space == KILLBLOCK):	 		# if space is a killblock
+			if (re.match(REGGX, (board[ram_r(probe)][ram_c(probe)]))):
+				kill_enemy(eggs, ram_r(probe), ram_c(probe))
+			loop = False
+		elif (space == BEAST): # if space is a beast
+			if ((space_after == KILLBLOCK) | (space_after == BORDER) | (space_after == BORDER)):
+				kill_enemy(beasts, probe_r(probe), probe_c(probe))
+				push_move()
+			loop = False
+		elif (space == MONSTER):# if space is a monster	
+			if ((space_after == KILLBLOCK) | (space_after == BORDER)):
+				kill_enemy(monsters, probe_r(probe), probe_c(probe))
+				push_move()		
+			loop = False
+
+
+
+
 
 
 def move_player(direction):
@@ -696,11 +855,11 @@ build_the_board()
 place_blocks(BLOCK)
 place_boxes()
 
-monsters = place_pawns(monsters, monster_cnt)
-beasts = place_pawns(beasts, beast_cnt)
-#eggs = place_pawns(eggs, egg_cnt)
+place_beasts(2)
+place_monsters(2)
+place_eggs(2)
 
-player = place_pawns(player, 1 )
+place_player()
 
 
 
@@ -728,6 +887,8 @@ def take_input():
 		elif keypress == ord('p'):
 			keypress = stdscr.getch()
 			keypress = ''
+		elif keypress == ord('r'):
+			system('clear')
 		elif keypress == ord('b'):
 			if debug == True:
 				debug = False
@@ -765,14 +926,8 @@ while(True):
 			sleep(.05)
 		game_pause = 0
 	else:
-		if beasts[0]['frame'] == beasts[0]['frames']:
-			beasts[0]['frame'] = 0
-		else:
-			beasts[0]['frame'] += 1
-		if monsters[0]['frame'] == monsters[0]['frames']:
-			monsters[0]['frame'] = 0
-		else:
-			monsters[0]['frame'] += 1
 		move_enemies(beasts)
+		move_enemies(monsters)
+		hatch_eggs()
 		print_board(board, True)
 	sleep(lcd_time)
