@@ -2,9 +2,9 @@ Python(3) script based on the 1984 DOS game, BEAST
 RUNS BEST IN xfce4-terminal
 
 
-=====================
-=====-- Setup --=====
-=====================
+
+------- Setup -------
+=
 
 (The game runs in the terminal)
 
@@ -18,7 +18,8 @@ RUNS BEST IN xfce4-terminal
 
 
 
-=== Controls ===
+----- Controls -----
+=
 
 
 'q'.............quit
@@ -28,7 +29,8 @@ arrows..........move
 spacebar........pull blocks
 
 
-=== For Best Results ===
+----- For Best Results -----
+=
 
 * use xfce4-terminal
 	* xfce4-terminal has a lot more font styling options than gnome-terminal
