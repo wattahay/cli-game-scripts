@@ -16,8 +16,8 @@ screen_cols = int(ttyCols / 2)#####################-- global settings --#####
 
 ##################################-- tty dynamic board size settings 
 
-max_play_rows = 40 	# alter max game height here
-max_play_cols = 80 	# alter max game width here
+max_play_rows = 100 	# alter max game height here
+max_play_cols = 100	# alter max game width here
 max_beast_cnt = 10	# alter max beasts here
 
 ##################################-- starting game statistics
@@ -37,35 +37,26 @@ monster_scr = 6		# points for killing monsters
 death_scr = -10		# point loss for dying
 
 ##################################-- game time parameters
-# framerate of the whole game
-# best results between .05 and .08
-# settings may have varied results between terminal and console
-# settings may have varied results with OS screen refresh
-# to check Ubuntu screen refresh in hz (refreshes per second), type 'xrandr' in terminal
-# 1 (second) / 60.02 = ~.01666111... ???? not sure whether it makes a difference.
 lcd_time = .03
 
 ###############################
 
-beast_speed = 1.3	# seconds between enemy moves
-monster_speed = 1.3	# seconds between enemy moves
-egg_speed = 4		# seconds between countdowns
+beast_speed = .5 	# seconds between enemy moves
+monster_speed = .5	# seconds between enemy moves
+egg_speed = 2		# seconds between countdowns
 
 
-
-		# frame-rate of entire game (CODISTADIT)
-
-####################################-- pawn move constants
+####################################-- move constants
 
 MOVES = {
-'U': {	'di':'U', 	'ra':-1, 	'ca':0, 	'mm':-1},
-'D': {	'di':'D', 	'ra':1, 	'ca':0, 	'mm':1},
-'L': {	'di':'L', 	'ra':0, 	'ca':-1, 	'mm':-1},
-'R': {	'di':'R',	'ra':0, 	'ca':1, 	'mm':1},
-'UL': {	'di':'UL',	'ra':-1, 	'ca':-1},
-'UR': {	'di':'UR', 	'ra':-1, 	'ca':1},
-'DL': {	'di':'DL', 	'ra':1, 	'ca':-1},
-'DR': {	'di':'DR', 	'ra':1, 	'ca':1}
+ 'U': {	'ra':-1,	'ca':0	}, 	# ra - "row adjustment"
+ 'D': {	'ra':1, 	'ca':0	},	# ca - "column adjustment"
+ 'L': {	'ra':0, 	'ca':-1	},
+ 'R': {	'ra':0, 	'ca':1	},
+'UL': {	'ra':-1, 	'ca':-1	},
+'UR': {	'ra':-1, 	'ca':1	},
+'DL': {	'ra':1, 	'ca':-1	},
+'DR': {	'ra':1, 	'ca':1	}
 }
 
 MVU = 'U'
@@ -85,14 +76,14 @@ keypress = ''
 
 
 # (ANSI styles)	 FG   + 	BG   + 		Style +		Characters +			Reset
-BAKGRD = 							'  ' 
+BAKGRD = 			'\033[40m' +			'  ' 
 BLOCK =		       		'\033[43m' +	       		'  ' + 				'\033[0m'
 KILLBLOCK = 	'\033[31m'	'\033[43m' + 			chr(9618) + chr(9618) + 	'\033[0m'
-BOX = 		'\033[32m' +					chr(9618) + chr(9618) +		'\033[0m'
-XPBOX = 	'\033[32m' + 			'\033[2m' +	chr(9618) + chr(9618) + 	'\033[0m'
-BEAST = 	'\033[31m' +					chr(9500) + chr(9508) +		'\033[0m'
-MONSTER = 	'\033[31m' +					chr(9567) + chr(9569) +		'\033[0m'
-PLAYER = 	'\033[34m' +					chr(9664) + chr(9654) +		'\033[0m'
+BOX = 		'\033[32m' +	'\033[40m' +			chr(9618) + chr(9618) +		'\033[0m'
+XPBOX = 	'\033[32m' + 	'\033[40m' +	'\033[2m' +	chr(9618) + chr(9618) + 	'\033[0m'
+BEAST = 	'\033[31m' +	'\033[40m' +			chr(9500) + chr(9508) +		'\033[0m'
+MONSTER = 	'\033[31m' +	'\033[40m' +			chr(9568) + chr(9571) +		'\033[0m'
+PLAYER = 	'\033[34m' +	'\033[40m' +			chr(9664) + chr(9654) +		'\033[0m'
 # http://wiki.bash-hackers.org/scripting/terminalcodes
 
 eggsub = 8329			# unicode key for subscript 9 (8328 = 8, and so on)
@@ -137,14 +128,10 @@ player = [{
 		'pnts': 10 
 	}]
 	
-# 'push'
 # 'tug'
 # 'ro'		row
 # 'co'		col
-# 'fow'		potential move
-# 'fol'		potential move
-# 'mv'		direction of travel
-# 'stag'	individual frame
+# 'stg'		"stagger" (frame of movement) compared to others
 ################################################################################################
 ####################################################################-- level 1 setup --#########
 ################################################################################################
@@ -156,11 +143,6 @@ kills = 0	# changes in-game
 level = 1	# change in order to start on a specific level
 score = 0	# in-game total score
 points = 0	# in-game level points added at end of level
-
-
-
-
-
 
 
 ################################################################################################
@@ -289,7 +271,7 @@ def print_board(board_array, stats): #{
 			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\rMonsters: ' + str(monsters[i]))
 			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\tMonster ' + str(i) + ': ' + str(monsters[i]))
 		 
-	print('\033[H')
+	print('\033[H\033[8m')
 
 
 
@@ -428,7 +410,7 @@ def lay_egg(row, col):
 
 	global monsters, beasts, eggs, board
 
-	wait_frames = (len(beasts) + len(monsters)) * eggs[0]['incu_frames'] * (randint(1, 6)) # seconds of wait time before egg starts counting down 
+	wait_frames = (len(beasts) + len(monsters)) * eggs[0]['incu_frames'] * (randint(1, 4)) # seconds of wait time before egg starts counting down 
 	stag = randint(1, eggs[0]['frames']) # the frame that the egg counts down on
 	board[row][col] = EGG(32)
 	eggs.append({'ro': row, 'co': col, 'wait': wait_frames, 'stg': stag, 'sub':32})
@@ -461,7 +443,8 @@ def hatch_eggs():
 	# wait_time is number of enemies at the time of creation times 4-16 (in seconds)
 	# egg_speed is usually between 2 and 4 seconds. It is the time between countdown numbers
 	global eggs, board, egg_speed, lcd_time, audio
-
+	
+	di = 0 # keeps track of index to accomodate for egg deletions
 
 	if eggs[0]['frame'] == eggs[0]['frames']:
 		eggs[0]['frame'] = 0
@@ -471,23 +454,23 @@ def hatch_eggs():
 		eggs[0]['incu_frame'] = 0
 	else:
 		eggs[0]['incu_frame'] += 1
-
-
 	# egg_speed, incu_frames, incu_frame, frames, frame, wait, stg
 	# each egg: wait, stg
 	for i in range(1, (len(eggs))):
-		if (eggs[i]['wait'] > 0):
-			eggs[i]['wait'] -= 1
-		elif (eggs[i]['wait'] == 0) & (eggs[i]['sub'] == 32):
-			eggs[i]['sub'] = 8329
-		elif (eggs[i]['wait'] == 0) :
-			if ((eggs[i]['stg'] == eggs[0]['frame']) & (eggs[i]['sub'] > 8320)):
-				eggs[i]['sub'] -= 1
-				board[eggs[i]['ro']][eggs[i]['co']] = EGG(eggs[i]['sub'])
-			elif ((eggs[i]['sub'] == 8320) & (eggs[i]['stg'] == eggs[0]['frame'])):
-				hatch_monster(eggs[i]['ro'], eggs[i]['co'])
-				del eggs[i]
+		if (eggs[i - di]['wait'] > 0):
+			eggs[i - di]['wait'] -= 1
+		elif (eggs[i - di]['wait'] == 0) & (eggs[i - di]['sub'] == 32):
+			eggs[i - di]['sub'] = 8329
+		elif (eggs[i - di]['wait'] == 0) :
+			if ((eggs[i - di]['stg'] == eggs[0]['frame']) & (eggs[i - di]['sub'] > 8320)):
+				eggs[i - di]['sub'] -= 1
+				board[eggs[i - di]['ro']][eggs[i - di]['co']] = EGG(eggs[i - di]['sub'])
+			elif ((eggs[i - di]['sub'] == 8320) & (eggs[i - di]['stg'] == eggs[0]['frame'])):
+				hatch_monster(eggs[i - di]['ro'], eggs[i - di]['co'])
+				del eggs[i - di]
 				audio = 'hatch'
+				di += 1
+
 
 
 ##############################################################################
@@ -623,7 +606,7 @@ def move_enemies(pawns): #{
 				pawns[pwni]['co'] = pawns[pwni]['co'] + MOVES[move]['ca']
 #}
 
-def push_tree(direction):
+def push_tree(intent):
 
 	global player, eggs, board, MOVES, BAKGRD, BOX, MVU, MVL, MVR, MVL
 
@@ -631,20 +614,20 @@ def push_tree(direction):
  
 	stnce_r = player[1]['ro']
 	stnce_c = player[1]['co']
-	intend_r = stnce_r + MOVES[direction]['ra']
-	intend_c = stnce_c + MOVES[direction]['ca']
+	intend_r = stnce_r + MOVES[intent]['ra']
+	intend_c = stnce_c + MOVES[intent]['ca']
 	def probe_r(p_ind):
-		return player[1]['ro'] + p_ind * MOVES[direction]['ra']
+		return player[1]['ro'] + p_ind * MOVES[intent]['ra']
 	def probe_c(p_ind):
-		return player[1]['co'] + p_ind * MOVES[direction]['ca']
+		return player[1]['co'] + p_ind * MOVES[intent]['ca']
 	def kill_r(p_ind):
-		return player[1]['ro'] + (p_ind + 1) * MOVES[direction]['ra']
+		return player[1]['ro'] + (p_ind + 1) * MOVES[intent]['ra']
 	def kill_c(p_ind):
-		return player[1]['co'] + (p_ind + 1) * MOVES[direction]['ca']
+		return player[1]['co'] + (p_ind + 1) * MOVES[intent]['ca']
 	def ram_r(p_ind):
-		return player[1]['ro'] + (p_ind - 1) * MOVES[direction]['ra']
+		return player[1]['ro'] + (p_ind - 1) * MOVES[intent]['ra']
 	def ram_c(p_ind):
-		return player[1]['co'] + (p_ind - 1) * MOVES[direction]['ca']
+		return player[1]['co'] + (p_ind - 1) * MOVES[intent]['ca']
 
 
 
@@ -655,16 +638,15 @@ def push_tree(direction):
 			eggs[push_eggs[i]]['co'] += MOVES[direction]['ca']
 			board[ eggs[push_eggs[i]]['ro'] ][ eggs[push_eggs[i]]['co'] ] = EGG(eggs[push_eggs[i]]['sub'])
 
-	
-
 
 	def push_move():
 
-		board[probe_r(probe)][probe_c(probe)] = board[probe_r(probe - 1)][probe_c(probe - 1)]	# make board space same as preceeding space
+		board[ probe_r(probe) ][ probe_c(probe) ] = board[probe_r(probe - 1)][probe_c(probe - 1)]	# make board space same as preceeding space
+		board[ player[1]['ro'] ][ player[1]['co'] ] = BAKGRD
 		player[1]['ro'] = intend_r	
 		player[1]['co'] = intend_c								# make player fol and fow the player
 		board[intend_r][intend_c] = player[0]['chr']						# move_player()
-		move_eggs(push_eggs, direction)								# increment all push_eggs
+		move_eggs(push_eggs, intent)								# increment all push_eggs
 
 
 	def kill_enemy(pawns, row, col):
@@ -748,16 +730,16 @@ def move_player(direction):
 
 
 
-def direct_move(direction):
+def direct_move(tap_move):
 
 	global player, MOVES, board
 
-	space = board[player[1]['ro'] +  MOVES[direction]['ra'] ][ player[1]['co'] + MOVES[direction]['ca'] ]
+	space = board[player[1]['ro'] +  MOVES[tap_move]['ra'] ][ player[1]['co'] + MOVES[tap_move]['ca'] ]
 
 	if (space == BAKGRD):
-		move_player(direction)
-#	elif (space == BOX):
-#		push_tree(direction)
+		move_player(tap_move)
+	elif (space == BOX):
+		push_tree(tap_move)
 	elif (space == MONSTER) | (space == BEAST) | (space == KILLBLOCK):
 		kill_player()
 
@@ -830,7 +812,7 @@ def pause():
 
 	pauseleft = (int(ttyCols/2) - 8)
 	pausetop = (int(ttyRows/2) - 4) - (int(board_rows / 4))
-	print('\033[0m')	
+	print('\033[0m\033[40m')	
 
 	print('\033[' + str(pausetop) + ';' + str(pauseleft) + 'H' + ' '*16)
 	print('\033[' + str(pausetop + 1) + ';' + str(pauseleft) + 'H' + ' ' + chr(9556) + chr(9552)*12 + chr(9559) + ' ')
@@ -840,7 +822,7 @@ def pause():
 	print('\033[' + str(pausetop + 5) + ';' + str(pauseleft) + 'H' + ' ' + chr(9562) + chr(9552)*12 + chr(9565) + ' ')
 	print('\033[' + str(pausetop + 6) + ';' + str(pauseleft) + 'H' + ' '*16)
 	
-	print('\033[H\033[8m')
+	print('\033[H\033[0m')
 
 
 #####################################################################################################
@@ -856,9 +838,9 @@ build_the_board()
 place_blocks(BLOCK)
 place_boxes()
 
-place_beasts(2)
-place_monsters(2)
-place_eggs(2)
+place_beasts(1)
+place_monsters(0)
+place_eggs(8)
 
 place_player()
 
@@ -929,7 +911,7 @@ while(True):
 		play_audio('pause')
 		pause()
 		while(keypress == ord('p')):
-			sleep(.05)
+			sleep(.08)
 		game_pause = 0
 		play_audio('pause')
 	else:
