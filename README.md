@@ -3,7 +3,7 @@ RUNS BEST IN xfce4-terminal
 
 
 
-=== Setup ===
+===-- Setup --===
 
 (The game runs in the terminal)
 
