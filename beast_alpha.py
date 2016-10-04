@@ -16,8 +16,8 @@ screen_cols = int(ttyCols / 2)#####################-- global settings --#####
 
 ##################################-- tty dynamic board size settings 
 
-max_play_rows = 40 	# alter max game height here
-max_play_cols = 80 	# alter max game width here
+max_play_rows = 1000 	# alter max game height here
+max_play_cols = 1000	# alter max game width here
 max_beast_cnt = 10	# alter max beasts here
 
 ##################################-- starting game statistics
@@ -37,35 +37,26 @@ monster_scr = 6		# points for killing monsters
 death_scr = -10		# point loss for dying
 
 ##################################-- game time parameters
-# framerate of the whole game
-# best results between .05 and .08
-# settings may have varied results between terminal and console
-# settings may have varied results with OS screen refresh
-# to check Ubuntu screen refresh in hz (refreshes per second), type 'xrandr' in terminal
-# 1 (second) / 60.02 = ~.01666111... ???? not sure whether it makes a difference.
 lcd_time = .03
 
 ###############################
 
-beast_speed = 1.3	# seconds between enemy moves
-monster_speed = 1.3	# seconds between enemy moves
+beast_speed = .5 	# seconds between enemy moves
+monster_speed = .5	# seconds between enemy moves
 egg_speed = 4		# seconds between countdowns
 
-
-
-		# frame-rate of entire game (CODISTADIT)
 
 ####################################-- pawn move constants
 
 MOVES = {
-'U': {	'di':'U', 	'ra':-1, 	'ca':0, 	'mm':-1},
-'D': {	'di':'D', 	'ra':1, 	'ca':0, 	'mm':1},
-'L': {	'di':'L', 	'ra':0, 	'ca':-1, 	'mm':-1},
-'R': {	'di':'R',	'ra':0, 	'ca':1, 	'mm':1},
-'UL': {	'di':'UL',	'ra':-1, 	'ca':-1},
-'UR': {	'di':'UR', 	'ra':-1, 	'ca':1},
-'DL': {	'di':'DL', 	'ra':1, 	'ca':-1},
-'DR': {	'di':'DR', 	'ra':1, 	'ca':1}
+ 'U': {	'ra':-1,	'ca':0	},
+ 'D': {	'ra':1, 	'ca':0	},
+ 'L': {	'ra':0, 	'ca':-1	},
+ 'R': {	'ra':0, 	'ca':1	},
+'UL': {	'ra':-1, 	'ca':-1	},
+'UR': {	'ra':-1, 	'ca':1	},
+'DL': {	'ra':1, 	'ca':-1	},
+'DR': {	'ra':1, 	'ca':1	}
 }
 
 MVU = 'U'
@@ -85,14 +76,14 @@ keypress = ''
 
 
 # (ANSI styles)	 FG   + 	BG   + 		Style +		Characters +			Reset
-BAKGRD = 							'  ' 
+BAKGRD = 			'\033[40m' +			'  ' 
 BLOCK =		       		'\033[43m' +	       		'  ' + 				'\033[0m'
 KILLBLOCK = 	'\033[31m'	'\033[43m' + 			chr(9618) + chr(9618) + 	'\033[0m'
-BOX = 		'\033[32m' +					chr(9618) + chr(9618) +		'\033[0m'
-XPBOX = 	'\033[32m' + 			'\033[2m' +	chr(9618) + chr(9618) + 	'\033[0m'
-BEAST = 	'\033[31m' +					chr(9500) + chr(9508) +		'\033[0m'
-MONSTER = 	'\033[31m' +					chr(9567) + chr(9569) +		'\033[0m'
-PLAYER = 	'\033[34m' +					chr(9664) + chr(9654) +		'\033[0m'
+BOX = 		'\033[32m' +	'\033[40m' +			chr(9618) + chr(9618) +		'\033[0m'
+XPBOX = 	'\033[32m' + 	'\033[40m' +	'\033[2m' +	chr(9618) + chr(9618) + 	'\033[0m'
+BEAST = 	'\033[31m' +	'\033[40m' +			chr(9500) + chr(9508) +		'\033[0m'
+MONSTER = 	'\033[31m' +	'\033[40m' +			chr(9568) + chr(9571) +		'\033[0m'
+PLAYER = 	'\033[34m' +	'\033[40m' +			chr(9664) + chr(9654) +		'\033[0m'
 # http://wiki.bash-hackers.org/scripting/terminalcodes
 
 eggsub = 8329			# unicode key for subscript 9 (8328 = 8, and so on)
@@ -623,7 +614,7 @@ def move_enemies(pawns): #{
 				pawns[pwni]['co'] = pawns[pwni]['co'] + MOVES[move]['ca']
 #}
 
-def push_tree(direction):
+def push_tree(intent):
 
 	global player, eggs, board, MOVES, BAKGRD, BOX, MVU, MVL, MVR, MVL
 
@@ -631,20 +622,20 @@ def push_tree(direction):
  
 	stnce_r = player[1]['ro']
 	stnce_c = player[1]['co']
-	intend_r = stnce_r + MOVES[direction]['ra']
-	intend_c = stnce_c + MOVES[direction]['ca']
+	intend_r = stnce_r + MOVES[intent]['ra']
+	intend_c = stnce_c + MOVES[intent]['ca']
 	def probe_r(p_ind):
-		return player[1]['ro'] + p_ind * MOVES[direction]['ra']
+		return player[1]['ro'] + p_ind * MOVES[intent]['ra']
 	def probe_c(p_ind):
-		return player[1]['co'] + p_ind * MOVES[direction]['ca']
+		return player[1]['co'] + p_ind * MOVES[intent]['ca']
 	def kill_r(p_ind):
-		return player[1]['ro'] + (p_ind + 1) * MOVES[direction]['ra']
+		return player[1]['ro'] + (p_ind + 1) * MOVES[intent]['ra']
 	def kill_c(p_ind):
-		return player[1]['co'] + (p_ind + 1) * MOVES[direction]['ca']
+		return player[1]['co'] + (p_ind + 1) * MOVES[intent]['ca']
 	def ram_r(p_ind):
-		return player[1]['ro'] + (p_ind - 1) * MOVES[direction]['ra']
+		return player[1]['ro'] + (p_ind - 1) * MOVES[intent]['ra']
 	def ram_c(p_ind):
-		return player[1]['co'] + (p_ind - 1) * MOVES[direction]['ca']
+		return player[1]['co'] + (p_ind - 1) * MOVES[intent]['ca']
 
 
 
@@ -660,11 +651,12 @@ def push_tree(direction):
 
 	def push_move():
 
-		board[probe_r(probe)][probe_c(probe)] = board[probe_r(probe - 1)][probe_c(probe - 1)]	# make board space same as preceeding space
+		board[ probe_r(probe) ][ probe_c(probe) ] = board[probe_r(probe - 1)][probe_c(probe - 1)]	# make board space same as preceeding space
+		board[ player[1]['ro'] ][ player[1]['co'] ] = BAKGRD
 		player[1]['ro'] = intend_r	
 		player[1]['co'] = intend_c								# make player fol and fow the player
 		board[intend_r][intend_c] = player[0]['chr']						# move_player()
-		move_eggs(push_eggs, direction)								# increment all push_eggs
+		move_eggs(push_eggs, intent)								# increment all push_eggs
 
 
 	def kill_enemy(pawns, row, col):
@@ -748,16 +740,16 @@ def move_player(direction):
 
 
 
-def direct_move(direction):
+def direct_move(key_move):
 
 	global player, MOVES, board
 
 	space = board[player[1]['ro'] +  MOVES[direction]['ra'] ][ player[1]['co'] + MOVES[direction]['ca'] ]
 
 	if (space == BAKGRD):
-		move_player(direction)
-	elif (space == BOX):
-		push_tree(direction)
+		move_player(key_move)
+#	elif (space == BOX):
+#		push_tree(direction)
 	elif (space == MONSTER) | (space == BEAST) | (space == KILLBLOCK):
 		kill_player()
 
@@ -929,7 +921,7 @@ while(True):
 		play_audio('pause')
 		pause()
 		while(keypress == ord('p')):
-			sleep(.05)
+			sleep(.08)
 		game_pause = 0
 		play_audio('pause')
 	else:
