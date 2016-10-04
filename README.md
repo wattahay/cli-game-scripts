@@ -3,7 +3,7 @@ RUNS BEST IN xfce4-terminal
 
 
 
-#------- Setup -------
+###------- Setup -------
 (The game runs in the terminal)
 
 1. download beast.py
@@ -15,7 +15,7 @@ RUNS BEST IN xfce4-terminal
 - set the board option to 'c' for classic mode or 't' for dynamic terminal sizing
 
 
-#----- Controls -----
+###----- Controls -----
 
 
 * 'q'.............quit
@@ -25,7 +25,7 @@ RUNS BEST IN xfce4-terminal
 * spacebar........pull blocks
 
 
-#----- For Best Results -----
+###----- For Best Results -----
 
 
 * use xfce4-terminal
