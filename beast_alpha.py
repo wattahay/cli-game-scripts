@@ -3,7 +3,6 @@ from random import randint
 from os import system, popen
 from time import sleep
 import threading
-import re
 #################################
 #####-- get tty sizes --#########################
 #############################################################
@@ -41,8 +40,8 @@ lcd_time = .03
 
 ###############################
 
-beast_speed = .5 	# seconds between enemy moves
-monster_speed = .5	# seconds between enemy moves
+beast_speed = 3		# seconds between enemy moves
+monster_speed = 3	# seconds between enemy moves
 egg_speed = 2		# seconds between countdowns
 
 
@@ -88,10 +87,13 @@ PLAYER = 	'\033[34m' +	'\033[40m' +			chr(9664) + chr(9654) +		'\033[0m'
 
 eggsub = 8329			# unicode key for subscript 9 (8328 = 8, and so on)
 egg2nd = 32			# unicode key for a space character 
-REGGX = re.compile('\u2B2C.') 	# use re.match(REGGX, char) to see if a piece is an egg
 
 def EGG(sub):
 	return '\033[37m\033[2m' + chr(11052) + '\033[1m' + chr(sub) + '\033[0m'
+
+
+def deteggt(chegg):
+	if (chegg[0:10] == '\033[37m\033[2m' + chr(11052)): return True
 
 
 ###################################-- Pawn Classes (Dictionaries)
@@ -608,10 +610,31 @@ def move_enemies(pawns): #{
 
 def push_tree(intent):
 
-	global player, eggs, board, MOVES, BORDER, KILLBLOCK, BAKGRD, BOX, PLAYER
+	global player, eggs, board, BLOCK, MOVES, BAKGRD, BOX, MVU, MVL, MVR, MVL, PLAYER
 
 	push_eggs = []  # use re.match(REGGX, char)
  
+	stnce_r = player[1]['ro']
+	stnce_c = player[1]['co']
+	tug_r = stnce_r - MOVES[intent]['ra']
+	tug_c = stnce_c - MOVES[intent]['ca']
+	intend_r = stnce_r + MOVES[intent]['ra']
+	intend_c = stnce_c + MOVES[intent]['ca']
+	def probe_r(p_ind):
+		return player[1]['ro'] + p_ind * MOVES[intent]['ra']
+	def probe_c(p_ind):
+		return player[1]['co'] + p_ind * MOVES[intent]['ca']
+	def wall_r(p_ind):
+		return player[1]['ro'] + (p_ind + 1) * MOVES[intent]['ra']
+	def wall_c(p_ind):
+		return player[1]['co'] + (p_ind + 1) * MOVES[intent]['ca']
+	def ram_r(p_ind):
+		return player[1]['ro'] + (p_ind - 1) * MOVES[intent]['ra']
+	def ram_c(p_ind):
+		return player[1]['co'] + (p_ind - 1) * MOVES[intent]['ca']
+
+
+
 	def move_eggs():
 	
 		for i in range(len(push_eggs)):
@@ -622,8 +645,12 @@ def push_tree(intent):
 
 	def push_move():
 
-		board[ probe_r ][ probe_c ] = board[ram_r][ram_c]	# make board space same as preceeding space
-		board[ stnce_r ][ stnce_c ] = BAKGRD
+		board[ probe_r(probe) ][ probe_c(probe) ] = board[probe_r(probe - 1)][probe_c(probe - 1)]	# make board space same as preceeding space
+		if ((player[1]['tug']) & (board[tug_r][tug_c] == BOX)):
+			board[tug_r][tug_c] = BAKGRD
+			board[stnce_r][stnce_c] = BOX
+		else:
+			board[ player[1]['ro'] ][ player[1]['co'] ] = BAKGRD
 		player[1]['ro'] = intend_r	
 		player[1]['co'] = intend_c								# make player fol and fow the player
 		board[intend_r][intend_c] = PLAYER						# move_player()
@@ -641,56 +668,48 @@ def push_tree(intent):
 				points += pawns[0]['pnts']
 
 
-	stnce_r = player[1]['ro'] # current player row
-	stnce_c = player[1]['co'] # current player column
-	intend_r = stnce_r + MOVES[intent]['ra'] # intended board row
-	intend_c = stnce_c + MOVES[intent]['ca'] # intended board column
 
 	probe = 2
 	loop = True
 	while (loop):
 
-		probe_r = (player[1]['ro'] + (probe * MOVES[intent]['ra'])) # the row of the space being probed to push into
-		probe_c = (player[1]['co'] + (probe * MOVES[intent]['ca'])) # the column of the space being probed to push into
-		wall_r =  (player[1]['ro'] + ((probe + 1) * MOVES[intent]['ra'])) # the row of the space beyond the space to push into
-		wall_c =  (player[1]['co'] + ((probe + 1) * MOVES[intent]['ca'])) # the column of the space beyond the space to push into
-		ram_r =   (player[1]['ro'] + ((probe - 1) * MOVES[intent]['ra'])) # the row of the space at the front of the push line
-		ram_c =   (player[1]['co'] + ((probe - 1) * MOVES[intent]['ca'])) # the column of the space at the front of the push line
-
-		space = board[probe_r][probe_c] # the board space character being probed
-		ram_space = board[ram_r][ram_c] # the board space character at the head of the pushed row
-		wall_space = board[wall_r][wall_c] # the board space character after the probed space
-
+		space = board[probe_r(probe)][probe_c(probe)]
+		ram_space = board[ram_r(probe)][ram_c(probe)]
+		if (((probe_r(probe) != 0) & (probe_r(probe) != (len(board) - 1))) & ((probe_c(probe) != 0) & (probe_c(probe) != len(board[0]) - 1))):
+			wall_space = board[wall_r(probe)][wall_c(probe)]
+	
 		if (space == BOX):		# if space is a box
 			probe += 1 		# start loop over
-		elif (re.match(REGGX, space)): 	# if space is a egg
-			if (wall_space == BORDER) | (wall_space == KILLBLOCK):	# if next block after egg is a border
-				kill_enemy(eggs, probe_r, probe_c) 			# del egg from global egg list
-				push_move()						# make space same as preceeding space
-			else:
-				for i in range(1, len(eggs)): 				# add egg to push_eggs list
-					if ((eggs[i]['ro'] == probe_r) & (eggs[i]['co'] == probe_c)):
-						push_eggs.append(i)
-				probe += 1
 		elif (space == BAKGRD): 		# if space is 
 			push_move()
 			loop = False
-		elif (space == BORDER):				# if space is a border
-#			if (re.match(REGGX, (board[ram_r][ram_c]))):
-#				kill_enemy(eggs, ram_r, ram_c)
+		elif (deteggt(space) == True): 	# if space is a egg
+			if (wall_space == BLOCK) | (wall_space == KILLBLOCK):	# if next block after egg is a border
+				kill_enemy(eggs, probe_r, probe_c) 			# del egg from global egg list
+				push_move()						# make space same as preceeding space
+			elif (wall_space == BAKGRD):
+				for i in range(1, len(eggs)): 				# add egg to push_eggs list
+					if ((eggs[i]['ro'] == probe_r(probe)) & (eggs[i]['co'] == probe_c(probe))):
+						push_eggs.append(i)
+				probe += 1
+			system('echo \"' + str(push_eggs) + '\" >> eggs.txt')
+			loop = False
+		elif (space == BLOCK):				# if space is a border
+#			if (re.match(REGGX, (board[ram_r(probe)][ram_c(probe)]))):
+#				kill_enemy(eggs, ram_r(probe), ram_c(probe))
 			loop = False
 		elif (space == KILLBLOCK):	 		# if space is a killblock
-			if (re.match(REGGX, (board[ram_r][ram_c]))):
-				kill_enemy(eggs, ram_r, ram_c)
+			if (re.match(REGGX, (board[ram_r(probe)][ram_c(probe)]))):
+				kill_enemy(eggs, ram_r(probe), ram_c(probe))
 			loop = False
 		elif (space == BEAST): # if space is a beast
-			if ((space_after == KILLBLOCK) | (space_after == BORDER) | (space_after == BORDER)):
-				kill_enemy(beasts, probe_r, probe_c)
+			if ((wall_space == KILLBLOCK) | (wall_space == BLOCK) | (wall_space == BLOCK)):
+				kill_enemy(beasts, probe_r(probe), probe_c(probe))
 				push_move()
 			loop = False
 		elif (space == MONSTER):# if space is a monster	
-			if ((space_after == KILLBLOCK) | (space_after == BORDER)):
-				kill_enemy(monsters, probe_r, probe_c)
+			if ((wall_space == KILLBLOCK) | (wall_space == BLOCK)):
+				kill_enemy(monsters, probe_r(probe), probe_c(probe))
 				push_move()		
 			loop = False
 
@@ -832,7 +851,7 @@ place_boxes()
 
 place_beasts(1)
 place_monsters(0)
-place_eggs(8)
+place_eggs(1)
 
 place_player()
 
