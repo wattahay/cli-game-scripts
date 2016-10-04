@@ -3,34 +3,30 @@ RUNS BEST IN xfce4-terminal
 
 
 
-------- Setup -------
-=
-
+#------- Setup -------
 (The game runs in the terminal)
 
 1. download beast.py
-2. download audio directory with files 
-(the audio directory should be in the same directory as the beast.py file)
-3. in a terminal, navigate to the directory
-4. run: chmod +x pybeast.py
-5. run: python3 pybeast.py
-6. set the board option to 'c' for classic mode or 't' for dynamic terminal sizing
+- download audio directory with files 
+	* (the audio directory should be in the same directory as the beast.py file)
+- in a terminal, navigate to the directory
+- run: chmod +x pybeast.py
+- run: python3 pybeast.py
+- set the board option to 'c' for classic mode or 't' for dynamic terminal sizing
 
 
-
------ Controls -----
-=
+#----- Controls -----
 
 
-'q'.............quit
-'p'.............pause
-'b'.............debug stats
-arrows..........move
-spacebar........pull blocks
+* 'q'.............quit
+* 'p'.............pause
+* 'b'.............debug stats
+* arrows..........move
+* spacebar........pull blocks
 
 
------ For Best Results -----
-=
+#----- For Best Results -----
+
 
 * use xfce4-terminal
 	* xfce4-terminal has a lot more font styling options than gnome-terminal
