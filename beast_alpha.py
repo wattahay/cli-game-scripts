@@ -646,7 +646,7 @@ def push_tree(intent):
 		player[1]['ro'] = intend_r	
 		player[1]['co'] = intend_c								# make player fol and fow the player
 		board[intend_r][intend_c] = player[0]['chr']						# move_player()
-		move_eggs(push_eggs, intent)								# increment all push_eggs
+		move_eggs()								# increment all push_eggs
 
 
 	def kill_enemy(pawns, row, col):
