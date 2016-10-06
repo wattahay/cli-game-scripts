@@ -93,7 +93,7 @@ def EGG(sub):
 
 
 def deteggt(chegg):
-	if (chegg[0:11] == '\033[37m\033[40m\033[2m' + chr(11052)): return True
+	if (chegg[0:15] == '\033[37m\033[40m\033[2m' + chr(11052)): return True
 
 
 ###################################-- Pawn Classes (Dictionaries)
@@ -679,22 +679,28 @@ def push_tree(intent):
 			push_move()
 			loop = False
 		elif (deteggt(space) == True): 	# if space is a egg
+			system('echo \"egg\" >> eggfunc.txt')
 			if (wall_space == BLOCK) | (wall_space == KILLBLOCK):	# if next block after egg is a border
 				kill_enemy(eggs, probe_r, probe_c) 			# del egg from global egg list
 				push_move()						# make space same as preceeding space
 			elif ((wall_space == BAKGRD) | (wall_space == BOX)):
-#				for i in range(1, len(eggs)): 				# add egg to push_eggs list
-#					if ((eggs[i]['ro'] == probe_r(probe)) & (eggs[i]['co'] == probe_c(probe))):
-#						push_move()
-				push_move()
+				for i in range(1, len(eggs)):
+					if ((eggs[i]['ro'] == probe_r(probe)) & (eggs[i]['co'] == probe_c(probe))):
+						push_eggs = [i] + push_eggs
 				probe += 1
 		elif (space == BLOCK):				# if space is a border
-#			if (re.match(REGGX, (board[ram_r(probe)][ram_c(probe)]))):
-#				kill_enemy(eggs, ram_r(probe), ram_c(probe))
+			if (deteggt(ram_space)):
+				kill_enemy(eggs, ram_r(probe), ram_c(probe))
 			loop = False
 		elif (space == KILLBLOCK):	 		# if space is a killblock
-			if (re.match(REGGX, (board[ram_r(probe)][ram_c(probe)]))):
+			if (deteggt(ram_space)):
 				kill_enemy(eggs, ram_r(probe), ram_c(probe))
+				play_audio('hatch')
+			elif (ram_space == BOX):
+				play_audio('squish')
+			board[ram_r(probe)][ram_c(probe)] = BAKGRD
+			push_move()
+			board[probe_r(probe - 1)][probe_c(probe - 1)] = KILLBLOCK
 			loop = False
 		elif (space == BEAST): # if space is a beast
 			if ((wall_space == KILLBLOCK) | (wall_space == BLOCK) | (wall_space == BLOCK)):
@@ -706,8 +712,11 @@ def push_tree(intent):
 				kill_enemy(monsters, probe_r(probe), probe_c(probe))
 				push_move()		
 			loop = False
-
-
+			
+		else:
+			system('echo \"' + str(space) + '\" >> probe_space.txt')
+			loop = False
+	
 
 def move_player(direction):
 	global player, board, MOVES, BAKGRD, BOX, MVU, MVL, MVR, MVD
@@ -837,7 +846,7 @@ system('reset')
 plan_the_board()
 build_the_board()
 
-place_blocks(BLOCK)
+place_blocks(KILLBLOCK)
 place_boxes()
 
 place_beasts(1)
