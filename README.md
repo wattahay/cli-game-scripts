@@ -31,9 +31,10 @@ RUNS BEST IN xfce4-terminal
 * use xfce4-terminal
 	* xfce4-terminal has a lot more font styling options than gnome-terminal
 * Use Mono fonts (Liberation Mono looks pretty good)
- 	* WenQuanYi Micro Hei Mono
+ 	* Noto Mono
+	* WenQuanYi Micro Hei Mono
 	* Ubuntu Mono
- 	* Liberation Mono
+ 	* Liberation Mono (closest to original)
  	* DeJaVu Sans Mono
  	* FreeMono (ok)
  	* Tlwg Mono looks . . . interesting
