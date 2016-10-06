@@ -93,7 +93,7 @@ def EGG(sub):
 
 
 def deteggt(chegg):
-	if (chegg[0:10] == '\033[37m\033[2m' + chr(11052)): return True
+	if (chegg[0:11] == '\033[37m\033[40m\033[2m' + chr(11052)): return True
 
 
 ###################################-- Pawn Classes (Dictionaries)
@@ -259,7 +259,19 @@ def print_board(board_array, stats): #{
 						
 	for rowi in range(board_rows + 1):	
 		print('\033[u' + '\033[' + str(rowi) +  'B' + ''.join(board_array[rowi - 1]))		
-	
+
+	if (debug):
+		print('\033[u' + '\033[' + str(len(board) + 4) + 'B' + '\rPlayer: ' + str(player) )
+		for i in range(0, len(eggs)):
+			if i == 0: print('\033[u' + '\033[' + str(len(board) + 6 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1AEggs: ' + str(eggs[i]))
+			else: print('\033[u' + '\033[' + str(len(board) + 6 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\tEgg ' + str(i) + ': ' + str(eggs[i]))
+		for i in range(0, len(beasts)):
+			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 7 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1ABeasts: ' + str(beasts[i]))
+			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 7 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\tBeast ' + str(i) + ': ' + str(beasts[i]))
+		for i in range(0, len(monsters)):
+			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1AMonsters: ' + str(monsters[i]))
+			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\tMonster ' + str(i) + ': ' + str(monsters[i]))
+		 
 	if (stats):
 		print('\033[u' + '\033[' + str(len(board) + 2) + 'B' + '\033[' + str(stat_space) + 'C' + '\033[s' + chr(9477) + 
 		chr(9483) + 'TOTAL: ' + str(score)  + 	chr(9483) + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) + 
@@ -267,18 +279,6 @@ def print_board(board_array, stats): #{
 		chr(9483) + 'LIVES: ' + str(lives)  +  	chr(9483) + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 3) + 'C' + chr(9477) + 
 		chr(9483) + 'LEVEL: ' + str(level)  +  	chr(9483) + chr(9477)) 
 
-	if (debug):
-		print('\033[u' + '\033[' + str(len(board) + 4) + 'B' + '\rPlayer: ' + str(player) )
-		for i in range(0, len(eggs)):
-			if i == 0: print('\033[u' + '\033[' + str(len(board) + 6 + i) + 'B' + '\rEggs: ' + str(eggs[i]))
-			else: print('\033[u' + '\033[' + str(len(board) + 6 + i) + 'B' + '\r\tEgg ' + str(i) + ': ' + str(eggs[i]))
-		for i in range(0, len(beasts)):
-			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 7 + i) + 'B' + '\rBeasts: ' + str(beasts[i]))
-			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 7 + i) + 'B' + '\r\tBeast ' + str(i) + ': ' + str(beasts[i]))
-		for i in range(0, len(monsters)):
-			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\rMonsters: ' + str(monsters[i]))
-			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\tMonster ' + str(i) + ': ' + str(monsters[i]))
-		 
 	print('\033[H\033[8m')
 
 
@@ -683,12 +683,11 @@ def push_tree(intent):
 				kill_enemy(eggs, probe_r, probe_c) 			# del egg from global egg list
 				push_move()						# make space same as preceeding space
 			elif ((wall_space == BAKGRD) | (wall_space == BOX)):
-				for i in range(1, len(eggs)): 				# add egg to push_eggs list
-					if ((eggs[i]['ro'] == probe_r(probe)) & (eggs[i]['co'] == probe_c(probe))):
-						push_eggs = [i] + push_eggs
-						push_move()
+#				for i in range(1, len(eggs)): 				# add egg to push_eggs list
+#					if ((eggs[i]['ro'] == probe_r(probe)) & (eggs[i]['co'] == probe_c(probe))):
+#						push_move()
+				push_move()
 				probe += 1
-			system('echo \"' + str(push_eggs) + '\" >> eggs.txt')
 		elif (space == BLOCK):				# if space is a border
 #			if (re.match(REGGX, (board[ram_r(probe)][ram_c(probe)]))):
 #				kill_enemy(eggs, ram_r(probe), ram_c(probe))
