@@ -42,7 +42,7 @@ lcd_time = .03
 
 beast_speed = 3		# seconds between enemy moves
 monster_speed = 3	# seconds between enemy moves
-egg_speed = 2		# seconds between countdowns
+egg_speed = 3		# seconds between countdowns
 
 
 ####################################-- move constants
@@ -77,7 +77,7 @@ keypress = ''
 # (ANSI styles)	 FG   + 	BG   + 		Style +		Characters +			Reset
 BAKGRD 	  =			'\033[40m' +			'  ' 
 BLOCK 	  =       		'\033[43m' +	       		'  ' + 				'\033[0m'
-KILLBLOCK = 	'\033[31m'	'\033[43m' + 			chr(9618) + chr(9618) + 	'\033[0m'
+KILLBLOCK = 	'\033[31m'	'\033[43m' + '\033[7m\033[2m' + chr(9618) + chr(9618) + 	'\033[0m'
 BOX 	  =	'\033[32m' +	'\033[40m' +			chr(9618) + chr(9618) +		'\033[0m'
 XPBOX 	  = 	'\033[32m' + 	'\033[40m' +	'\033[2m' +	chr(9618) + chr(9618) + 	'\033[0m'
 BEAST 	  = 	'\033[31m' +	'\033[40m' +			chr(9500) + chr(9508) +		'\033[0m'
@@ -274,10 +274,10 @@ def print_board(board_array, stats): #{
 		 
 	if (stats):
 		print('\033[u' + '\033[' + str(len(board) + 2) + 'B' + '\033[' + str(stat_space) + 'C' + '\033[s' + chr(9477) + 
-		chr(9483) + 'TOTAL: ' + str(score)  + 	chr(9483) + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) + 
-		chr(9483) + 'TALLY: ' + str(points) + 	chr(9483) + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 2) + 'C' + chr(9477) + 
-		chr(9483) + 'LIVES: ' + str(lives)  +  	chr(9483) + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 3) + 'C' + chr(9477) + 
-		chr(9483) + 'LEVEL: ' + str(level)  +  	chr(9483) + chr(9477)) 
+		' ' + 'TOTAL: ' + str(score)  + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) + 
+		' ' + 'TALLY: ' + str(points) + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 2) + 'C' + chr(9477) + 
+		' ' + 'LIVES: ' + str(lives)  +  	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 3) + 'C' + chr(9477) + 
+		' ' + 'LEVEL: ' + str(level)  +  	' ' + chr(9477)) 
 
 	print('\033[H\033[8m')
 
@@ -420,7 +420,7 @@ def lay_egg(row, col):
 
 	global monsters, beasts, eggs, board
 
-	wait_frames = (len(beasts) + len(monsters)) * eggs[0]['incu_frames'] * (randint(1, 4)) # seconds of wait time before egg starts counting down 
+	wait_frames = (len(eggs) + len(beasts) + len(monsters)) * eggs[0]['incu_frames'] * (randint(2, 6)) # seconds of wait time before egg starts counting down 
 	stag = randint(1, eggs[0]['frames']) # the frame that the egg counts down on
 	board[row][col] = EGG(32)
 	eggs.append({'ro': row, 'co': col, 'wait': wait_frames, 'stg': stag, 'sub':32})
@@ -670,6 +670,7 @@ def push_tree(intent):
 
 		space = board[probe_r(probe)][probe_c(probe)]
 		ram_space = board[ram_r(probe)][ram_c(probe)]
+
 		if (((probe_r(probe) != 0) & (probe_r(probe) != (len(board) - 1))) & ((probe_c(probe) != 0) & (probe_c(probe) != len(board[0]) - 1))):
 			wall_space = board[wall_r(probe)][wall_c(probe)]
 	
@@ -681,34 +682,31 @@ def push_tree(intent):
 		elif (deteggt(space) == True): 	# if space is a egg
 			system('echo \"egg\" >> eggfunc.txt')
 			if (wall_space == BLOCK) | (wall_space == KILLBLOCK):	# if next block after egg is a border
-				kill_enemy(eggs, probe_r, probe_c) 			# del egg from global egg list
-				push_move()						# make space same as preceeding space
+				play_audio('hatch')
+				kill_enemy(eggs, probe_r(probe), probe_c(probe)) 			# del egg from global egg list
+				push_move()
+				loop = False						# make space same as preceeding space
 			elif ((wall_space == BAKGRD) | (wall_space == BOX)):
 				for i in range(1, len(eggs)):
 					if ((eggs[i]['ro'] == probe_r(probe)) & (eggs[i]['co'] == probe_c(probe))):
 						push_eggs = [i] + push_eggs
 				probe += 1
 		elif (space == BLOCK):				# if space is a border
-			if (deteggt(ram_space)):
-				kill_enemy(eggs, ram_r(probe), ram_c(probe))
 			loop = False
 		elif (space == KILLBLOCK):	 		# if space is a killblock
-			if (deteggt(ram_space)):
-				kill_enemy(eggs, ram_r(probe), ram_c(probe))
-				play_audio('hatch')
-			elif (ram_space == BOX):
-				play_audio('squish')
-			board[ram_r(probe)][ram_c(probe)] = BAKGRD
+			play_audio('squish')
 			push_move()
 			board[probe_r(probe - 1)][probe_c(probe - 1)] = KILLBLOCK
 			loop = False
 		elif (space == BEAST): # if space is a beast
-			if ((wall_space == KILLBLOCK) | (wall_space == BLOCK) | (wall_space == BLOCK)):
+			if ((wall_space == KILLBLOCK) | (wall_space == BOX) | (wall_space == BLOCK)):
+				play_audio('squish2')
 				kill_enemy(beasts, probe_r(probe), probe_c(probe))
 				push_move()
 			loop = False
 		elif (space == MONSTER):# if space is a monster	
 			if ((wall_space == KILLBLOCK) | (wall_space == BLOCK)):
+				play_audio('squish2')
 				kill_enemy(monsters, probe_r(probe), probe_c(probe))
 				push_move()		
 			loop = False
@@ -851,7 +849,7 @@ place_boxes()
 
 place_beasts(1)
 place_monsters(0)
-place_eggs(5)
+place_eggs(1)
 
 place_player()
 
