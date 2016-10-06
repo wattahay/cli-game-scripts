@@ -23,6 +23,7 @@ RUNS BEST IN xfce4-terminal
 * 'b'.............debug stats
 * arrows..........move
 * spacebar........pull blocks
+* 'r'.............restore screen
 
 
 ###----- For Best Results -----
