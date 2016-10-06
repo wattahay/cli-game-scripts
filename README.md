@@ -29,15 +29,18 @@ RUNS BEST IN xfce4-terminal
 ###----- For Best Results -----
 
 
-* use xfce4-terminal
-	* xfce4-terminal has a lot more font styling options than gnome-terminal
-* Use Mono fonts (Liberation Mono looks pretty good)
- 	* Noto Mono
+* Terminal Ranking
+	* xfce4-terminal
+	* guake
+	* gnome-terminal
+* Font Ranking
+	* Free Mono (this is only good in Gnome-terminal)
+ 	* Liberation Mono (closest to original)
+	* Noto Mono
 	* WenQuanYi Micro Hei Mono
 	* Ubuntu Mono
- 	* Liberation Mono (closest to original)
  	* DeJaVu Sans Mono
- 	* FreeMono (ok)
+ 	*  (better in gnome-terminal)
  	* Tlwg Mono looks . . . interesting
 * Alter font sizes for varied results
 * Run in a termainal that can:
