@@ -28,19 +28,24 @@ RUNS BEST IN xfce4-terminal
 
 ###----- For Best Results -----
 
-
-* Terminal Ranking
+* Terminal Emulator Ranking
 	* xfce4-terminal
 	* guake
 	* gnome-terminal
+	* konsole
+	* xterm
+	* "uxterm" (lxterm)
+	* "Terminator" (x-terminal-emulator)
+
+ Most terminals have profiles you can create for individual applications.
+
 * Font Ranking
-	* Free Mono (this is only good in Gnome-terminal)
+	* Free Mono (this is good in Gnome-terminal)
  	* Liberation Mono (closest to original)
 	* Noto Mono
 	* WenQuanYi Micro Hei Mono
 	* Ubuntu Mono
  	* DeJaVu Sans Mono
- 	*  (better in gnome-terminal)
  	* Tlwg Mono looks . . . interesting
 * Alter font sizes for varied results
 * Run in a termainal that can:
