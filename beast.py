@@ -3,29 +3,18 @@ from random import randint
 from os import system, popen
 from time import sleep
 import threading
-#################################
-#####-- get tty sizes --#########################
-#############################################################
-ttyRows, ttyCols = popen('stty size', 'r').read().split()######
-ttyRows = int(ttyRows)################################################
-ttyCols = int(ttyCols)###################################################
-screen_rows = ttyRows########################################################
-screen_cols = int(ttyCols / 2)#####################-- global settings --#####
-#############################################################################
 
-##################################-- tty dynamic board size settings 
-
-max_play_rows = 100 	# alter max game height here
-max_play_cols = 100	# alter max game width here
-max_beast_cnt = 10	# alter max beasts here
 
 ##################################-- starting game statistics
 
 beast_cnt = 4 		# starting beasts	
 lives = 5		# starting lives
 
-squish_boxes = False	# boxes shuv into nothing against blocks
-block_hit_death = False	# player dies when hitting blocks
+###############################
+
+beast_speed = 1.5	# seconds between enemy moves
+monster_speed = 1.1	# seconds between enemy moves
+egg_speed = 3		# seconds between countdowns
 
 ##################################-- game scoring balance
 
@@ -35,15 +24,9 @@ egg_scr = 4		# points for killing eggs
 monster_scr = 6		# points for killing monsters
 death_scr = -10		# point loss for dying
 
-##################################-- game time parameters
+##################################-- game speed
+
 lcd_time = .04
-
-###############################
-
-beast_speed = 1.5		# seconds between enemy moves
-monster_speed = 1.2	# seconds between enemy moves
-egg_speed = 3		# seconds between countdowns
-
 
 ####################################-- move constants
 
@@ -70,6 +53,7 @@ MVDR = 	'DR'
 DIR_LIS = (MVU, MVD, MVL, MVR, MVUL, MVUR, MVDL, MVDR)
 
 keypress = '' 
+debug = False
 
 ##################################-- formatted character constants
 
@@ -150,7 +134,6 @@ points = 0	# in-game level points added at end of level
 ################################################################################################
 board = [] #########################################################-- board setup --###########
 ################################################################################################
-
 ######################################-- classic board size variables
 
 play_rows = 20	# only change this in-game
@@ -158,68 +141,47 @@ play_cols = 40	# only change this in-game
 
 block_cnt = 10	# level 1 count
 
-######################################-- dynamic board dimensions
-
+######################################-- board dimensions
+classic = True
 left_margin = 0 
 top_margin = 0
-max_play_rows = int(max_play_rows / 3) * int(3)
-max_play_cols = int(max_play_cols / 3) * int(3)
-min_play_rows = 9
-min_play_cols = 9
+stat_rows = 3
 board_rows = play_rows + 2
 board_cols = play_cols + 2
-debug = False
 
 def plan_the_board(): #{
 
-	global save_top, save_left, top_margin, left_margin, board_rows, board_cols, play_rows, play_cols, min_play_rows, min_play_cols, max_play_rows, max_play_cols, stat_rows, ttyCols, screen_rows, screen_cols
+	global save_top, save_left, top_margin, left_margin, board_rows, board_cols, play_rows, play_cols, stat_rows, stat_space, classic, ttyCols, ttyRows
 
-	padding = 2 # the blank border around a board
-	fill_margin = 2 + padding # This prevents fill boards from completely removing margins
-	stat_rows = 2
-	used_rows = 0
-	used_cols = 0
+	ttyRows, ttyCols = popen('stty size', 'r').read().split()
+	ttyRows = int(ttyRows)
+	ttyCols = int(ttyCols)
+	screen_rows = ttyRows
+	screen_cols = int(ttyCols / 2)
 
-	if (classic_board):
+	if (screen_cols < 44) & (ttyRows < 28):	classic = False
+	elif (ttyCols < 60) & (ttyRows < 20):
+		print('This screen is impossibly small')
+		sleep(3)
+		system('reset')
+	else: classic = True
+
+	if (classic):
+		board_rows = play_rows + 2
+		board_cols = play_cols + 2
 		top_margin = int((screen_rows - board_rows - stat_rows) / 2)
 		left_margin = int((ttyCols - board_cols*2) / 2)
 	else:
-		# this condition tests to see if the board is in the middle range of the fill size
-		# if it is true, then the board should fill the terminal, but have a slim boarder
-		if ((screen_rows <= (max_play_rows + fill_margin)) & (screen_rows > (min_play_rows + fill_margin))):
-			play_rows = int((screen_rows - fill_margin - stat_rows) / 3) * int(3)
-			if (play_rows > max_play_rows):
-				play_rows = max_play_rows
-			board_rows = play_rows + 2
-			used_rows = board_rows + stat_rows
-			top_margin = int((screen_rows - used_rows) / 2)
-		else: # if the board is either small or huge 
-			play_rows = int((screen_rows - padding - stat_rows) / 3) * int(3)
-			if (play_rows > max_play_rows):
-				play_rows = max_play_rows
-			board_rows = play_rows + 2
-			used_rows = board_rows + stat_rows
-			top_margin = int((screen_rows - used_rows) / 2)
+		board_rows = screen_rows - stat_rows
+		board_cols = screen_cols
+		top_margin = 0
+		left_margin = 0
 
-		if ((screen_cols <= (max_play_cols + fill_margin)) & (screen_cols > (min_play_cols + fill_margin))):
-			play_cols = (int((screen_cols - fill_margin) / 3) * (int(3)))
-			if (play_cols > max_play_cols):
-				play_cols = max_play_cols
-			board_cols = play_cols + 2
-			left_margin = int((ttyCols - (board_cols * 2)) / 2)
-		else: # if the board is either small or huge 
-			play_cols = int((screen_cols - padding) / 3) * int(3)
-			if (play_cols > max_play_cols):
-				play_cols = max_play_cols
-			board_cols = play_rows + 2
-			left_margin = int((ttyCols - board_cols * 2) / 2)
-
-
-	save_top = top_margin 
-	save_left = left_margin
-	stat_space = int((board_cols * 2 - (4 * 14 )) / 5)
+	save_top = top_margin # assigned for the debug feature 
+	save_left = left_margin # assigned for the debug feature
+	stat_space = int((board_cols * 2 - (4 * 14 )) / 5) # calculate this for the print_board function
 	if stat_space < 0: stat_space = 0
-	global stat_space
+	global stat_space, save_left, save_top
 	#}
 
 	
@@ -238,15 +200,6 @@ def build_the_board(): #{
 		for coli in range(board_cols):
 			if(rowi == 0) | (rowi == (board_rows - 1)) | (coli == 0) | (coli == (board_cols - 1)):
 				board[rowi][coli] = BLOCK
-
-
-#	intro = board
-#	roster = board
-#	controls = board
-#	info = board
-#
-#	global intro, roster, controls, info
-
 #}
 
 
@@ -282,10 +235,15 @@ def print_board(board_array, stats): #{
 	print('\033[H\033[8m')
 
 
+##########################################################################################################
+##############################################################################-- play audio function --###
+##########################################################################################################
 
-###############################################################
-####################################--block_cnt--##############
-###############################################################
+def play_audio(filename): system('play -q audio/' + filename + '.ogg &')
+
+#########################################################################################################
+##############################################################################--block_cnt--##############
+#########################################################################################################
 
 def place_randomly(char, count):
 
@@ -299,76 +257,25 @@ def place_randomly(char, count):
 		step += 1	
 
 
+def build_level(block_type):
 
+	global BLOCK, KILLBLOCK, BOX
 
+	if block_type == BLOCK:
+		place_randomly(BLOCK, 10)
+	elif block_type == KILLBLOCK:
+		place_randomly(KILLBLOCK, 10)
 
-# fills the board with appropriate number of yellow block_cnt
-def place_blocks(blocks): #{
-
-	global play_rows, play_cols
-
-	row_ranges = []
-	col_ranges = []
-
-	rowi = 0
-	coli = 0
-
-	if(classic_board):
-		row_ranges = [[1,2],[3,4],[5,6],[7,8],[9,10],[11,12],[13,14],[15,16],[17,18],[19,20]]
-		col_ranges = [[1,4],[5,8],[9,12],[13,16],[17,20],[21,24],[25,28],[29,32],[33,36],[37,40]]
-		step = 9 
-		rowi = 0
-		coli = 0
-		while(step >= 0):
-			row_range_index = randint(0, step)
-			rowi = randint(row_ranges[row_range_index][0], row_ranges[row_range_index][1])
-			col_range_index = randint(0, step)
-			coli = randint(col_ranges[col_range_index][0], col_ranges[col_range_index][1])
-			board[rowi][coli] = blocks
-			step -= 1
-			del col_ranges[col_range_index]
-			del row_ranges[row_range_index]
-	else:
-		block_cnt = round(play_rows * play_cols / 90 )
-		place_randomly(blocks, block_cnt)
-				
-#}
-
-
-
-def place_boxes():
+	lower_boxes = play_rows * play_cols / 4 - 10
+	upper_boxes = play_rows * play_cols / 4 + 10
+	box_cnt = randint(lower_boxes, upper_boxes)
 	
-	global play_rows, play_cols, classic_board, BOX
-
-	if (classic_board):
-		box_cnt = randint(210,225)
-	else:
-		prerange = int(play_rows * play_cols / 6)
-		lower = prerange - (int(prerange * .05))
-		upper = prerange + (int(prerange * .05))
-		box_cnt = randint(lower,upper)
 	place_randomly(BOX, box_cnt)
-			
 
 
-##########################################################################################################
-##############################################################################-- play audio function --###
-##########################################################################################################
-
-audio = ''
-
-def play_audio(filename):
-
-	global audio
-
-	system('play -q audio/' + filename + '.ogg &')
-
-	audio = ''
-	
 ##########################################################################################################
 ###############################################################################-- place the pieces -- ####
 ##########################################################################################################
-
 
 def place_beasts(count):
 
@@ -384,8 +291,6 @@ def place_beasts(count):
 			step += 1
 			beasts[step]['stg'] = randint(1, (beasts[0]['frames']))
 
-
-
 ###########################################################################################
 
 def hatch_monster(row, col):
@@ -395,7 +300,6 @@ def hatch_monster(row, col):
 	stagger = randint(1, (monsters[0]['frames']))	
 	board[row][col] = MONSTER
 	monsters.append({'ro':row, 'co':col,'stg':stagger })
-
 
 
 def place_monsters(count):
@@ -444,9 +348,6 @@ def place_eggs(count):
 
 #####################################################################
 
-
-
-
 def hatch_eggs():
 	# this function runs through all the eggs, and increments their time
 	# it transition eggs from wait phase, to countdown, to Monster
@@ -478,10 +379,8 @@ def hatch_eggs():
 			elif ((eggs[i - di]['sub'] == 8320) & (eggs[i - di]['stg'] == eggs[0]['frame'])):
 				hatch_monster(eggs[i - di]['ro'], eggs[i - di]['co'])
 				del eggs[i - di]
-				audio = 'hatch'
+				play_audio('hatch')
 				di += 1
-
-
 
 ##############################################################################
 ###############################################-- move pieces --##############
@@ -501,14 +400,14 @@ def place_player():
 
 def kill_player():
 
-	global BAKGRD, player, lives, board, audio
+	global BAKGRD, player, lives, board
 
 	board[ player[1]['ro'] ][ player[1]['co'] ] = BAKGRD
 	lives -= 1
 	del player[1]
 	place_player()
 
-	audio = 'death'
+	play_audio('death')
 
 
 
@@ -618,7 +517,7 @@ def push_tree(intent):
 	global player, eggs, board, BLOCK, MOVES, BAKGRD, BOX, MVU, MVL, MVR, MVL, PLAYER
 
 	push_eggs = []
-	del_index = 0 
+ 
 	stnce_r = player[1]['ro']
 	stnce_c = player[1]['co']
 	tug_r = stnce_r - MOVES[intent]['ra']
@@ -641,6 +540,8 @@ def push_tree(intent):
 
 	def push_move():
 
+		global BOX, BAKGRD, PLAYER, player 
+
 		for i in range(probe):
 			board[ probe_r(probe - i) ][ probe_c(probe - i) ] = board[ probe_r(probe - 1 - i) ][ probe_c(probe - 1 - i) ]	# make board space same as preceeding space
 		for i in range(len(push_eggs)):
@@ -654,10 +555,13 @@ def push_tree(intent):
 		player[1]['ro'] = intend_r	
 		player[1]['co'] = intend_c								# make player fol and fow the player
 		board[intend_r][intend_c] = PLAYER						# move_player()
-			
+		
+	
 	def kill_enemy(pawns, row, col):
 
 		global points, board
+
+		del_index = 0
 
 		for i in range(1, (len(pawns))):
 			if ((pawns[i]['ro'] == row) & (pawns[i]['co'] == col)):
@@ -684,8 +588,8 @@ def push_tree(intent):
 		elif (deteggt(space) == True): 	# if space is a egg
 			system('echo \"egg\" >> eggfunc.txt')
 			if (wall_space == BLOCK) | (wall_space == KILLBLOCK):	# if next block after egg is a border
-				play_audio('hatch')
 				kill_enemy(eggs, probe_r(probe), probe_c(probe)) 			# del egg from global egg list
+				play_audio('hatch')
 				push_move()
 				loop = False						# make space same as preceeding space
 			elif ((wall_space == BAKGRD) | (wall_space == BOX)):
@@ -702,14 +606,14 @@ def push_tree(intent):
 			loop = False
 		elif (space == BEAST): # if space is a beast
 			if ((wall_space == KILLBLOCK) | (wall_space == BOX) | (wall_space == BLOCK)):
-				play_audio('squish2')
 				kill_enemy(beasts, probe_r(probe), probe_c(probe))
+				play_audio('squish2')
 				push_move()
 			loop = False
 		elif (space == MONSTER):# if space is a monster	
 			if ((wall_space == KILLBLOCK) | (wall_space == BLOCK)):
-				play_audio('squish2')
 				kill_enemy(monsters, probe_r(probe), probe_c(probe))
+				play_audio('squish2')
 				push_move()		
 			loop = False
 			
@@ -756,7 +660,7 @@ def direct_move(tap_move):
 
 
 
-def direct_keypress(tap):	
+def direct_keypress(tap):
 
 	global player, MOVES, board
 
@@ -776,50 +680,11 @@ def direct_keypress(tap):
 ########################-- question user about board-size --##########
 ######################################################################
 
-
-
-def intro():
-	global ttyRows, ttyCols, screen_cols
-	introhalf = 13
-	introleft = int((ttyCols/2) - introhalf)
-	introright = int((ttyCols/2) + introhalf)
-	introquestion = ''
-	
-	while(introquestion != 't') & (introquestion != 'c'):
-		system('clear')
-		print('\n'*(int(ttyRows/2) - 10))
-		print('\r' + ' '*introleft + '\u250C' + '\u2500'*(introright - introleft - 1) + '\u2510')
-		print('\r' + ' '*introright + '\u2502'+ '\r' + ' '*introleft + '\u2502' + 'tty rows:' + ' '*11 + str(ttyRows))
-		print('\r'+ ' '*introright + '\u2502' + '\r' + ' '*introleft + '\u2502' + 'tty columns:' + ' '*8 + str(ttyCols))
-		print('\r'+ ' '*introright + '\u2502' + '\r' + ' '*introleft + '\u2502' + 'game columns:' + ' '*7 + str(screen_cols))
-		print('\r'+ ' '*introleft + '\u2514' + '\u2500'*(introright - introleft - 1) + '\u2518')
-		print('\n'*4)
-	
-		introquestion = input(
-			' '*(introleft - 7)
-			+ 'Enter \'t\' to play a terminal-size board.\n\n\r' 
-			+ ' '*(introleft - 7)
-			+ 'Enter \'c\' to play a classic sized board. . . '
-			+ '\n\n\r' 
-			+ ' '*int(ttyCols/2)
-			)
-		if (introquestion == 't'):
-			classic = False
-			system('clear')
-		elif (introquestion == 'c'):
-			classic = True 
-			system('clear')
-		elif (introquestion == 'q'):
-			system('clear')
-			exit()
-
-	return classic
-
-
-
 def pause():
 
 	global ttyRows, ttyCols, screen_cols 
+
+	play_audio('pause')
 
 	pauseleft = (int(ttyCols/2) - 8)
 	pausetop = (int(ttyRows/2) - 4) - (int(board_rows / 4))
@@ -835,31 +700,31 @@ def pause():
 	
 	print('\033[H\033[0m')
 
+	while(keypress == ord('p')):
+		sleep(.08)
+
+	play_audio('pause')
 
 #####################################################################################################
 #######################################################-- main function calls -######################
 #####################################################################################################
 
-classic_board = intro()
 system('reset')
 
 plan_the_board()
 build_the_board()
 
-place_blocks(KILLBLOCK)
-place_boxes()
-
-place_beasts(beast_cnt)
-place_monsters(monster_cnt)
+	
+build_level(BLOCK)
+place_beasts(3)
+place_monsters(2)
 place_eggs(3)
-
 place_player()
 
 
 ####################################################################################################
 #########################################################################-- take input func -- #####
 ####################################################################################################
-
 
 def take_input():
 
@@ -905,31 +770,22 @@ def take_input():
 			player[1]['tug'] = False
 			direct_keypress(keypress)
 
-
 #########################################################################################################
 threading.Thread(target=take_input).start()  ###############-- the main game clock and print loop --#####
 #########################################################################################################
 
-
 while(True):
-	if audio == 'death':
-		play_audio(audio)
-	elif audio == 'hatch':
-		play_audio(audio)
 	if keypress == ord('q'):
 		system('reset')
 		exit()
 	elif keypress == ord('p'):
-		play_audio('pause')
 		pause()
-		while(keypress == ord('p')):
-			sleep(.08)
-		play_audio('pause')
 	else:
 		move_enemies(beasts)
 		move_enemies(monsters)
 		hatch_eggs()
 		print_board(board, True)
 	sleep(lcd_time)
+
 ################################################
 input()
