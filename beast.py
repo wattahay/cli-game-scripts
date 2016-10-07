@@ -478,7 +478,7 @@ def hatch_eggs():
 			elif ((eggs[i - di]['sub'] == 8320) & (eggs[i - di]['stg'] == eggs[0]['frame'])):
 				hatch_monster(eggs[i - di]['ro'], eggs[i - di]['co'])
 				del eggs[i - di]
-				audio = 'hatch'
+				play_audio('hatch')
 				di += 1
 
 
@@ -508,7 +508,7 @@ def kill_player():
 	del player[1]
 	place_player()
 
-	audio = 'death'
+	play_audio('death')
 
 
 
@@ -754,7 +754,7 @@ def direct_move(tap_move):
 
 
 
-def direct_keypress(tap):	
+def direct_keypress(tap):
 
 	global player, MOVES, board
 
@@ -819,6 +819,8 @@ def pause():
 
 	global ttyRows, ttyCols, screen_cols 
 
+	play_audio('pause')
+
 	pauseleft = (int(ttyCols/2) - 8)
 	pausetop = (int(ttyRows/2) - 4) - (int(board_rows / 4))
 	print('\033[0m\033[40m')	
@@ -833,6 +835,10 @@ def pause():
 	
 	print('\033[H\033[0m')
 
+	while(keypress == ord('p')):
+		sleep(.08)
+
+	play_audio('pause')
 
 #####################################################################################################
 #######################################################-- main function calls -######################
@@ -853,11 +859,9 @@ place_eggs(1)
 
 place_player()
 
-
 ####################################################################################################
 #########################################################################-- take input func -- #####
 ####################################################################################################
-
 
 def take_input():
 
@@ -903,32 +907,22 @@ def take_input():
 			player[1]['tug'] = False
 			direct_keypress(keypress)
 
-
 #########################################################################################################
 threading.Thread(target=take_input).start()  ###############-- the main game clock and print loop --#####
 #########################################################################################################
 
-
 while(True):
-	if audio == 'death':
-		play_audio(audio)
-	elif audio == 'hatch':
-		play_audio(audio)
 	if keypress == ord('q'):
 		system('reset')
 		exit()
 	elif keypress == ord('p'):
-		play_audio('pause')
 		pause()
-		while(keypress == ord('p')):
-			sleep(.08)
-		game_pause = 0
-		play_audio('pause')
 	else:
 		move_enemies(beasts)
 		move_enemies(monsters)
 		hatch_eggs()
 		print_board(board, True)
 	sleep(lcd_time)
+
 ################################################
 input()
