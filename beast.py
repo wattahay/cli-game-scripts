@@ -151,7 +151,7 @@ board_cols = play_cols + 2
 
 def plan_the_board(): #{
 
-	global save_top, save_left, top_margin, left_margin, board_rows, board_cols, play_rows, play_cols, stat_rows, stat_space, classic, ttyCols, ttyRows
+	global save_top, save_left, top_margin, left_margin, board_rows, board_cols, play_rows, play_cols, stat_rows, stat_space, classic, ttyCols, ttyRows, lower_padding
 
 	ttyRows, ttyCols = popen('stty size', 'r').read().split()
 	ttyRows = int(ttyRows)
@@ -171,19 +171,22 @@ def plan_the_board(): #{
 		board_cols = play_cols + 2
 		top_margin = int((screen_rows - board_rows - stat_rows) / 2)
 		left_margin = int((ttyCols - board_cols*2) / 2)
+		lower_padding = 2
 	else:
 		board_rows = screen_rows - stat_rows
 		board_cols = screen_cols
-		top_margin = 0
+		top_margin = 0 
 		left_margin = 0
+		lower_padding = 1
 
 	save_top = top_margin # assigned for the debug feature 
 	save_left = left_margin # assigned for the debug feature
 	stat_space = int((board_cols * 2 - (4 * 14 )) / 5) # calculate this for the print_board function
 	if stat_space < 0: stat_space = 0
 	global stat_space, save_left, save_top
-	#}
 
+	system('clear')
+	#}
 	
 
 # BUILDS a blank board
@@ -744,6 +747,7 @@ def take_input():
 			keypress = stdscr.getch()
 			keypress = ''
 		elif keypress == ord('r'):
+			plan_the_board()
 			system('clear')
 		elif keypress == ord('b'):
 			if debug == True:
