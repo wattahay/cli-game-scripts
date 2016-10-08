@@ -56,18 +56,19 @@ RUNS BEST IN xfce4-terminal
 ###----- File Tweaks -----
 Edit these seetings in the beast.py file to change the game. 
 (These settings might be added to an options menu in the future.
-	* lcd_time
-		* change this if there are issues with flickering or player speed
-		* lower (faster) than .02 is usually counter-productive
-		* higher (slower) than .07 makes for clunkly gameplay
-	* beast_speed - in seconds
-	* monster_speed - in seconds
-	* hatch_speed (countdown speed) - in seconds
-	* beast_cnt - number of starting beasts
+
+* lcd_time
+	* change this if there are issues with flickering or player speed
+	* lower (faster) than .02 is usually counter-productive
+	* higher (slower) than .07 makes for clunkly gameplay
+* beast_speed - in seconds
+* monster_speed - in seconds
+* hatch_speed (countdown speed) - in seconds
+* beast_cnt - number of starting beasts
 
 ###--- Advanced Tweaks ---
-	* use xset to change keyboard delay
-		* alternatively, consider changing lcd_time
-	* egg wait time algorithm
+* use xset to change keyboard delay
+	* alternatively, consider changing lcd_time
+* egg wait time algorithm
 
 
