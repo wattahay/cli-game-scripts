@@ -52,9 +52,10 @@ MVDR = 	'DR'
 
 DIR_LIS = (MVU, MVD, MVL, MVR, MVUL, MVUR, MVDL, MVDR)
 
+key_move = False
 keypress = '' 
 debug = False
-
+countdown = 1
 ##################################-- formatted character constants
 
 
@@ -126,15 +127,15 @@ monster_cnt = 0	# level 1 count
 egg_cnt = 0	# level 1 count
 
 kills = 0	# changes in-game
-level = 1	# change in order to start on a specific level
+level = 0	# change in order to start on a specific level
 score = 0	# in-game total score
 points = 0	# in-game level points added at end of level
 
 
 ################################################################################################
 board = [] #########################################################-- board setup --###########
-################################################################################################
-######################################-- classic board size variables
+blank_board = [] ###############################################################################
+reset_board = [] ###########-- classic board size variables
 
 play_rows = 20	# only change this in-game
 play_cols = 40	# only change this in-game
@@ -151,7 +152,7 @@ board_cols = play_cols + 2
 
 def plan_the_board(): #{
 
-	global save_top, save_left, top_margin, left_margin, board_rows, board_cols, play_rows, play_cols, stat_rows, stat_space, classic, ttyCols, ttyRows, lower_padding
+	global save_top, save_left, top_margin, left_margin, board_rows, board_cols, play_rows, play_cols, stat_rows, stat_space, classic, ttyCols, ttyRows
 
 	ttyRows, ttyCols = popen('stty size', 'r').read().split()
 	ttyRows = int(ttyRows)
@@ -171,43 +172,46 @@ def plan_the_board(): #{
 		board_cols = play_cols + 2
 		top_margin = int((screen_rows - board_rows - stat_rows) / 2)
 		left_margin = int((ttyCols - board_cols*2) / 2)
-		lower_padding = 2
 	else:
 		board_rows = screen_rows - stat_rows
 		board_cols = screen_cols
-		top_margin = 0 
+		top_margin = 0
 		left_margin = 0
-		lower_padding = 1
 
 	save_top = top_margin # assigned for the debug feature 
 	save_left = left_margin # assigned for the debug feature
 	stat_space = int((board_cols * 2 - (4 * 14 )) / 5) # calculate this for the print_board function
 	if stat_space < 0: stat_space = 0
 	global stat_space, save_left, save_top
-
-	system('clear')
 	#}
+
 	
 
 # BUILDS a blank board
 def build_the_board(): #{
-	global board_cols, board_rows, board
+	global board_cols, board_rows
+
+	screen_board = []
 
 	for rowi in range(board_rows): # builds the board based on 'board_rows' and 'board_cols' which includes room for borders
-		board.append([])
+		screen_board.append([])
 		for coli in range(board_cols):
-			board[rowi].append([])
-			board[rowi][coli] = BAKGRD
+			screen_board[rowi].append([])
+			screen_board[rowi][coli] = BAKGRD
 
 	for rowi in range(board_rows): # draws the game boarders on the board
 		for coli in range(board_cols):
 			if(rowi == 0) | (rowi == (board_rows - 1)) | (coli == 0) | (coli == (board_cols - 1)):
-				board[rowi][coli] = BLOCK
+				screen_board[rowi][coli] = BLOCK
+
+	return screen_board
 #}
+board = build_the_board()
+reset_board = build_the_board()
+blank_board = build_the_board()
 
 
-
-def print_board(board_array, stats): #{
+def print_board(board_array): #{
 
 	global ttyCols, top_margin, left_margin, points, score, lives, level, board_rows, board_cols, save_top, save_left, stat_space
 
@@ -228,15 +232,13 @@ def print_board(board_array, stats): #{
 			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1AMonsters: ' + str(monsters[i]))
 			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\tMonster ' + str(i) + ': ' + str(monsters[i]))
 		 
-	if (stats):
-		print('\033[u' + '\033[' + str(len(board) + 2) + 'B' + '\033[' + str(stat_space) + 'C' + '\033[s' + chr(9477) + 
-		' ' + 'TOTAL: ' + str(score)  + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) + 
-		' ' + 'TALLY: ' + str(points) + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 2) + 'C' + chr(9477) + 
-		' ' + 'LIVES: ' + str(lives)  +  	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 3) + 'C' + chr(9477) + 
-		' ' + 'LEVEL: ' + str(level)  +  	' ' + chr(9477)) 
+	print('\033[u' + '\033[' + str(len(board) + 2) + 'B' + '\033[' + str(stat_space) + 'C' + '\033[s' + chr(9477) + 
+	' ' + 'TOTAL: ' + str(score)  + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) + 
+	' ' + 'TALLY: ' + str(points) + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 2) + 'C' + chr(9477) + 
+	' ' + 'LIVES: ' + str(lives)  +  	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 3) + 'C' + chr(9477) + 
+	' ' + 'LEVEL: ' + str(level)  +  	' ' + chr(9477)) 
 
 	print('\033[H\033[8m')
-
 
 ##########################################################################################################
 ##############################################################################-- play audio function --###
@@ -248,26 +250,11 @@ def play_audio(filename): system('play -q audio/' + filename + '.ogg &')
 ##############################################################################--block_cnt--##############
 #########################################################################################################
 
-def place_randomly(char, count):
-
-	step = 1	
-
-	while(step < count):
-		row = randint(1, (board_rows - 1))
-		col = randint(1, (board_cols - 1))
-		if(board[row][col] == BAKGRD):
-			board[row][col] = char
-		step += 1	
 
 
-def build_level(block_type):
+def place_blocks():
 
-	global BLOCK, KILLBLOCK, BOX
-
-	if block_type == BLOCK:
-		place_randomly(BLOCK, 10)
-	elif block_type == KILLBLOCK:
-		place_randomly(KILLBLOCK, 10)
+	global block_type, BOX
 
 	lower_boxes = play_rows * play_cols / 4 - 10
 	upper_boxes = play_rows * play_cols / 4 + 10
@@ -275,6 +262,22 @@ def build_level(block_type):
 	
 	place_randomly(BOX, box_cnt)
 
+	box_step = 0
+	block_step = 0	
+
+	while(block_step < block_cnt):
+		row = randint(1, (board_rows - 1))
+		col = randint(1, (board_cols - 1))
+		if(board[row][col] == BAKGRD):
+			board[row][col] = block_type
+		block_step += 1	
+
+	while(box_step < box_cnt):
+		row = randint(1, (board_rows - 1))
+		col = randint(1, (board_cols - 1))
+		if(board[row][col] == BAKGRD):
+			board[row][col] = BOX
+		box_step += 1	
 
 ##########################################################################################################
 ###############################################################################-- place the pieces -- ####
@@ -408,7 +411,8 @@ def kill_player():
 	board[ player[1]['ro'] ][ player[1]['co'] ] = BAKGRD
 	lives -= 1
 	del player[1]
-	place_player()
+	if lives > 0:
+		place_player()
 
 	play_audio('death')
 
@@ -715,14 +719,89 @@ def pause():
 system('reset')
 
 plan_the_board()
-build_the_board()
 
+
+def build_level():
 	
-build_level(BLOCK)
-place_beasts(3)
-place_monsters(2)
-place_eggs(3)
-place_player()
+	global board_rows, board_cols, reset_board, blank_board, board, beast_cnt, monster_cnt, egg_cnt, key_move, level, lives, score, points, BAKGRD, BLOCK, KILLBLOCK, countdown
+	
+	system('echo \'pre-key_move\' >> level.txt')
+	key_move = False
+	system('echo \'pre-print\' >> level.txt')
+	print_board(board)
+	sleep(1)	
+	block_type = BLOCK
+
+	lvl_beast_cnt = 0
+	lvl_monster_cnt = 0
+	lvl_egg_cnt = 0
+	board = []
+	board = build_the_board()
+	print_board(board)
+	sleep(1)
+	system('echo \'pre_assignments\' >> level.txt')
+	if (lives == 0):
+		level = 1
+		lives = 5
+		points = 0
+		lvl_beast_cnt = beast_cnt
+		lvl_monster_cnt = monster_cnt
+		lvl_egg_cnt = egg_cnt
+		for i in range(1, len(player)): del player[1]
+		print_board(board)
+		sleep(.4)
+		for i in range(1, len(beasts)): del beasts[1]
+		print_board(board)
+		sleep(.4)
+		for i in range(1, len(monsters)): del monsters[1]
+		print_board(board)
+		sleep(.4)
+		for i in range(1, len(egggs)): del eggs[1]
+	else:
+		level += 1
+		score += points
+		points = 0
+		for i in range(1, len(player)): del player[1]
+		if (level < 9): lvl_beast_cnt = beast_cnt + level - 1
+		if (level > 3): lvl_monster_cnt = level - 3
+		if (level > 6): lvl_egg_cnt = level - 6
+		if (level > 4): block_type = KILLBLOCK
+
+	lower_boxes = int(play_rows * play_cols / 4 - 10)
+	upper_boxes = int(play_rows * play_cols / 4 + 10)
+	box_cnt = randint(lower_boxes, upper_boxes)
+	
+	box_step = 0
+	block_step = 0	
+	blockrow = 0
+	blockcol = 0
+	boxrow = 0
+	boxcol = 0
+	system('echo \'pre-block-loop\' >> level.txt')
+	while(block_step < block_cnt):
+		blockrow = randint(1, (board_rows - 1))
+		blockcol = randint(1, (board_cols - 1))
+		if(board[blockrow][blockcol] == BAKGRD):
+			board[blockrow][blockcol] = block_type
+		block_step += 1	
+	system('echo \'pre-box-loop\' >> level.txt')
+
+	while(box_step < box_cnt):
+		boxrow = randint(1, (board_rows - 1))
+		boxcol = randint(1, (board_cols - 1))
+		if(board[boxrow][boxcol] == BAKGRD):
+			board[boxrow][boxcol] = BOX
+		box_step += 1	
+	system('echo \'pre-beasts\' >> level.txt')
+	
+	place_beasts(lvl_beast_cnt)
+	system('echo \'pre-monsters\' >> level.txt')
+	place_monsters(lvl_monster_cnt)
+	place_eggs(lvl_egg_cnt)
+	place_player()
+	
+	countdown = 1
+	key_move = True
 
 
 ####################################################################################################
@@ -731,7 +810,7 @@ place_player()
 
 def take_input():
 
-	global debug, keypress, player, top_margin, left_margin, save_top, save_left
+	global debug, keypress, player, top_margin, left_margin, save_top, save_left, key_move
 	
 	stdscr = curses.initscr() 
 	curses.cbreak()
@@ -760,23 +839,25 @@ def take_input():
 				top_margin = 0
 				left_margin = 0
 				system('clear')
-		elif keypress == ord(' '):
-			while (keypress == ord(' ')):
-				keypress = stdscr.getch()
-				player[1]['tug'] = not player[1]['tug']
-				if (keypress != ord(' ')):
-					tugspan = keypress # logs the present direction to compare for direction change
-					while (tugspan == keypress): # this ensures the player has pull function until direction key changes.
-						direct_keypress(keypress)
-						player[1]['tug'] = True
-						keypress = stdscr.getch()				
-		if keypress != ord(' '):
-			player[1]['tug'] = False
-			direct_keypress(keypress)
-
+		if (key_move == True):
+			if keypress == ord(' '):
+				while (keypress == ord(' ')):
+					keypress = stdscr.getch()
+					player[1]['tug'] = not player[1]['tug']
+					if (keypress != ord(' ')):
+						tugspan = keypress # logs the present direction to compare for direction change
+						while (tugspan == keypress): # this ensures the player has pull function until direction key changes.
+							direct_keypress(keypress)
+							player[1]['tug'] = True
+							keypress = stdscr.getch()				
+			if keypress != ord(' '):
+				player[1]['tug'] = False
+				direct_keypress(keypress)
+	
 #########################################################################################################
 threading.Thread(target=take_input).start()  ###############-- the main game clock and print loop --#####
 #########################################################################################################
+countdown = 1
 
 while(True):
 	if keypress == ord('q'):
@@ -785,11 +866,16 @@ while(True):
 	elif keypress == ord('p'):
 		pause()
 	else:
+		if ((lives == 0) | ((len(beasts) == 1) & (len(monsters) == 1) & (len(eggs) == 1))):
+			if countdown == 0:
+				system('echo \'pre-call\' >> level.txt')
+				build_level()								
+			countdown -= 1
 		move_enemies(beasts)
 		move_enemies(monsters)
 		hatch_eggs()
-		print_board(board, True)
-	sleep(lcd_time)
+		print_board(board)
+		sleep(lcd_time)
 
 ################################################
 input()
