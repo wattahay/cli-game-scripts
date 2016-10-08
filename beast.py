@@ -244,7 +244,7 @@ def print_board(board_array): #{
 ##############################################################################-- play audio function --###
 ##########################################################################################################
 
-def play_audio(filename): system('play -q audio/' + filename + '.ogg &')
+def play_audio(filename): system('aplay -q audio/' + filename + '.wav &')
 
 ##########################################################################################################
 ###############################################################################-- place the pieces -- ####
@@ -574,20 +574,20 @@ def push_tree(intent):
 		elif (space == BLOCK):				# if space is a border
 			loop = False
 		elif (space == KILLBLOCK):	 		# if space is a killblock
-			play_audio('squish')
+			play_audio('flatten')
 			push_move()
 			board[probe_r(probe - 1)][probe_c(probe - 1)] = KILLBLOCK
 			loop = False
 		elif (space == BEAST): # if space is a beast
 			if ((wall_space == KILLBLOCK) | (wall_space == BOX) | (wall_space == BLOCK)):
 				kill_enemy(beasts, probe_r(probe), probe_c(probe))
-				play_audio('squish2')
+				play_audio('squish')
 				push_move()
 			loop = False
 		elif (space == MONSTER):# if space is a monster	
 			if ((wall_space == KILLBLOCK) | (wall_space == BLOCK)):
 				kill_enemy(monsters, probe_r(probe), probe_c(probe))
-				play_audio('squish2')
+				play_audio('squish')
 				push_move()		
 			loop = False
 			
@@ -706,6 +706,7 @@ def build_level():
 	sleep(1)
 
 	if (lives == 0):
+		if score > 0: score -= 50
 		level = 1
 		lives = 5
 		points = 0
@@ -823,6 +824,8 @@ while(True):
 	else:
 		if ((lives == 0) | ((len(beasts) == 1) & (len(monsters) == 1) & (len(eggs) == 1))):
 			if countdown == 0:
+				if lives == 0: play_audio('loss')
+				else: play_audio('win')
 				system('echo \'pre-call\' >> level.txt')
 				build_level()								
 			countdown -= 1
