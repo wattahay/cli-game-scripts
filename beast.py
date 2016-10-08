@@ -56,6 +56,7 @@ key_move = False
 keypress = '' 
 debug = False
 countdown = 1
+timeout = 0
 ##################################-- formatted character constants
 
 
@@ -373,7 +374,7 @@ def place_player():
 
 def kill_player():
 
-	global BAKGRD, player, lives, board
+	global BAKGRD, player, lives, board, timeout
 
 	board[ player[1]['ro'] ][ player[1]['co'] ] = BAKGRD
 	lives -= 1
@@ -381,6 +382,8 @@ def kill_player():
 	if lives > 0:
 		place_player()
 
+	timeout += 1
+		
 	play_audio('death')
 
 
@@ -706,7 +709,8 @@ def build_level():
 	sleep(1)
 
 	if (lives == 0):
-		if score > 0: score -= 50
+		score += points
+		if level != 0: score -= 50
 		level = 1
 		lives = 5
 		points = 0
@@ -766,7 +770,7 @@ def build_level():
 
 def take_input():
 
-	global debug, keypress, player, top_margin, left_margin, save_top, save_left, key_move
+	global debug, keypress, player, top_margin, left_margin, save_top, save_left, key_move, timeout
 	
 	stdscr = curses.initscr() 
 	curses.cbreak()
@@ -775,6 +779,7 @@ def take_input():
 
 	while(True):
 		keypress = stdscr.getch()
+		timeout = 0
 		if keypress == ord('q'):
 			system('clear')
 			exit()
@@ -816,6 +821,9 @@ threading.Thread(target=take_input).start()  ###############-- the main game clo
 countdown = 1
 
 while(True):
+	if timeout > 2:
+		keypress = ord('p')
+		timeout = 0
 	if keypress == ord('q'):
 		system('reset')
 		exit()
