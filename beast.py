@@ -747,24 +747,22 @@ def build_level():
 		lvl_beast_cnt = beast_cnt
 		lvl_monster_cnt = monster_cnt
 		lvl_egg_cnt = egg_cnt
+		system('echo \'pre_player\' >> level.txt')
 		for i in range(1, len(player)): del player[1]
-		print_board(board)
-		sleep(.4)
+		system('echo \'pre_beasts\' >> level.txt')
 		for i in range(1, len(beasts)): del beasts[1]
-		print_board(board)
-		sleep(.4)
+		system('echo \'pre_monsters\' >> level.txt')
 		for i in range(1, len(monsters)): del monsters[1]
-		print_board(board)
-		sleep(.4)
-		for i in range(1, len(egggs)): del eggs[1]
+		system('echo \'pre_eggs\' >> level.txt')
+		for i in range(1, len(eggs)): del eggs[1]
 	else:
 		level += 1
 		score += points
 		points = 0
 		for i in range(1, len(player)): del player[1]
 		if (level < 9): lvl_beast_cnt = beast_cnt + level - 1
-		if (level > 3): lvl_monster_cnt = level - 3
-		if (level > 6): lvl_egg_cnt = level - 6
+		if (level > 4): lvl_monster_cnt = level - 4
+		if (level > 3): lvl_egg_cnt = level - 3
 		if (level > 4): block_type = KILLBLOCK
 
 	lower_boxes = int(play_rows * play_cols / 4 - 10)
