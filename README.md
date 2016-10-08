@@ -10,28 +10,25 @@ RUNS BEST IN xfce4-terminal
 - download audio directory with files 
 	* (the audio directory should be in the same directory as the beast.py file)
 - in a terminal, navigate to the directory
-- run: chmod +x pybeast.py
-- run: python3 pybeast.py
-- set the board option to 'c' for classic mode or 't' for dynamic terminal sizing
+- run: python3 beast.py
 
 
 ###----- Controls -----
-
 
 * 'q'.............quit
 * 'p'.............pause
 * 'b'.............debug stats
 * arrows..........move
 * spacebar........pull blocks
-* 'r'.............restore screen
+* 'r'.............restore screen / resized terminal
 
 
 ###----- For Best Results -----
 
 * Terminal Emulator Ranking
-	* xfce4-terminal
-	* guake
-	* gnome-terminal
+	* xfce4-terminal - Liberation Mono
+	* guake - Liberation Mono
+	* gnome-terminal - Free Mono
 	* konsole
 	* xterm
 	* "uxterm" (lxterm)
@@ -49,12 +46,28 @@ RUNS BEST IN xfce4-terminal
  	* Tlwg Mono looks . . . interesting
 * Alter font sizes for varied results
 * Run in a termainal that can:
-	* change between Mono fonts
+	* change font size (changes board size)
+	* change font
 	* change color schemes
+	* allow you to create user profiles
 * change font sizes
-* Set max_board_size (in file) smaller than 75 by 75 to prevent screen glitching
 
 
+###----- File Tweaks -----
+Edit these seetings in the beast.py file to change the game. 
+(These settings might be added to an options menu in the future.
+	* lcd_time
+		* change this if there are issues with flickering or player speed
+		* lower (faster) than .02 is usually counter-productive
+		* higher (slower) than .07 makes for clunkly gameplay
+	* beast_speed - in seconds
+	* monster_speed - in seconds
+	* hatch_speed (countdown speed) - in seconds
+	* beast_cnt - number of starting beasts
 
+###--- Advanced Tweaks ---
+	* use xset to change keyboard delay
+		* alternatively, consider changing lcd_time
+	* egg wait time algorithm
 
 
