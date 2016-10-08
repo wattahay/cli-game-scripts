@@ -246,39 +246,6 @@ def print_board(board_array): #{
 
 def play_audio(filename): system('play -q audio/' + filename + '.ogg &')
 
-#########################################################################################################
-##############################################################################--block_cnt--##############
-#########################################################################################################
-
-
-
-def place_blocks():
-
-	global block_type, BOX
-
-	lower_boxes = play_rows * play_cols / 4 - 10
-	upper_boxes = play_rows * play_cols / 4 + 10
-	box_cnt = randint(lower_boxes, upper_boxes)
-	
-	place_randomly(BOX, box_cnt)
-
-	box_step = 0
-	block_step = 0	
-
-	while(block_step < block_cnt):
-		row = randint(1, (board_rows - 1))
-		col = randint(1, (board_cols - 1))
-		if(board[row][col] == BAKGRD):
-			board[row][col] = block_type
-		block_step += 1	
-
-	while(box_step < box_cnt):
-		row = randint(1, (board_rows - 1))
-		col = randint(1, (board_cols - 1))
-		if(board[row][col] == BAKGRD):
-			board[row][col] = BOX
-		box_step += 1	
-
 ##########################################################################################################
 ###############################################################################-- place the pieces -- ####
 ##########################################################################################################
@@ -689,21 +656,21 @@ def direct_keypress(tap):
 
 def pause():
 
-	global ttyRows, ttyCols, screen_cols 
+	global ttyRows, ttyCols, screen_cols, left_margin, top_margin
 
 	play_audio('pause')
 
-	pauseleft = (int(ttyCols/2) - 8)
-	pausetop = (int(ttyRows/2) - 4) - (int(board_rows / 4))
+	pauseleft = (int(ttyCols/2) - 8) - left_margin
+	pausetop = (int(ttyRows/2) - 4) - (int(board_rows / 4)) - top_margin
 	print('\033[0m\033[40m')	
 
-	print('\033[' + str(pausetop) + ';' + str(pauseleft) + 'H' + ' '*16)
-	print('\033[' + str(pausetop + 1) + ';' + str(pauseleft) + 'H' + ' ' + chr(9556) + chr(9552)*12 + chr(9559) + ' ')
-	print('\033[' + str(pausetop + 2) + ';' + str(pauseleft) + 'H' + ' ' + chr(9553) + '            ' + chr(9553) + ' ')
-	print('\033[' + str(pausetop + 3) + ';' + str(pauseleft) + 'H' + ' ' + chr(9553) + '   PAUSED   ' + chr(9553) + ' ')
-	print('\033[' + str(pausetop + 4) + ';' + str(pauseleft) + 'H' + ' ' + chr(9553) + '            ' + chr(9553) + ' ')
-	print('\033[' + str(pausetop + 5) + ';' + str(pauseleft) + 'H' + ' ' + chr(9562) + chr(9552)*12 + chr(9565) + ' ')
-	print('\033[' + str(pausetop + 6) + ';' + str(pauseleft) + 'H' + ' '*16)
+	print('\033[' + str(pausetop + top_margin) + ';' + str(pauseleft + left_margin) + 'H' + ' '*16)
+	print('\033[' + str(pausetop + top_margin + 1) + ';' + str(pauseleft + left_margin) + 'H' + ' ' + chr(9556) + chr(9552)*12 + chr(9559) + ' ')
+	print('\033[' + str(pausetop + top_margin + 2) + ';' + str(pauseleft + left_margin) + 'H' + ' ' + chr(9553) + '            ' + chr(9553) + ' ')
+	print('\033[' + str(pausetop + top_margin + 3) + ';' + str(pauseleft + left_margin) + 'H' + ' ' + chr(9553) + '   PAUSED   ' + chr(9553) + ' ')
+	print('\033[' + str(pausetop + top_margin + 4) + ';' + str(pauseleft + left_margin) + 'H' + ' ' + chr(9553) + '            ' + chr(9553) + ' ')
+	print('\033[' + str(pausetop + top_margin + 5) + ';' + str(pauseleft + left_margin) + 'H' + ' ' + chr(9562) + chr(9552)*12 + chr(9565) + ' ')
+	print('\033[' + str(pausetop + top_margin + 6) + ';' + str(pauseleft + left_margin) + 'H' + ' '*16)
 	
 	print('\033[H\033[0m')
 
@@ -725,21 +692,19 @@ def build_level():
 	
 	global board_rows, board_cols, reset_board, blank_board, board, beast_cnt, monster_cnt, egg_cnt, key_move, level, lives, score, points, BAKGRD, BLOCK, KILLBLOCK, countdown
 	
-	system('echo \'pre-key_move\' >> level.txt')
 	key_move = False
-	system('echo \'pre-print\' >> level.txt')
-	print_board(board)
-	sleep(1)	
 	block_type = BLOCK
-
 	lvl_beast_cnt = 0
 	lvl_monster_cnt = 0
 	lvl_egg_cnt = 0
+	
+	print_board(board)
+	sleep(1)	
 	board = []
 	board = build_the_board()
 	print_board(board)
 	sleep(1)
-	system('echo \'pre_assignments\' >> level.txt')
+
 	if (lives == 0):
 		level = 1
 		lives = 5
@@ -747,13 +712,9 @@ def build_level():
 		lvl_beast_cnt = beast_cnt
 		lvl_monster_cnt = monster_cnt
 		lvl_egg_cnt = egg_cnt
-		system('echo \'pre_player\' >> level.txt')
 		for i in range(1, len(player)): del player[1]
-		system('echo \'pre_beasts\' >> level.txt')
 		for i in range(1, len(beasts)): del beasts[1]
-		system('echo \'pre_monsters\' >> level.txt')
 		for i in range(1, len(monsters)): del monsters[1]
-		system('echo \'pre_eggs\' >> level.txt')
 		for i in range(1, len(eggs)): del eggs[1]
 	else:
 		level += 1
@@ -762,7 +723,7 @@ def build_level():
 		for i in range(1, len(player)): del player[1]
 		if (level < 9): lvl_beast_cnt = beast_cnt + level - 1
 		if (level > 4): lvl_monster_cnt = level - 4
-		if (level > 3): lvl_egg_cnt = level - 3
+		if (level > 2): lvl_egg_cnt = level - 2
 		if (level > 4): block_type = KILLBLOCK
 
 	lower_boxes = int(play_rows * play_cols / 4 - 10)
@@ -775,14 +736,12 @@ def build_level():
 	blockcol = 0
 	boxrow = 0
 	boxcol = 0
-	system('echo \'pre-block-loop\' >> level.txt')
 	while(block_step < block_cnt):
 		blockrow = randint(1, (board_rows - 1))
 		blockcol = randint(1, (board_cols - 1))
 		if(board[blockrow][blockcol] == BAKGRD):
 			board[blockrow][blockcol] = block_type
 		block_step += 1	
-	system('echo \'pre-box-loop\' >> level.txt')
 
 	while(box_step < box_cnt):
 		boxrow = randint(1, (board_rows - 1))
@@ -790,10 +749,8 @@ def build_level():
 		if(board[boxrow][boxcol] == BAKGRD):
 			board[boxrow][boxcol] = BOX
 		box_step += 1	
-	system('echo \'pre-beasts\' >> level.txt')
 	
 	place_beasts(lvl_beast_cnt)
-	system('echo \'pre-monsters\' >> level.txt')
 	place_monsters(lvl_monster_cnt)
 	place_eggs(lvl_egg_cnt)
 	place_player()
