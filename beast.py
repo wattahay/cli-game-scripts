@@ -112,9 +112,15 @@ eggs = [{
 # 'sub'		updated digital unicode reference to subscript character
 # 'wait'	randomized wait time before hatching countdown
 player = [{
+		'flash_frames': (int(.05 / lcd_time) * 2),
 		'chr': PLAYER,
 		'pnts': 10 
 	}]
+
+plr_flashes = 4
+plr_flash = 0
+plr_frames = (int(.05 / lcd_time) * 2)
+plr_frame = 0
 	
 # 'tug'
 # 'ro'		row
@@ -141,7 +147,7 @@ reset_board = [] ###########-- classic board size variables
 play_rows = 20	# only change this in-game
 play_cols = 40	# only change this in-game
 
-block_cnt = 10	# level 1 count
+block_cnt = 10  # number of yellow blocks
 
 ######################################-- board dimensions
 classic = True
@@ -179,11 +185,11 @@ def plan_the_board(): #{
 		top_margin = 0
 		left_margin = 0
 
+	global stat_space, save_left, save_top
 	save_top = top_margin # assigned for the debug feature 
 	save_left = left_margin # assigned for the debug feature
 	stat_space = int((board_cols * 2 - (4 * 14 )) / 5) # calculate this for the print_board function
 	if stat_space < 0: stat_space = 0
-	global stat_space, save_left, save_top
 	#}
 
 	
@@ -359,18 +365,42 @@ def hatch_eggs():
 ##############################################################################
 ###############################################-- move pieces --##############
 ##############################################################################
+
+def flash_player():
+
+	global player, PLAYER, plr_flashes, plr_flash, plr_frames, plr_frame
+
+	neg_PLAYER = '\033[7m\033[34m\033[40m' + chr(9664) + chr(9654) + '\033[0m'
+	pos_PLAYER = '\033[34m\033[40m' + chr(9664) + chr(9654) + '\033[0m'
+
+	if plr_flash <= plr_flashes:
+		if plr_frame < plr_frames:
+			plr_frame += 1
+		elif plr_frame == plr_frames:
+			plr_frame = 0
+			if board[player[1]['ro']][player[1]['co']] == PLAYER:
+				board[player[1]['ro']][player[1]['co']] = neg_PLAYER
+			else:
+				board[player[1]['ro']][player[1]['co']] = PLAYER
+
+			plr_flash += 1
+
+	# if the flash is greater than 0
+
 def place_player():
-	
+
+	global player, PLAYER, plr_flash
+
 	step = 0 
 	while(step < 1):
 		row = randint(1, (board_rows - 1))
 		col = randint(1, (board_cols - 1))
 		if(board[row][col] == BAKGRD):
-			board[row][col] = player[0]['chr']
+			board[row][col] = PLAYER
 			step += 1
 			player.append({'ro': row, 'co': col, 'tug': False })
 			step += 1
-
+	plr_flash = 0
 
 def kill_player():
 
@@ -600,19 +630,17 @@ def push_tree(intent):
 	
 
 def move_player(direction):
-	global player, board, MOVES, BAKGRD, BOX, MVU, MVL, MVR, MVD
+	global PLAYER, board, MOVES, BAKGRD, BOX, MVU, MVL, MVR, MVD
 
-	pawns = player	
 	index = 1
-	char = player[0]['chr']
 	row = player[1]['ro']
 	col = player[1]['co']
 	fow = row + MOVES[direction]['ra'] 
 	fol = col + MOVES[direction]['ca']
 	rtug = row - MOVES[direction]['ra']
 	ctug = col - MOVES[direction]['ca']
-	board[fow][fol] = char 
-	if (pawns[index]['tug']) & (board[rtug][ctug] == BOX):
+	board[fow][fol] = PLAYER 
+	if (player[index]['tug']) & (board[rtug][ctug] == BOX):
 		board[rtug][ctug] = BAKGRD
 		board[row][col] = BOX
 	else:
@@ -746,14 +774,14 @@ def build_level():
 		blockcol = randint(1, (board_cols - 1))
 		if(board[blockrow][blockcol] == BAKGRD):
 			board[blockrow][blockcol] = block_type
-		block_step += 1	
+			block_step += 1	
 
 	while(box_step < box_cnt):
 		boxrow = randint(1, (board_rows - 1))
 		boxcol = randint(1, (board_cols - 1))
 		if(board[boxrow][boxcol] == BAKGRD):
 			board[boxrow][boxcol] = BOX
-		box_step += 1	
+			box_step += 1	
 	
 	place_beasts(lvl_beast_cnt)
 	place_monsters(lvl_monster_cnt)
@@ -840,8 +868,9 @@ while(True):
 		move_enemies(beasts)
 		move_enemies(monsters)
 		hatch_eggs()
+		flash_player()
 		print_board(board)
-		sleep(lcd_time)
+	sleep(lcd_time)
 
 ################################################
 input()
