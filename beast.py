@@ -117,7 +117,7 @@ player = [{
 		'pnts': 10 
 	}]
 
-plr_flashes = 4
+plr_flashes = 5
 plr_flash = 0
 plr_frames = (int(.05 / lcd_time) * 2)
 plr_frame = 0
