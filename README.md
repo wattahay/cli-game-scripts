@@ -21,6 +21,7 @@ RUNS BEST IN xfce4-terminal
 * arrows..........move
 * spacebar........pull blocks
 * 'r'.............restore screen / resized terminal
+* 'esc'...........restarts the whole game
 
 
 ###----- For Best Results -----
