@@ -8,7 +8,6 @@ while(True):
 
 	##################################-- starting game statistics
 
-	beast_cnt = 4 		# starting beasts	
 	lives = 5		# starting lives
 
 	###############################
@@ -19,11 +18,9 @@ while(True):
 
 	##################################-- game scoring balance
 
-	level_loss = 50		# point loss if player loses level
 	beast_scr = 2		# points for killing beasts
 	egg_scr = 4		# points for killing eggs
 	monster_scr = 6		# points for killing monsters
-	death_scr = 0		# point loss for dying
 
 	##################################-- game speed
 
@@ -131,10 +128,6 @@ while(True):
 	####################################################################-- level 1 setup --#########
 	################################################################################################
 
-	monster_cnt = 0	# level 1 count
-	egg_cnt = 0	# level 1 count
-
-	kills = 0	# changes in-game
 	level = 0	# change in order to start on a specific level
 	score = 0	# in-game total score
 	points = 0	# in-game level points added at end of level
@@ -147,6 +140,8 @@ while(True):
 
 	play_rows = 20	# only change this in-game
 	play_cols = 40	# only change this in-game
+	board_rows = play_rows + 2
+	board_cols = play_cols + 2
 
 	block_cnt = 10  # number of yellow blocks
 
@@ -155,8 +150,6 @@ while(True):
 	left_margin = 0 
 	top_margin = 0
 	stat_rows = 3
-	board_rows = play_rows + 2
-	board_cols = play_cols + 2
 
 	def plan_the_board(): #{
 
@@ -305,7 +298,7 @@ while(True):
 
 		global monsters, beasts, eggs, board
 
-		wait_frames = (len(eggs) + len(beasts) + len(monsters)) * eggs[0]['incu_frames'] * (randint(2, 6)) # seconds of wait time before egg starts counting down 
+		wait_frames = (len(eggs) + len(beasts) + len(monsters)) * eggs[0]['incu_frames'] + (randint(1, 30)) # seconds of wait time before egg starts counting down 
 		stag = randint(1, eggs[0]['frames']) # the frame that the egg counts down on
 		board[row][col] = EGG(32)
 		eggs.append({'ro': row, 'co': col, 'wait': wait_frames, 'stg': stag, 'sub':32})
@@ -594,7 +587,6 @@ while(True):
 				push_move()
 				loop = False
 			elif (deteggt(space) == True): 	# if space is a egg
-				system('echo \"egg\" >> eggfunc.txt')
 				if (wall_space == BLOCK) | (wall_space == KILLBLOCK):	# if next block after egg is a border
 					kill_enemy(eggs, probe_r(probe), probe_c(probe)) 			# del egg from global egg list
 					play_audio('hatch')
@@ -732,17 +724,16 @@ while(True):
 		board = build_the_board()
 		reset_board = build_the_board()
 		print_board(board)
-		sleep(1)
+		sleep(.5)
 
 		if (lives == 0):
 			score += points
-			if level != 0: score -= 50
-			level = 1
+			if level != 0: score -= 75
+			level -= 3
+			if level < 1: level = 1
 			lives = 5
 			points = 0
-			lvl_beast_cnt = beast_cnt
-			lvl_monster_cnt = monster_cnt
-			lvl_egg_cnt = egg_cnt
+			
 			for i in range(1, len(player)): del player[1]
 			for i in range(1, len(beasts)): del beasts[1]
 			for i in range(1, len(monsters)): del monsters[1]
@@ -752,10 +743,92 @@ while(True):
 			score += points
 			points = 0
 			for i in range(1, len(player)): del player[1]
-			if (level < 9): lvl_beast_cnt = beast_cnt + level - 1
-			if (level > 4): lvl_monster_cnt = level - 4
-			if (level > 2): lvl_egg_cnt = level - 2
-			if (level > 4): block_type = KILLBLOCK
+
+		if level == 1:
+			lvl_beast_cnt = 3
+			lvl_monster_cnt = 0
+			lvl_egg_cnt = 0
+			block_type = BLOCK
+		elif level == 2:
+			lvl_beast_cnt = 5
+			lvl_monster_cnt = 0
+			lvl_egg_cnt = 0
+			block_type = KILLBLOCK
+		elif level == 3:
+			lvl_beast_cnt = 5
+			lvl_monster_cnt = 0
+			lvl_egg_cnt = 2
+			block_type = BLOCK
+		elif level == 4:
+			lvl_beast_cnt = 4
+			lvl_monster_cnt = 1 
+			lvl_egg_cnt = 1
+			block_type = KILLBLOCK
+		elif level == 5:
+			lvl_beast_cnt = 4
+			lvl_monster_cnt = 2
+			lvl_egg_cnt = 2
+			block_type = BLOCK
+		elif level == 6:
+			lvl_beast_cnt = 8
+			lvl_monster_cnt = 0 
+			lvl_egg_cnt = 0
+			block_type = KILLBLOCK
+		elif level == 7:
+			lvl_beast_cnt = 0
+			lvl_monster_cnt = 0 
+			lvl_egg_cnt = 8
+			block_type = KILLBLOCK
+		elif level == 8:
+			lvl_beast_cnt = 0
+			lvl_monster_cnt = 8 
+			lvl_egg_cnt = 0
+			block_type = KILLBLOCK
+		elif level == 9:
+			lvl_beast_cnt = 3
+			lvl_monster_cnt = 3
+			lvl_egg_cnt = 3
+			block_type = BLOCK
+		elif level == 10:
+			lvl_beast_cnt = 2
+			lvl_monster_cnt = 4
+			lvl_egg_cnt = 3
+			block_type = BLOCK
+		elif level == 11:
+			lvl_beast_cnt = 1
+			lvl_monster_cnt = 5
+			lvl_egg_cnt = 4
+			block_type = KILLBLOCK
+		elif level == 12:
+			lvl_beast_cnt = 1
+			lvl_monster_cnt = 6
+			lvl_egg_cnt = 4
+			block_type = KILLBLOCK
+		elif level == 13:
+			lvl_beast_cnt = 0
+			lvl_monster_cnt = 0
+			lvl_egg_cnt = 12
+			block_type = KILLBLOCK
+		elif level == 14:
+			lvl_beast_cnt = 0
+			lvl_monster_cnt = 12
+			lvl_egg_cnt = 0
+			block_type = KILLBLOCK
+		elif level == 15:
+			lvl_beast_cnt = 15
+			lvl_monster_cnt = 0
+			lvl_egg_cnt = 0
+			block_type = KILLBLOCK
+		else:
+			lvl_beast_cnt =	int(level / 3)
+			lvl_monster_cnt = int(level / 3)
+			lvl_egg_cnt = int(level / 3)
+			if (level % 2 == 0): block_type = KILLBLOCK
+			else: block_type = BLOCK
+			if (level % 3) == 1: lvl_beast_cnt += 1
+			elif (level % 3) == 2: 
+				lvl_beast_cnt += 1
+				lvl_egg_cnt += 1
 
 		lower_boxes = int(play_rows * play_cols / 4 - 10)
 		upper_boxes = int(play_rows * play_cols / 4 + 10)
@@ -861,6 +934,7 @@ while(True):
 			exit()
 		elif keypress == 27:
 			break
+			system('clear')
 		elif keypress == ord('p'):
 			pause()
 		else:
