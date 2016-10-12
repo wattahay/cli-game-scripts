@@ -708,7 +708,8 @@ def pause():
 
 def build_level():
 	
-	global game_play_mode, keypress, stdscr, board_rows, board_cols, reset_board, blank_board, board, beast_cnt, monster_cnt, egg_cnt, level, lives, score, points, BAKGRD, BLOCK, KILLBLOCK, last_frame, top_margin, left_margin
+	global game_play_mode, keypress, stdscr, board_rows, board_cols, reset_board, blank_board, board, beast_cnt, monster_cnt, egg_cnt, level, lives, score, points, BAKGRD, BLOCK, KILLBLOCK, last_frame, top_margin, left_margin, lcd_time
+
 	game_play_mode = False # sets the input loop to reject player move functions and other functions reserved for game play time	
 
 	stdscr = curses.initscr() 
@@ -725,25 +726,25 @@ def build_level():
 	board = build_the_board()
 	print_board(board)
 
+	print('\033[' + str(top_margin + 5) + ';' + str(left_margin + (board_cols - 30)) + 'H\033[s\033[0m')
+
 	if (level == 0):
 		sleep(.6)
-	print('\033[' + str(top_margin + 5) + ';' + str(left_margin + (board_cols - 30)) + 'H\033[s\033[0m'
-		+ '\033[u\033[2B' + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*3 + BEAST*1 + BAKGRD*4 + BEAST*3 + BAKGRD*2 + BEAST*5
-		+ '\033[u\033[3B' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*6 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*2 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1
-		+ '\033[u\033[4B' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*7 + BEAST*1
-		+ '\033[u\033[5B' + BEAST*4 + BAKGRD*2 + BEAST*3 + BAKGRD*3 + BEAST*5 + BAKGRD*2 + BEAST*3 + BAKGRD*4 + BEAST*1
-		+ '\033[u\033[6B' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1
-		+ '\033[u\033[7B' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1
-		+ '\033[u\033[8B' + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*1 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*2 + BEAST*3 + BAKGRD*4 + BEAST*1
-		+ '\033[u\r\033[' + str(left_margin + 3) + 'C\033[' + str(3) + 'A\033[40m\033[2mPress Spacebar to Play . . .\033[1B\033[0m\033[8m')
-
-
-	keypress = 999
-	if (level == 0):
+		print('\033[u\033[2B' + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*3 + BEAST*1 + BAKGRD*4 + BEAST*3 + BAKGRD*2 + BEAST*5
+			+ '\033[u\033[3B' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*6 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*2 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1
+			+ '\033[u\033[4B' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*7 + BEAST*1
+			+ '\033[u\033[5B' + BEAST*4 + BAKGRD*2 + BEAST*3 + BAKGRD*3 + BEAST*5 + BAKGRD*2 + BEAST*3 + BAKGRD*4 + BEAST*1
+			+ '\033[u\033[6B' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1
+			+ '\033[u\033[7B' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1
+			+ '\033[u\033[8B' + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*1 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*2 + BEAST*3 + BAKGRD*4 + BEAST*1)
+		print('\033[u\r\033[' + str(left_margin + 3) + 'C\033[3A\033[40m\033[2mPress the Spacebar to Play . . .\033[1B\033[0m')
 		while (keypress != ord(' ')):
-			if keypress == 27:
-				exit()
-			sleep(.5)
+			sleep(.2)
+
+	print('\033[u\r\033[' + str(left_margin + 3) + 'C\033[3A\033[40m\033[2mPress \'tab\' for Options Menus . . .\033[1B\033[0m\033[8m')
+	sleep(2)
+
+
 
 	if (lives == 0):
 		score += points
@@ -852,13 +853,47 @@ def build_level():
 	lower_boxes = int(play_rows * play_cols / 4 - 10)
 	upper_boxes = int(play_rows * play_cols / 4 + 10)
 	box_cnt = randint(lower_boxes, upper_boxes)
-		
-#	if keypress == 9:
-#		while (True):
-			# print options
-			
-	#	stdscr.addstr((top_margin + 3), (left_margin + 4),"There are " + str(play_rows * play_cols - (lvl_beast_cnt + lvl_egg_cnt + lvl_monster_cnt + box_cnt + block_cnt ")
-	#	lvl_beast_cnt = int(stdscr.getstr(2))
+
+	main_menu = 0
+	controls_menu = 9
+	board_setup_menu = 0
+	pawn_speeds_menu = 0
+	ltab = '\033[7m\033[40m'
+	dtab = '\033[7m\033[40m\033[2m'
+	norm = '\033[0m'
+
+	if keypress == 9:
+		sleep(1.5)
+		keypress == 999
+		print_board(blank_board)
+		print('\033[' + str(top_margin + 3) + ';' + str(left_margin + 6) + 'H\033[s\033[0m')
+		while (True):
+
+			if keypress == 9:
+				keypress = ''
+				main_menu += 1
+				play_audio('menu_tab')
+				if main_menu > 3:
+					main_menu = 1
+				if main_menu == 1:
+					print('\033[u' + chr(9473) + ltab + ' key options ' + norm + chr(9473) + ltab + ' board setup ' + norm + chr(9473) + ltab + ' pawn speeds ' + norm + chr(9473)*20)
+					sleep(.08)
+					print('\033[u' + chr(9473) + dtab + ' key options ' + norm + chr(9473) + ltab + ' board setup ' + norm + chr(9473) + ltab + ' pawn speeds ' + norm + chr(9473)*20)
+				elif main_menu == 2:
+					print('\033[u' + chr(9473) + ltab + ' key options ' + norm + chr(9473) + ltab + ' board setup ' + norm + chr(9473) + ltab + ' pawn speeds ' + norm + chr(9473)*20)
+					sleep(.08)
+					print('\033[u' + chr(9473) + ltab + ' key options ' + norm + chr(9473) + dtab + ' board setup ' + norm + chr(9473) + ltab + ' pawn speeds ' + norm + chr(9473)*20)
+				elif main_menu == 3:
+					print('\033[u' + chr(9473) + ltab + ' key options ' + norm + chr(9473) + ltab + ' board setup ' + norm + chr(9473) + ltab + ' pawn speeds ' + norm + chr(9473)*20)
+					sleep(.08)
+					print('\033[u' + chr(9473) + ltab + ' key options ' + norm + chr(9473) + ltab + ' board setup ' + norm + chr(9473) + dtab + ' pawn speeds ' + norm + chr(9473)*20)
+			elif keypress == 27:
+				keypress = ''
+				print_board(blank_board)
+				sleep(1)
+				break
+			sleep(lcd_time)			
+
 	box_step = 0
 	block_step = 0	
 	blockrow = 0
@@ -904,11 +939,11 @@ def take_input():
 		keypress = stdscr.getch()
 		system('echo \'' + str(keypress) + '\' >> level.txt')
 		timeout = 0
-		if keypress == 27: # the esc key
-			system('clear')
-			exit()
 		if (game_play_mode):
-			if keypress == ord('p'):
+			if keypress == 27: # the esc key
+				system('clear')
+				exit()
+			elif keypress == ord('p'):
 				keypress = stdscr.getch()
 				keypress = ''
 			elif keypress == ord('r'):
