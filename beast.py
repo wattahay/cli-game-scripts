@@ -49,6 +49,11 @@ MVDR = 	'DR'
 
 DIR_LIS = (MVU, MVD, MVL, MVR, MVUL, MVUR, MVDL, MVDR)
 
+KEY_UP = 259
+KEY_DOWN = 258
+KEY_RIGHT = 261
+KEY_LEFT = 260
+
 keypress = '' 
 debug = False
 last_frame = 1
@@ -659,15 +664,15 @@ def direct_move(tap_move):
 
 def direct_keypress(tap):
 
-	global player, MOVES, board
+	global player, MOVES, board, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT
 
-	if (tap == curses.KEY_UP):
+	if (tap == KEY_UP):
 		direct_move('U')
-	elif (tap == curses.KEY_LEFT):
+	elif (tap == KEY_LEFT):
 		direct_move('L')
-	elif (tap == curses.KEY_DOWN):
+	elif (tap == KEY_DOWN):
 		direct_move('D')
-	elif (tap == curses.KEY_RIGHT):
+	elif (tap == KEY_RIGHT):
 		direct_move('R')
 
 
@@ -708,7 +713,7 @@ def pause():
 
 def build_level():
 	
-	global game_play_mode, keypress, stdscr, board_rows, board_cols, reset_board, blank_board, board, beast_cnt, monster_cnt, egg_cnt, level, lives, score, points, BAKGRD, BLOCK, KILLBLOCK, last_frame, top_margin, left_margin, lcd_time
+	global game_play_mode, keypress, stdscr, play_rows, play_cols, board_rows, board_cols, reset_board, blank_board, board, beast_cnt, monster_cnt, egg_cnt, level, lives, score, points, BAKGRD, BLOCK, KILLBLOCK, last_frame, top_margin, left_margin, lcd_time, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT
 
 	game_play_mode = False # sets the input loop to reject player move functions and other functions reserved for game play time	
 
@@ -720,6 +725,8 @@ def build_level():
 	lvl_beast_cnt = 0
 	lvl_monster_cnt = 0
 	lvl_egg_cnt = 0
+	lvl_box_cnt = 0
+	lvl_block_cnt = block_cnt
 	
 	print_board(board)
 	board = []
@@ -852,23 +859,31 @@ def build_level():
 
 	lower_boxes = int(play_rows * play_cols / 4 - 10)
 	upper_boxes = int(play_rows * play_cols / 4 + 10)
-	box_cnt = randint(lower_boxes, upper_boxes)
+	lvl_box_cnt = randint(lower_boxes, upper_boxes)
 
 	main_menu = 0
+	item_menu = 0
 	controls_menu = 9
-	board_setup_menu = 0
-	pawn_speeds_menu = 0
+	menu_ref = '\033[' + str(top_margin + 3) + ';' + str(left_margin + 6) + 'H\033[s\033[0m'
 	ltab = '\033[7m\033[40m'
 	dtab = '\033[7m\033[40m\033[2m'
-	norm = '\033[0m'
+	dspeedbg = ' \033[7m\033[2;34m   \033[2;32m     \033[2;33m\033[2;31m  \033[0m\033[2m\033[40m '
+	lspeedbg = ' \033[44m   \033[42m     \033[43m\033[41m  \033[0m\033[2m\033[40m '
+	speedbg = dspeedbg
+	speedarrow = chr(10219)
+	norm = '\033[0m\033[40m'
+	darkhl = '\033[2m'
+	lighthl = '\033[1m'
+	highlight = darkhl 
+	chr_cnt = 0
+	key_tracker = 0
 
 	if keypress == 9:
 		sleep(1.5)
 		keypress == 999
 		print_board(blank_board)
-		print('\033[' + str(top_margin + 3) + ';' + str(left_margin + 6) + 'H\033[s\033[0m')
+		print(menu_ref)
 		while (True):
-
 			if keypress == 9:
 				keypress = ''
 				main_menu += 1
@@ -876,18 +891,99 @@ def build_level():
 				if main_menu > 3:
 					main_menu = 1
 				if main_menu == 1:
-					print('\033[u' + chr(9473) + ltab + ' key options ' + norm + chr(9473) + ltab + ' board setup ' + norm + chr(9473) + ltab + ' pawn speeds ' + norm + chr(9473)*20)
+					print_board(blank_board) 
+					print(menu_ref)
+					print('\033[u' + chr(9473) + dtab + ' key options ' + norm + chr(9473) + dtab + ' level setup ' + norm + chr(9473) + dtab + ' pawn speeds ' + norm + chr(9473)*20)
 					sleep(.08)
-					print('\033[u' + chr(9473) + dtab + ' key options ' + norm + chr(9473) + ltab + ' board setup ' + norm + chr(9473) + ltab + ' pawn speeds ' + norm + chr(9473)*20)
+					print('\033[u' + chr(9473) + ltab + ' key options ' + norm + chr(9473) + dtab + ' level setup ' + norm + chr(9473) + dtab + ' pawn speeds ' + norm + chr(9473)*20)
+					print('\033[u\033[3B' + highlight + 'Movement Keys:  w,a,s,d   arrows   vi (h,j,k,l) ')
+					print('\033[u\033[5B' + highlight + 'Pulling Boxes:  toggle   single   switch')
+					item_menu = 0
 				elif main_menu == 2:
-					print('\033[u' + chr(9473) + ltab + ' key options ' + norm + chr(9473) + ltab + ' board setup ' + norm + chr(9473) + ltab + ' pawn speeds ' + norm + chr(9473)*20)
+					print_board(blank_board) 
+					print(menu_ref)
+					print('\033[u' + chr(9473) + dtab + ' key options ' + norm + chr(9473) + dtab + ' level setup ' + norm + chr(9473) + dtab + ' pawn speeds ' + norm + chr(9473)*20)
 					sleep(.08)
-					print('\033[u' + chr(9473) + ltab + ' key options ' + norm + chr(9473) + dtab + ' board setup ' + norm + chr(9473) + ltab + ' pawn speeds ' + norm + chr(9473)*20)
+					print('\033[u' + chr(9473) + dtab + ' key options ' + norm + chr(9473) + ltab + ' level setup ' + norm + chr(9473) + dtab + ' pawn speeds ' + norm + chr(9473)*20)
+					print('\033[u\033[4B\033[34CTotal Spaces: \033[36m' + str(play_rows * play_cols) + '\033[0m\033[40m')
+					print('\033[u\033[5B\033[35CUsed Spaces: \033[36m' + str(lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt) + '\033[0m\033[40m')
+					print('\033[u\033[6B\033[35CFree Spaces: \033[36m' + str((play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)) + '\033[0m\033[40m')
+					print('\033[u\033[3B' + BEAST + '\033[40m' + highlight + ' - Beast Count: \033[35m' + str(lvl_beast_cnt) + norm)
+					print('\033[u\033[5B' + MONSTER + '\033[40m' + highlight + ' - Monster Count: \033[35m' + str(lvl_monster_cnt) + norm)
+					print('\033[u\033[7B' + EGG(32) + '\033[40m' + highlight + ' - Egg Count: \033[35m' + str(lvl_egg_cnt) + norm)
+					print('\033[u\033[9B' + BOX + '\033[40m' + highlight + ' - Box Count: \033[35m' + str(lvl_box_cnt) + norm)
+					print('\033[u\033[11B' + block_type + '\033[40m' + highlight + ' - Block Count: \033[35m' + str(lvl_block_cnt) + norm)
+					print('\033[u\033[13B' + block_type + '\033[40m' + highlight + ' - Block Type: Normal Yellow   Dangerous Orange ' + norm)
+					item_menu = 2
 				elif main_menu == 3:
-					print('\033[u' + chr(9473) + ltab + ' key options ' + norm + chr(9473) + ltab + ' board setup ' + norm + chr(9473) + ltab + ' pawn speeds ' + norm + chr(9473)*20)
+					print_board(blank_board) 
+					print(menu_ref)
+					print('\033[u' + chr(9473) + dtab + ' key options ' + norm + chr(9473) + dtab + ' level setup ' + norm + chr(9473) + dtab + ' pawn speeds ' + norm + chr(9473)*20)
 					sleep(.08)
-					print('\033[u' + chr(9473) + ltab + ' key options ' + norm + chr(9473) + ltab + ' board setup ' + norm + chr(9473) + dtab + ' pawn speeds ' + norm + chr(9473)*20)
-			elif keypress == 27:
+					print('\033[u' + chr(9473) + dtab + ' key options ' + norm + chr(9473) + dtab + ' level setup ' + norm + chr(9473) + ltab + ' pawn speeds ' + norm + chr(9473)*20)
+					print('\033[u\033[3B' + BEAST + highlight + '\033[40m - Beast:' + '\033[2m\033[40m\t\t slower' + speedbg + 'faster')
+					print('\033[u\033[5B' + MONSTER + highlight + '\033[40m - Monster:\t' + '\033[2m\033[40m\t slower' + speedbg + 'faster')
+					print('\033[u\033[7B' + EGG(32) + highlight + '\033[40m - Egg Incubator:   ' + '\033[2m\033[40m\t slower' + speedbg + 'faster')
+					print('\033[u\033[9B' + EGG(8320) + highlight + '\033[40m - Egg Timer:' + '\033[2m\033[40m\t slower' + speedbg + 'faster')
+					item_menu = 8
+
+
+			if ((keypress == KEY_UP) | (keypress == KEY_DOWN)):		
+				if (main_menu == 1):
+					
+					if (keypress == KEY_UP):
+						item_menu -= 1
+						if item_menu < 0: item_menu = 2
+					elif (keypress == KEY_DOWN): 
+						item_menu += 1
+						if item_menu > 2: item_menu = 0
+					if (item_menu != 0): 
+						play_audio('menu_item')
+					if (item_menu == 1): keypress = 999
+					elif (item_menu == 2): keypress = 999
+					while (keypress == 999):
+						sleep(lcd_time)
+
+				elif (main_menu == 2):
+					if (keypress == KEY_UP):
+						item_menu -= 1
+						if item_menu < 2: 
+							item_menu = 8
+					elif (keypress == KEY_DOWN): 
+						item_menu += 1
+						if item_menu > 8: 
+							item_menu = 2
+					if (item_menu != 2): 
+						play_audio('menu_item')
+					if (item_menu == 3): keypress = 999
+					elif (item_menu == 4): keypress = 999
+					elif (item_menu == 5): keypress = 999
+					elif (item_menu == 6): keypress = 999
+					elif (item_menu == 7): keypress = 999
+					elif (item_menu == 8): keypress = 999
+					while (keypress == 999):
+						sleep(lcd_time)
+
+				elif (main_menu == 3):
+					if (keypress == KEY_UP):
+						item_menu -= 1
+						if item_menu < 8: 
+							item_menu = 12
+					elif (keypress == KEY_DOWN): 
+						item_menu += 1
+						if item_menu > 12: 
+							item_menu = 8
+					if (item_menu != 8): 
+						play_audio('menu_item')
+					if (item_menu == 9): keypress = 999
+					elif (item_menu == 10): keypress = 999
+					elif (item_menu == 11): keypress = 999
+					elif (item_menu == 12): keypress = 999
+					while (keypress == 999):
+						sleep(lcd_time)
+
+
+			if keypress == 27:
 				keypress = ''
 				print_board(blank_board)
 				sleep(1)
@@ -900,14 +996,14 @@ def build_level():
 	blockcol = 0
 	boxrow = 0
 	boxcol = 0
-	while(block_step < block_cnt):
+	while(block_step < lvl_block_cnt):
 		blockrow = randint(1, (board_rows - 1))
 		blockcol = randint(1, (board_cols - 1))
 		if(board[blockrow][blockcol] == BAKGRD):
 			board[blockrow][blockcol] = block_type
 			block_step += 1	
 
-	while(box_step < box_cnt):
+	while(box_step < lvl_box_cnt):
 		boxrow = randint(1, (board_rows - 1))
 		boxcol = randint(1, (board_cols - 1))
 		if(board[boxrow][boxcol] == BAKGRD):
