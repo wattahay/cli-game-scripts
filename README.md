@@ -14,13 +14,12 @@ Python(3) script based on the 1984 DOS game, BEAST
 
 ###----- Controls -----
 
-* 'q'.............quit
+* 'esc'...........quit
 * 'p'.............pause
 * 'b'.............debug stats
 * arrows..........move
 * spacebar........pull blocks
 * 'r'.............restore screen / resized terminal
-* 'esc'...........restarts the whole game
 
 
 ###----- For Best Results -----
