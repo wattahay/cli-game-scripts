@@ -178,7 +178,8 @@ def plan_the_board(): #{
 		top_margin = int((screen_rows - board_rows - stat_rows) / 2)
 		left_margin = int((ttyCols - board_cols*2) / 2)
 	else:
-		board_rows = screen_rows - stat_rows
+		stat_space = 0
+		board_rows = screen_rows - stat_rows - 1 
 		board_cols = screen_cols
 		top_margin = 0
 		left_margin = 0
@@ -218,7 +219,7 @@ blank_board = build_the_board()
 
 def print_board(board_array): #{
 
-	global ttyCols, top_margin, left_margin, points, score, lives, level, board_rows, board_cols, save_top, save_left, stat_space
+	global ttyCols, top_margin, left_margin, points, score, lives, level, board_rows, board_cols, save_top, save_left, stat_space, stat_rows
 
 	print('\033[?25l\033[0m\033[' + str(top_margin)  + ';' + str(left_margin) + 'H\033[s')
 						
@@ -729,6 +730,7 @@ def build_level():
 	lvl_block_cnt = block_cnt
 	
 	print_board(board)
+	sleep(.5)
 	board = []
 	board = build_the_board()
 	print_board(board)
@@ -749,7 +751,7 @@ def build_level():
 			sleep(.2)
 
 	print('\033[u\r\033[' + str(left_margin + 3) + 'C\033[3A\033[40m\033[2mPress \'tab\' for Options Menus . . .\033[1B\033[0m\033[8m')
-	sleep(2)
+	sleep(1.2)
 
 
 
@@ -923,7 +925,7 @@ def build_level():
 					print('\033[u' + chr(9473) + dtab + ' key options ' + norm + chr(9473) + dtab + ' level setup ' + norm + chr(9473) + ltab + ' pawn speeds ' + norm + chr(9473)*20)
 					print('\033[u\033[3B' + BEAST + highlight + '\033[40m - Beast:' + '\033[2m\033[40m\t\t slower' + speedbg + 'faster')
 					print('\033[u\033[5B' + MONSTER + highlight + '\033[40m - Monster:\t' + '\033[2m\033[40m\t slower' + speedbg + 'faster')
-					print('\033[u\033[7B' + EGG(32) + highlight + '\033[40m - Egg Incubator:   ' + '\033[2m\033[40m\t slower' + speedbg + 'faster')
+					print('\033[u\033[7B' + EGG(32) + highlight + '\033[40m - Egg Incubate:   ' + '\033[2m\033[40m\t slower' + speedbg + 'faster')
 					print('\033[u\033[9B' + EGG(8320) + highlight + '\033[40m - Egg Timer:' + '\033[2m\033[40m\t slower' + speedbg + 'faster')
 					item_menu = 8
 
@@ -939,8 +941,12 @@ def build_level():
 						if item_menu > 2: item_menu = 0
 					if (item_menu != 0): 
 						play_audio('menu_item')
-					if (item_menu == 1): keypress = 999
-					elif (item_menu == 2): keypress = 999
+					if (item_menu == 1): 
+						print('\033[u\033[3B' + highlight + 'Movement Keys:  w,a,s,d   arrows   vi (h,j,k,l) ')
+						keypress = 999
+					elif (item_menu == 2):
+						print('\033[u\033[5B' + highlight + 'Pulling Boxes:  toggle   single   switch')
+						keypress = 999
 					while (keypress == 999):
 						sleep(lcd_time)
 
@@ -955,12 +961,24 @@ def build_level():
 							item_menu = 2
 					if (item_menu != 2): 
 						play_audio('menu_item')
-					if (item_menu == 3): keypress = 999
-					elif (item_menu == 4): keypress = 999
-					elif (item_menu == 5): keypress = 999
-					elif (item_menu == 6): keypress = 999
-					elif (item_menu == 7): keypress = 999
-					elif (item_menu == 8): keypress = 999
+					if (item_menu == 3): 
+						print('\033[u\033[3B' + BEAST + '\033[40m' + highlight + ' - Beast Count: \033[35m' + str(lvl_beast_cnt) + norm)
+						keypress = 999
+					elif (item_menu == 4):
+						print('\033[u\033[5B' + MONSTER + '\033[40m' + highlight + ' - Monster Count: \033[35m' + str(lvl_monster_cnt) + norm)
+						keypress = 999
+					elif (item_menu == 5):
+						print('\033[u\033[7B' + EGG(32) + '\033[40m' + highlight + ' - Egg Count: \033[35m' + str(lvl_egg_cnt) + norm)
+						keypress = 999
+					elif (item_menu == 6):
+						print('\033[u\033[9B' + BOX + '\033[40m' + highlight + ' - Box Count: \033[35m' + str(lvl_box_cnt) + norm)
+						keypress = 999
+					elif (item_menu == 7):
+						print('\033[u\033[11B' + block_type + '\033[40m' + highlight + ' - Block Count: \033[35m' + str(lvl_block_cnt) + norm)
+						keypress = 999
+					elif (item_menu == 8):
+						print('\033[u\033[13B' + block_type + '\033[40m' + highlight + ' - Block Type: Normal Yellow   Dangerous Orange ' + norm)
+						keypress = 999
 					while (keypress == 999):
 						sleep(lcd_time)
 
@@ -975,10 +993,18 @@ def build_level():
 							item_menu = 8
 					if (item_menu != 8): 
 						play_audio('menu_item')
-					if (item_menu == 9): keypress = 999
-					elif (item_menu == 10): keypress = 999
-					elif (item_menu == 11): keypress = 999
-					elif (item_menu == 12): keypress = 999
+					if (item_menu == 9):
+						print('\033[u\033[3B' + BEAST + highlight + '\033[40m - Beast:' + '\033[40m\t\t slower' + speedbg + 'faster')
+						keypress = 999
+					elif (item_menu == 10):
+						print('\033[u\033[5B' + MONSTER + highlight + '\033[40m - Monster:\t' + '\033[40m\t slower' + speedbg + 'faster')
+						keypress = 999
+					elif (item_menu == 11):
+						print('\033[u\033[7B' + EGG(32) + highlight + '\033[40m - Egg Incubate:   ' + '\033[40m\t slower' + speedbg + 'faster')
+						keypress = 999
+					elif (item_menu == 12):
+						print('\033[u\033[9B' + EGG(8320) + highlight + '\033[40m - Egg Timer:' + '\033[40m\t slower' + speedbg + 'faster')
+						keypress = 999
 					while (keypress == 999):
 						sleep(lcd_time)
 
