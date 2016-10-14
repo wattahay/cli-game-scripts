@@ -14,7 +14,7 @@ lives = 5		# starting lives
 beast_speed = 1.5	# seconds between enemy moves
 monster_speed = 1.1	# seconds between enemy moves
 egg_speed = 3		# seconds between countdown
-
+incubate = 10    # frame multiplier range for egg incubation 
 ##################################-- game scoring balance
 
 beast_scr = 2		# points for killing beasts
@@ -110,7 +110,6 @@ eggs = [{
 	'incu_frame': 0,
 	'pnts': egg_scr
 	}]
-
 # 'sub'		updated digital unicode reference to subscript character
 # 'wait'	randomized wait time before hatching countdown
 player = [{
@@ -301,9 +300,10 @@ def place_monsters(count):
 
 def lay_egg(row, col):
 
-	global monsters, beasts, eggs, board
+	global incubate, monsters, beasts, eggs, board
+	enemy_total = len(eggs) + len(beasts) + len(monsters)
 
-	wait_frames = (len(eggs) + len(beasts) + len(monsters)) * eggs[0]['incu_frames'] + (randint(1, 30)) # seconds of wait time before egg starts counting down 
+	wait_frames = (eggs[0]['incu_frames'] * ( enemy_total * incubate )) + randint(0, (2 * eggs[0]['incu_frames'])) # seconds of wait time before egg starts counting down 
 	stag = randint(1, eggs[0]['frames']) # the frame that the egg counts down on
 	board[row][col] = EGG(32)
 	eggs.append({'ro': row, 'co': col, 'wait': wait_frames, 'stg': stag, 'sub':32})
@@ -714,7 +714,7 @@ def pause():
 
 def build_level():
 	
-	global game_play_mode, keypress, stdscr, play_rows, play_cols, board_rows, board_cols, reset_board, blank_board, board, beast_cnt, monster_cnt, egg_cnt, level, lives, score, points, BAKGRD, BLOCK, KILLBLOCK, last_frame, top_margin, left_margin, lcd_time, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT
+	global incubate, egg_speed, beast_speed, monster_speed, game_play_mode, keypress, play_rows, play_cols, board_rows, board_cols, reset_board, blank_board, board, beast_cnt, monster_cnt, egg_cnt, level, lives, score, points, BAKGRD, BLOCK, KILLBLOCK, last_frame, top_margin, left_margin, lcd_time, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT
 
 	game_play_mode = False # sets the input loop to reject player move functions and other functions reserved for game play time	
 
@@ -862,49 +862,92 @@ def build_level():
 	lower_boxes = int(play_rows * play_cols / 4 - 10)
 	upper_boxes = int(play_rows * play_cols / 4 + 10)
 	lvl_box_cnt = randint(lower_boxes, upper_boxes)
-
 	main_menu = 0
 	item_menu = 0
 	controls_menu = 9
 	menu_ref = '\033[' + str(top_margin + 3) + ';' + str(left_margin + 6) + 'H\033[s\033[0m'
 	ltab = '\033[7m\033[40m'
 	dtab = '\033[7m\033[40m\033[2m'
-	dspeedbg = ' \033[7m\033[2;34m   \033[2;32m     \033[2;33m\033[2;31m  \033[0m\033[2m\033[40m '
-	lspeedbg = ' \033[44m   \033[42m     \033[43m\033[41m  \033[0m\033[2m\033[40m '
+	dspeedbg = '\033[40m\033[34m|||\033[32m|||||\033[33m\033[31m||\033[37m\033[40m'
+	lspeedbg = '\033[44m   \033[42m     \033[43m\033[41m  \033[0m\033[2m\033[40m'
 	speedbg = dspeedbg
-	speedarrow = chr(10219)
+	speed_arrow = '\033[40m\033[35m' + chr(10219) + '\033[40m'
 	norm = '\033[0m\033[40m'
 	dnorm = '\033[0m\033[40m\033[2m'
-	darkhl = '\033[2m'
-	lighthl = '\033[1m'
-	highlight = darkhl 
 	chr_cnt = 0
-	key_tracker = 0
+	# item 1
+	wasd = ' w,a,s,d '
+	arrows = ' arrows '
+	vi = ' vi (h,j,k,l) '
+	# item 2
+	toggle = ' toggle '
+	single = ' single '
+	switch = ' switch '
+	# item 3
+	# item 4
+	# item 5
+	# item 6
+	# item 7
+	# item 8
+	normalyellow = ' Normal Yellow '
+	dangerousorange = ' Dangerous Orange '
+	# item 9
+	beast_speed_min = .5
+	beast_speed_max = 2.5
+	beast_speed_inc = .2
+	beast_speed = beast_speed - (beast_speed % beast_speed_inc)
+	if (beast_speed > beast_speed_max): beast_speed = beast_speed_max
+	elif (beast_speed < beast_speed_min): beast_speed = beast_speed_min
+	beast_arrows = int((beast_speed - beast_speed_min ) / beast_speed_inc)
+	# item 10
+	monster_speed_min = .5
+	monster_speed_max = 2.5
+	monster_speed_inc = .2
+	monster_speed = monster_speed - (monster_speed % monster_speed_inc)
+	if (monster_speed > monster_speed_max): monster_speed = monster_speed_max
+	elif (monster_speed < monster_speed_min): monster_speed = monster_speed_min
+	monster_arrows = int((monster_speed - monster_speed_min) / monster_speed_inc)
+	# item 11
+	incubate_min = 4
+	incubate_max = 44
+	incubate_inc = 4
+	incubate = incubate - (incubate % incubate_inc)
+	if (incubate > incubate_max): incubate = incubate_max
+	elif (incubate < incubate_min): incubate = incubate_min
+	incubate_arrows = int((incubate - incubate_min) / incubate_inc)
+	# item 12
+	timer_min = 4.5
+	timer_max = .5
+	timer_inc = .4
+	egg_speed = egg_speed - (egg_speed % timer_inc)
+	if (egg_speed > timer_max): egg_speed = timer_max
+	elif (egg_speed < timer_min): egg_speed = timer_min
+	timer_arrows = int((egg_speed - timer_min) / timer_inc) 
 
 	def main_menu_1():
-		print('\033[u\033[3B' + dnorm + 'Movement Keys:  w,a,s,d   arrows   vi (h,j,k,l) ')
-		print('\033[u\033[5B' + dnorm + 'Pulling Boxes:  toggle   single   switch')
-
+		print('\033[u\033[3B' + dnorm + 'Movement Keys: ' + wasd + arrows + vi)
+		print('\033[u\033[5B' + dnorm + 'Pulling Boxes: ' + toggle + single + switch)
 
 	def main_menu_2():
-		print('\033[u\033[4B\033[34C' + dnorm + 'Total Spaces: \033[36m' + str(play_rows * play_cols) + norm)
+		print('\033[u\033[4B\033[34C' + dnorm + 'Total Spaces: \033[36m' 
+			+ str(play_rows * play_cols) + ' ' + norm)
 		print('\033[u\033[5B\033[35C' + dnorm + 'Used Spaces: \033[36m' 
-			+ str(lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt) + norm)
+			+ str(lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt) + ' ' + norm)
 		print('\033[u\033[6B\033[35C' + dnorm + 'Free Spaces: \033[36m' 
-			+ str((play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)) + norm)
+			+ str((play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)) + ' ' + norm)
 
-		print('\033[u\033[3B' + dnorm + BEAST + '\033[40m\033[2m - Beast Count: \033[35m' + str(lvl_beast_cnt) + norm)
-		print('\033[u\033[5B' + dnorm + MONSTER + '\033[40m\033[2m - Monster Count: \033[35m' + str(lvl_monster_cnt) + norm)
-		print('\033[u\033[7B' + dnorm + EGG(32) + '\033[40m\033[2m - Egg Count: \033[35m' + str(lvl_egg_cnt) + norm)
-		print('\033[u\033[9B' + dnorm + BOX + '\033[40m\033[2m - Box Count: \033[35m' + str(lvl_box_cnt) + norm)
-		print('\033[u\033[11B' + dnorm + block_type + '\033[40m\033[2m - Block Count: \033[35m' + str(lvl_block_cnt) + norm)
-		print('\033[u\033[13B' + dnorm + block_type + '\033[40m\033[2m - Block Type: Normal Yellow   Dangerous Orange ' + norm)
+		print('\033[u\033[3B' + dnorm + BEAST + '\033[40m\033[2m - Beast Count: \033[35m' + str(lvl_beast_cnt) + ' ' + norm)
+		print('\033[u\033[5B' + dnorm + MONSTER + '\033[40m\033[2m - Monster Count: \033[35m' + str(lvl_monster_cnt) + ' ' + norm)
+		print('\033[u\033[7B' + dnorm + EGG(32) + '\033[40m\033[2m - Egg Count: \033[35m' + str(lvl_egg_cnt) + ' ' + norm)
+		print('\033[u\033[9B' + dnorm + BOX + '\033[40m\033[2m - Box Count: \033[35m' + str(lvl_box_cnt) + ' ' + norm)
+		print('\033[u\033[11B' + dnorm + block_type + '\033[40m\033[2m - Block Count: \033[35m' + str(lvl_block_cnt) + ' ' + norm)
+		print('\033[u\033[13B' + dnorm + block_type + '\033[40m\033[2m - Block Type: ' + normalyellow + dangerousorange + ' ' + norm)
 
 	def main_menu_3():
-		print('\033[u\033[3B' + dnorm + BEAST + dnorm + ' - Beast:\t\t slower' + speedbg + 'faster')
-		print('\033[u\033[5B' + dnorm + MONSTER + dnorm + ' - Monster:\t\t slower' + speedbg + 'faster')
-		print('\033[u\033[7B' + dnorm + EGG(32) + dnorm + ' - Egg Incubate:\t slower' + speedbg + 'faster')
-		print('\033[u\033[9B' + dnorm + EGG(8320) + dnorm + ' - Egg Timer:\t slower' + speedbg + 'faster')
+		print('\033[u\033[3B' + dnorm + BEAST + dnorm + ' - Beast:\t\t slower ' + speedbg + ' faster\033[17D' + speed_arrow * beast_arrows)
+		print('\033[u\033[5B' + dnorm + MONSTER + dnorm + ' - Monster:\t\t slower ' + speedbg + ' faster\033[17D' + speed_arrow * monster_arrows)
+		print('\033[u\033[7B' + dnorm + EGG(32) + dnorm + ' - Egg Incubate:\t slower ' + speedbg + ' faster\033[17D' + speed_arrow * incubate_arrows)
+		print('\033[u\033[9B' + dnorm + EGG(8320) + dnorm + ' - Egg Timer:\t slower ' + speedbg + ' faster\033[17D' + speed_arrow * timer_arrows)
 
 	if keypress == 9:
 		sleep(1.5)
@@ -919,28 +962,47 @@ def build_level():
 				if main_menu > 3:
 					main_menu = 1
 				if main_menu == 1:
-					print_board(blank_board) 
+					print_board(blank_board)
 					print(menu_ref)
-					print('\033[u' + chr(9473) + dtab + ' key options ' + norm + chr(9473) + dtab + ' level setup ' + norm + chr(9473) + dtab + ' pawn speeds ' + norm + chr(9473)*20)
+					print('\033[u' + chr(9473) 
+						+ dtab + ' key options ' + norm + chr(9473) 
+						+ dtab + ' level setup ' + norm + chr(9473) 
+						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
 					sleep(.08)
-					print('\033[u' + chr(9473) + ltab + ' key options ' + norm + chr(9473) + dtab + ' level setup ' + norm + chr(9473) + dtab + ' pawn speeds ' + norm + chr(9473)*20)
-					main_menu_1()
+					print('\033[u' + chr(9473) 
+						+ ltab + ' key options ' + norm + chr(9473) 
+						+ dtab + ' level setup ' + norm + chr(9473) 
+						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
 				elif main_menu == 2:
-					print_board(blank_board) 
+					print_board(blank_board)
 					print(menu_ref)
-					print('\033[u' + chr(9473) + dtab + ' key options ' + norm + chr(9473) + dtab + ' level setup ' + norm + chr(9473) + dtab + ' pawn speeds ' + norm + chr(9473)*20)
+					print('\033[u' + chr(9473) 
+						+ dtab + ' key options ' + norm + chr(9473) 
+						+ dtab + ' level setup ' + norm + chr(9473) 
+						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
 					sleep(.08)
-					print('\033[u' + chr(9473) + dtab + ' key options ' + norm + chr(9473) + ltab + ' level setup ' + norm + chr(9473) + dtab + ' pawn speeds ' + norm + chr(9473)*20)
-					main_menu_2()
+					print('\033[u' + chr(9473) 
+						+ dtab + ' key options ' + norm + chr(9473) 
+						+ ltab + ' level setup ' + norm + chr(9473) 
+						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
 				elif main_menu == 3:
-					print_board(blank_board) 
+					print_board(blank_board)
 					print(menu_ref)
-					print('\033[u' + chr(9473) + dtab + ' key options ' + norm + chr(9473) + dtab + ' level setup ' + norm + chr(9473) + dtab + ' pawn speeds ' + norm + chr(9473)*20)
+					print('\033[u' + chr(9473) 
+						+ dtab + ' key options ' + norm + chr(9473) 
+						+ dtab + ' level setup ' + norm + chr(9473) 
+						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
 					sleep(.08)
-					print('\033[u' + chr(9473) + dtab + ' key options ' + norm + chr(9473) + dtab + ' level setup ' + norm + chr(9473) + ltab + ' pawn speeds ' + norm + chr(9473)*20)
-					main_menu_3()
-
-
+					print('\033[u' + chr(9473) 
+						+ dtab + ' key options ' + norm + chr(9473) 
+						+ dtab + ' level setup ' + norm + chr(9473) 
+						+ ltab + ' pawn speeds ' + norm + chr(9473)*20)
+			if main_menu == 1:
+				main_menu_1()
+			elif main_menu == 2:
+				main_menu_2()
+			elif main_menu == 3:
+				main_menu_3()
 			elif ((keypress == KEY_UP) | (keypress == KEY_DOWN)):		
 
 				if (main_menu == 1):
@@ -1022,7 +1084,68 @@ def build_level():
 						keypress = 999
 					while (keypress == 999):
 						sleep(lcd_time)
+			elif ((keypress == KEY_LEFT) | (keypress == KEY_RIGHT)):
 
+				if (item_menu == 1):
+					if (keypress == KEY_LEFT):
+						keypress = 999
+					elif (keypress == KEY_RIGHT):
+						keypress = 999
+				elif (item_menu == 2):
+					if (keypress == KEY_LEFT):
+						keypress = 999
+					elif (keypress == KEY_RIGHT):
+						keypress = 999
+				elif (item_menu == 3):
+					if (keypress == KEY_LEFT):
+						keypress = 999
+					elif (keypress == KEY_RIGHT):
+						keypress = 999
+				elif (item_menu == 4):
+					if (keypress == KEY_LEFT):
+						keypress = 999
+					elif (keypress == KEY_RIGHT):
+						keypress = 999
+				elif (item_menu == 5):
+					if (keypress == KEY_LEFT):
+						keypress = 999
+					elif (keypress == KEY_RIGHT):
+						keypress = 999
+				elif (item_menu == 6):
+					if (keypress == KEY_LEFT):
+						keypress = 999
+					elif (keypress == KEY_RIGHT):
+						keypress = 999
+				elif (item_menu == 7):
+					if (keypress == KEY_LEFT):
+						keypress = 999
+					elif (keypress == KEY_RIGHT):
+						keypress = 999
+				elif (item_menu == 8):
+					if (keypress == KEY_LEFT):
+						keypress = 999
+					elif (keypress == KEY_RIGHT):
+						keypress = 999
+				elif (item_menu == 9):
+					if (keypress == KEY_LEFT):
+						keypress = 999
+					elif (keypress == KEY_RIGHT):
+						keypress = 999
+				elif (item_menu == 10):
+					if (keypress == KEY_LEFT):
+						keypress = 999
+					elif (keypress == KEY_RIGHT):
+						keypress = 999
+				elif (item_menu == 11):
+					if (keypress == KEY_LEFT):
+						keypress = 999
+					elif (keypress == KEY_RIGHT):
+						keypress = 999
+				elif (item_menu == 12):
+					if (keypress == KEY_LEFT):
+						keypress = 999
+					elif (keypress == KEY_RIGHT):
+						keypress = 999
 
 			if keypress == 27:
 				keypress = ''
