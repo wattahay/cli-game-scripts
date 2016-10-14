@@ -868,10 +868,8 @@ def build_level():
 	menu_ref = '\033[' + str(top_margin + 3) + ';' + str(left_margin + 6) + 'H\033[s\033[0m'
 	ltab = '\033[7m\033[40m'
 	dtab = '\033[7m\033[40m\033[2m'
-	dspeedbg = '\033[40m\033[34m|||\033[32m|||||\033[33m\033[31m||\033[37m\033[40m'
-	lspeedbg = '\033[44m   \033[42m     \033[43m\033[41m  \033[0m\033[2m\033[40m'
-	speedbg = dspeedbg
-	speed_arrow = '\033[40m\033[35m' + chr(10219) + '\033[40m'
+	speedbg = '\033[40m\033[34m|||\033[32m|||||\033[33m\033[31m||\033[37m\033[40m'
+	speed_arrow = '\033[40m\033[35m' + chr(9632) + '\033[40m' # 10219 (thin double) 9193 (skip) 9670 (diamon)
 	norm = '\033[0m\033[40m'
 	dnorm = '\033[0m\033[40m\033[2m'
 	chr_cnt = 0
@@ -916,9 +914,9 @@ def build_level():
 	elif (incubate < incubate_min): incubate = incubate_min
 	incubate_arrows = int((incubate - incubate_min) / incubate_inc)
 	# item 12
-	timer_min = 4.5
-	timer_max = .5
-	timer_inc = .4
+	timer_min = .5
+	timer_max = 4.5
+	timer_inc = .5
 	egg_speed = egg_speed - (egg_speed % timer_inc)
 	if (egg_speed > timer_max): egg_speed = timer_max
 	elif (egg_speed < timer_min): egg_speed = timer_min
@@ -944,10 +942,10 @@ def build_level():
 		print('\033[u\033[13B' + dnorm + block_type + '\033[40m\033[2m - Block Type: ' + normalyellow + dangerousorange + ' ' + norm)
 
 	def main_menu_3():
-		print('\033[u\033[3B' + dnorm + BEAST + dnorm + ' - Beast:\t\t slower ' + speedbg + ' faster\033[17D' + speed_arrow * beast_arrows)
-		print('\033[u\033[5B' + dnorm + MONSTER + dnorm + ' - Monster:\t\t slower ' + speedbg + ' faster\033[17D' + speed_arrow * monster_arrows)
-		print('\033[u\033[7B' + dnorm + EGG(32) + dnorm + ' - Egg Incubate:\t slower ' + speedbg + ' faster\033[17D' + speed_arrow * incubate_arrows)
-		print('\033[u\033[9B' + dnorm + EGG(8320) + dnorm + ' - Egg Timer:\t slower ' + speedbg + ' faster\033[17D' + speed_arrow * timer_arrows)
+		print('\033[u\033[3B' + dnorm + BEAST + dnorm + ' - Beast:\t\t slower ' + speedbg + ' faster\033[18D\033[' + str(beast_arrows) + 'C' + speed_arrow)
+		print('\033[u\033[5B' + dnorm + MONSTER + dnorm + ' - Monster:\t\t slower ' + speedbg + ' faster\033[18D\033[' + str(monster_arrows) + 'C' + speed_arrow)
+		print('\033[u\033[7B' + dnorm + EGG(32) + dnorm + ' - Egg Incubate:\t slower ' + speedbg + ' faster\033[18D\033[' + str(incubate_arrows) + 'C' + speed_arrow)
+		print('\033[u\033[9B' + dnorm + EGG(8320) + dnorm + ' - Egg Timer:\t slower ' + speedbg + ' faster\033[18D\033[' + str(timer_arrows) + 'C' + speed_arrow)
 
 	if keypress == 9:
 		sleep(1.5)
@@ -1017,13 +1015,12 @@ def build_level():
 					if (item_menu != 0): 
 						play_audio('menu_item')
 					if (item_menu == 1): 
-						print('\033[u\033[0m\033[40m\033[3BMovement Keys:  w,a,s,d   arrows   vi (h,j,k,l) ')
 						keypress = 999
 					elif (item_menu == 2):
-						print('\033[u\033[0m\033[40m\033[5BPulling Boxes:  toggle   single   switch')
 						keypress = 999
-					while (keypress == 999):
-						sleep(lcd_time)
+
+#					while (keypress == 999):
+#						sleep(lcd_time)
 
 				elif (main_menu == 2):
 					main_menu_2()
@@ -1038,25 +1035,20 @@ def build_level():
 					if (item_menu != 2): 
 						play_audio('menu_item')
 					if (item_menu == 3): 
-						print('\033[u\033[3B\033[40m' + BEAST + '\033[40m - Beast Count: \033[35m' + str(lvl_beast_cnt) + norm)
 						keypress = 999
 					elif (item_menu == 4):
-						print('\033[u\033[5B\033[40m' + MONSTER + '\033[40m - Monster Count: \033[35m' + str(lvl_monster_cnt) + norm)
 						keypress = 999
 					elif (item_menu == 5):
-						print('\033[u\033[7B\033[40m' + EGG(32) + '\033[40m - Egg Count: \033[35m' + str(lvl_egg_cnt) + norm)
 						keypress = 999
 					elif (item_menu == 6):
-						print('\033[u\033[9B\033[40m' + BOX + '\033[40m - Box Count: \033[35m' + str(lvl_box_cnt) + norm)
 						keypress = 999
 					elif (item_menu == 7):
-						print('\033[u\033[11B\033[40m' + block_type + '\033[40m - Block Count: \033[35m' + str(lvl_block_cnt) + norm)
 						keypress = 999
 					elif (item_menu == 8):
-						print('\033[u\033[13B\033[40m' + block_type + '\033[40m - Block Type: Normal Yellow   Dangerous Orange ' + norm)
 						keypress = 999
-					while (keypress == 999):
-						sleep(lcd_time)
+
+#					while (keypress == 999):
+#						sleep(lcd_time)
 
 				elif (main_menu == 3):
 					main_menu_3()
@@ -1082,8 +1074,8 @@ def build_level():
 					elif (item_menu == 12):
 						print('\033[u\033[9B\033[40m' + EGG(8320) + '\033[40m - Egg Timer:' + '\033[2m\033[40m\t slower' + speedbg + 'faster')
 						keypress = 999
-					while (keypress == 999):
-						sleep(lcd_time)
+#					while (keypress == 999):
+#						sleep(lcd_time)
 			elif ((keypress == KEY_LEFT) | (keypress == KEY_RIGHT)):
 
 				if (item_menu == 1):
