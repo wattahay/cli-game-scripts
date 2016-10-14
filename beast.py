@@ -866,30 +866,30 @@ def build_level():
 	item_menu = 0
 	controls_menu = 9
 	menu_ref = '\033[' + str(top_margin + 3) + ';' + str(left_margin + 6) + 'H\033[s\033[0m'
+	dim = '\033[0m\033[40m\033[2m'
+	norm = '\033[0m\033[40m'
 	ltab = '\033[7m\033[40m'
 	dtab = '\033[7m\033[40m\033[2m'
 	speedbg = '\033[40m\033[34m|||\033[32m|||||\033[33m\033[31m||\033[37m\033[40m'
 	speed_arrow = '\033[40m\033[35m' + chr(9632) + '\033[40m' # 10219 (thin double) 9193 (skip) 9670 (diamon)
-	norm = '\033[0m\033[40m'
-	dnorm = '\033[0m\033[40m\033[2m'
 	chr_cnt = 0
-	# item 1
+	mi1_shade = '' ###############-- item 1
 	wasd = ' w,a,s,d '
 	arrows = ' arrows '
 	vi = ' vi (h,j,k,l) '
-	# item 2
+	mi2_shade = '' ###############-- item 2
 	toggle = ' toggle '
 	single = ' single '
 	switch = ' switch '
-	# item 3
-	# item 4
-	# item 5
-	# item 6
-	# item 7
-	# item 8
+	mi3_shade = '' ###############-- item 3
+	mi4_shade = '' ###############-- item 4
+	mi5_shade = '' ###############-- item 5
+	mi6_shade = '' ###############-- item 6
+	mi7_shade = '' ###############-- item 7
+	mi8_shade = '' ###############-- item 8
 	normalyellow = ' Normal Yellow '
 	dangerousorange = ' Dangerous Orange '
-	# item 9
+	mi9_shade = '' ###############-- item 9
 	beast_speed_min = .5
 	beast_speed_max = 2.5
 	beast_speed_inc = .2
@@ -897,7 +897,7 @@ def build_level():
 	if (beast_speed > beast_speed_max): beast_speed = beast_speed_max
 	elif (beast_speed < beast_speed_min): beast_speed = beast_speed_min
 	beast_arrows = int((beast_speed - beast_speed_min ) / beast_speed_inc)
-	# item 10
+	mi10_shade = '' ##############-- item 10
 	monster_speed_min = .5
 	monster_speed_max = 2.5
 	monster_speed_inc = .2
@@ -905,7 +905,7 @@ def build_level():
 	if (monster_speed > monster_speed_max): monster_speed = monster_speed_max
 	elif (monster_speed < monster_speed_min): monster_speed = monster_speed_min
 	monster_arrows = int((monster_speed - monster_speed_min) / monster_speed_inc)
-	# item 11
+	mi11_shade = '' ##############-- item 11
 	incubate_min = 4
 	incubate_max = 44
 	incubate_inc = 4
@@ -913,7 +913,7 @@ def build_level():
 	if (incubate > incubate_max): incubate = incubate_max
 	elif (incubate < incubate_min): incubate = incubate_min
 	incubate_arrows = int((incubate - incubate_min) / incubate_inc)
-	# item 12
+	mi12_shade = '' ##############-- item 12
 	timer_min = .5
 	timer_max = 4.5
 	timer_inc = .5
@@ -922,38 +922,69 @@ def build_level():
 	elif (egg_speed < timer_min): egg_speed = timer_min
 	timer_arrows = int((egg_speed - timer_min) / timer_inc) 
 
+	def dim_menus(mi):
+		global mi1_shade, mi2_shade, mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, mi9_shade, mi10_shade, mi11_shade, mi12_shade
+		if mi != 1: mi1_shade = dim ##############-- item 1
+		else: mi1_shade = norm
+		if mi != 2: mi2_shade = dim ##############-- item 2
+		else: mi2_shade = norm
+		if mi != 3: mi3_shade = dim ##############-- item 3
+		else: mi3_shade = norm
+		if mi != 4: mi4_shade = dim ##############-- item 4
+		else: mi4_shade = norm
+		if mi != 5: mi5_shade = dim ##############-- item 5
+		else: mi5_shade = norm
+		if mi != 6: mi6_shade = dim ##############-- item 6
+		else: mi6_shade = norm
+		if mi != 7: mi7_shade = dim ##############-- item 7
+		else: mi7_shade = norm
+		if mi != 8: mi8_shade = dim ##############-- item 8
+		else: mi8_shade = norm
+		if mi != 9: mi9_shade = dim ##############-- item 9
+		else: mi9_shade = norm
+		if mi != 10: mi10_shade = dim ##############-- item 10
+		else: mi10_shade = norm
+		if mi != 11: mi11_shade = dim ##############-- item 11
+		else: mi11_shade = norm
+		if mi != 12: mi12_shade = dim ##############-- item 12
+		else: mi12_shade = norm
+	dim_menus(0)
 	def main_menu_1():
-		print('\033[u\033[3B' + dnorm + 'Movement Keys: ' + wasd + arrows + vi)
-		print('\033[u\033[5B' + dnorm + 'Pulling Boxes: ' + toggle + single + switch)
+		global mi1_shade, mi2_shade, mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, mi9_shade, mi10_shade, mi11_shade, mi12_shade
+		print('\033[u\033[3B' + mi1_shade + 'Movement Keys: ' + wasd + arrows + vi)
+		print('\033[u\033[5B' + mi2_shade + 'Pulling Boxes: ' + toggle + single + switch)
 
 	def main_menu_2():
-		print('\033[u\033[4B\033[34C' + dnorm + 'Total Spaces: \033[36m' 
-			+ str(play_rows * play_cols) + ' ' + norm)
-		print('\033[u\033[5B\033[35C' + dnorm + 'Used Spaces: \033[36m' 
-			+ str(lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt) + ' ' + norm)
-		print('\033[u\033[6B\033[35C' + dnorm + 'Free Spaces: \033[36m' 
-			+ str((play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)) + ' ' + norm)
+		global mi1_shade, mi2_shade, mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, mi9_shade, mi10_shade, mi11_shade, mi12_shade
+		print('\033[u\033[4B\033[34C' + dim + 'Total Spaces: \033[36m' 
+			+ str(play_rows * play_cols) + ' \033[37m')
+		print('\033[u\033[5B\033[35C' + dim + 'Used Spaces: \033[36m' 
+			+ str(lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt) + ' \033[37m')
+		print('\033[u\033[6B\033[35C' + dim + 'Free Spaces: \033[36m' 
+			+ str((play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)) + ' \033[37m')
 
-		print('\033[u\033[3B' + dnorm + BEAST + '\033[40m\033[2m - Beast Count: \033[35m' + str(lvl_beast_cnt) + ' ' + norm)
-		print('\033[u\033[5B' + dnorm + MONSTER + '\033[40m\033[2m - Monster Count: \033[35m' + str(lvl_monster_cnt) + ' ' + norm)
-		print('\033[u\033[7B' + dnorm + EGG(32) + '\033[40m\033[2m - Egg Count: \033[35m' + str(lvl_egg_cnt) + ' ' + norm)
-		print('\033[u\033[9B' + dnorm + BOX + '\033[40m\033[2m - Box Count: \033[35m' + str(lvl_box_cnt) + ' ' + norm)
-		print('\033[u\033[11B' + dnorm + block_type + '\033[40m\033[2m - Block Count: \033[35m' + str(lvl_block_cnt) + ' ' + norm)
-		print('\033[u\033[13B' + dnorm + block_type + '\033[40m\033[2m - Block Type: ' + normalyellow + dangerousorange + ' ' + norm)
+		print('\033[u\033[3B' + mi3_shade + BEAST + mi3_shade + '\033[40m - Beast Count: \033[35m' + str(lvl_beast_cnt) + ' \033[37m')
+		print('\033[u\033[5B' + mi4_shade + MONSTER + mi4_shade + '\033[40m - Monster Count: \033[35m' + str(lvl_monster_cnt) + ' \033[37m')
+		print('\033[u\033[7B' + mi5_shade + EGG(32) + mi5_shade + '\033[40m - Egg Count: \033[35m' + str(lvl_egg_cnt) + ' \033[37m')
+		print('\033[u\033[9B' + mi6_shade + BOX + mi6_shade + '\033[40m - Box Count: \033[35m' + str(lvl_box_cnt) + ' \033[37m')
+		print('\033[u\033[11B' + mi7_shade + block_type + mi7_shade + '\033[40m - Block Count: \033[35m' + str(lvl_block_cnt) + ' \033[37m')
+		print('\033[u\033[13B' + mi8_shade + block_type + mi8_shade + '\033[40m - Block Type: ' + normalyellow + dangerousorange + ' \033[37m')
 
 	def main_menu_3():
-		print('\033[u\033[3B' + dnorm + BEAST + dnorm + ' - Beast:\t\t slower ' + speedbg + ' faster\033[18D\033[' + str(beast_arrows) + 'C' + speed_arrow)
-		print('\033[u\033[5B' + dnorm + MONSTER + dnorm + ' - Monster:\t\t slower ' + speedbg + ' faster\033[18D\033[' + str(monster_arrows) + 'C' + speed_arrow)
-		print('\033[u\033[7B' + dnorm + EGG(32) + dnorm + ' - Egg Incubate:\t slower ' + speedbg + ' faster\033[18D\033[' + str(incubate_arrows) + 'C' + speed_arrow)
-		print('\033[u\033[9B' + dnorm + EGG(8320) + dnorm + ' - Egg Timer:\t slower ' + speedbg + ' faster\033[18D\033[' + str(timer_arrows) + 'C' + speed_arrow)
+		global mi1_shade, mi2_shade, mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, mi9_shade, mi10_shade, mi11_shade, mi12_shade
+		print('\033[u\033[3B' + mi9_shade + BEAST + mi9_shade + ' - Beast:\t\t slower ' + speedbg + ' faster\033[18D\033[' + str(beast_arrows) + 'C' + speed_arrow)
+		print('\033[u\033[5B' + mi10_shade + MONSTER + mi10_shade + ' - Monster:\t\t slower ' + speedbg + ' faster\033[18D\033[' + str(monster_arrows) + 'C' + speed_arrow)
+		print('\033[u\033[7B' + mi11_shade + EGG(32) + mi11_shade + ' - Egg Incubate:\t slower ' + speedbg + ' faster\033[18D\033[' + str(incubate_arrows) + 'C' + speed_arrow)
+		print('\033[u\033[9B' + mi12_shade + EGG(8320) + mi12_shade + ' - Egg Timer:\t slower ' + speedbg + ' faster\033[18D\033[' + str(timer_arrows) + 'C' + speed_arrow)
 
+		
 	if keypress == 9:
 		sleep(1.5)
 		keypress == 999
 		print_board(blank_board)
 		print(menu_ref)
-		while (True):
-			if keypress == 9:
+		while (True):############################################################
+			if keypress == 9: ###############################################
 				keypress = ''
 				main_menu += 1
 				play_audio('menu_tab')
@@ -961,6 +992,7 @@ def build_level():
 					main_menu = 1
 				if main_menu == 1:
 					print_board(blank_board)
+					item_menu = 0
 					print(menu_ref)
 					print('\033[u' + chr(9473) 
 						+ dtab + ' key options ' + norm + chr(9473) 
@@ -973,6 +1005,7 @@ def build_level():
 						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
 				elif main_menu == 2:
 					print_board(blank_board)
+					item_menu = 2
 					print(menu_ref)
 					print('\033[u' + chr(9473) 
 						+ dtab + ' key options ' + norm + chr(9473) 
@@ -985,6 +1018,7 @@ def build_level():
 						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
 				elif main_menu == 3:
 					print_board(blank_board)
+					item_menu = 8
 					print(menu_ref)
 					print('\033[u' + chr(9473) 
 						+ dtab + ' key options ' + norm + chr(9473) 
@@ -1001,143 +1035,100 @@ def build_level():
 				main_menu_2()
 			elif main_menu == 3:
 				main_menu_3()
-			elif ((keypress == KEY_UP) | (keypress == KEY_DOWN)):		
 
+			if ((keypress == KEY_UP) | (keypress == KEY_DOWN)):		
 				if (main_menu == 1):
 				
 					main_menu_1()	
 					if (keypress == KEY_UP):
 						item_menu -= 1
-						if item_menu < 0: item_menu = 2
+						if item_menu < 1: item_menu = 2
+						keypress = 999
 					elif (keypress == KEY_DOWN): 
 						item_menu += 1
-						if item_menu > 2: item_menu = 0
+						if item_menu > 2: item_menu = 1
+						keypress = 999
 					if (item_menu != 0): 
 						play_audio('menu_item')
-					if (item_menu == 1): 
-						keypress = 999
-					elif (item_menu == 2):
-						keypress = 999
-
-#					while (keypress == 999):
-#						sleep(lcd_time)
-
+					if (item_menu == 1): dim_menus(1)
+					elif (item_menu == 2): dim_menus(2)
 				elif (main_menu == 2):
 					main_menu_2()
 					if (keypress == KEY_UP):
 						item_menu -= 1
-						if item_menu < 2: 
+						if item_menu < 3: 
 							item_menu = 8
+						keypress = 999
 					elif (keypress == KEY_DOWN): 
 						item_menu += 1
 						if item_menu > 8: 
-							item_menu = 2
+							item_menu = 3
+						keypress = 999
 					if (item_menu != 2): 
 						play_audio('menu_item')
-					if (item_menu == 3): 
-						keypress = 999
-					elif (item_menu == 4):
-						keypress = 999
-					elif (item_menu == 5):
-						keypress = 999
-					elif (item_menu == 6):
-						keypress = 999
-					elif (item_menu == 7):
-						keypress = 999
-					elif (item_menu == 8):
-						keypress = 999
-
-#					while (keypress == 999):
-#						sleep(lcd_time)
-
+					if (item_menu == 3): dim_menus(3) 
+					elif (item_menu == 4): dim_menus(4)
+					elif (item_menu == 5): dim_menus(5)
+					elif (item_menu == 6): dim_menus(6)
+					elif (item_menu == 7): dim_menus(7)
+					elif (item_menu == 8): dim_menus(8)
 				elif (main_menu == 3):
 					main_menu_3()
 					if (keypress == KEY_UP):
 						item_menu -= 1
-						if item_menu < 8: 
+						if item_menu < 9: 
 							item_menu = 12
+						keypress = 999
 					elif (keypress == KEY_DOWN): 
 						item_menu += 1
 						if item_menu > 12: 
-							item_menu = 8
+							item_menu = 9
+						keypress = 999
 					if (item_menu != 8): 
 						play_audio('menu_item')
-					if (item_menu == 9):
-						print('\033[u\033[3B\033[40m' + BEAST + '\033[40m - Beast:' + '\033[2m\033[40m\t\t slower' + speedbg + 'faster')
-						keypress = 999
-					elif (item_menu == 10):
-						print('\033[u\033[5B\033[40m' + MONSTER + '\033[40m - Monster:\t' + '\033[2m\033[40m\t slower' + speedbg + 'faster')
-						keypress = 999
-					elif (item_menu == 11):
-						print('\033[u\033[7B\033[40m' + EGG(32) + '\033[40m - Egg Incubate:   ' + '\033[2m\033[40m\t slower' + speedbg + 'faster')
-						keypress = 999
-					elif (item_menu == 12):
-						print('\033[u\033[9B\033[40m' + EGG(8320) + '\033[40m - Egg Timer:' + '\033[2m\033[40m\t slower' + speedbg + 'faster')
-						keypress = 999
-#					while (keypress == 999):
-#						sleep(lcd_time)
-			elif ((keypress == KEY_LEFT) | (keypress == KEY_RIGHT)):
-
-				if (item_menu == 1):
-					if (keypress == KEY_LEFT):
-						keypress = 999
-					elif (keypress == KEY_RIGHT):
-						keypress = 999
-				elif (item_menu == 2):
-					if (keypress == KEY_LEFT):
-						keypress = 999
-					elif (keypress == KEY_RIGHT):
-						keypress = 999
-				elif (item_menu == 3):
-					if (keypress == KEY_LEFT):
-						keypress = 999
-					elif (keypress == KEY_RIGHT):
-						keypress = 999
-				elif (item_menu == 4):
-					if (keypress == KEY_LEFT):
-						keypress = 999
-					elif (keypress == KEY_RIGHT):
-						keypress = 999
-				elif (item_menu == 5):
-					if (keypress == KEY_LEFT):
-						keypress = 999
-					elif (keypress == KEY_RIGHT):
-						keypress = 999
-				elif (item_menu == 6):
-					if (keypress == KEY_LEFT):
-						keypress = 999
-					elif (keypress == KEY_RIGHT):
-						keypress = 999
-				elif (item_menu == 7):
-					if (keypress == KEY_LEFT):
-						keypress = 999
-					elif (keypress == KEY_RIGHT):
-						keypress = 999
-				elif (item_menu == 8):
-					if (keypress == KEY_LEFT):
-						keypress = 999
-					elif (keypress == KEY_RIGHT):
-						keypress = 999
-				elif (item_menu == 9):
-					if (keypress == KEY_LEFT):
-						keypress = 999
-					elif (keypress == KEY_RIGHT):
-						keypress = 999
-				elif (item_menu == 10):
-					if (keypress == KEY_LEFT):
-						keypress = 999
-					elif (keypress == KEY_RIGHT):
-						keypress = 999
-				elif (item_menu == 11):
-					if (keypress == KEY_LEFT):
-						keypress = 999
-					elif (keypress == KEY_RIGHT):
-						keypress = 999
-				elif (item_menu == 12):
-					if (keypress == KEY_LEFT):
-						keypress = 999
-					elif (keypress == KEY_RIGHT):
-						keypress = 999
+					if (item_menu == 9): dim_menus(9)
+					elif (item_menu == 10): dim_menus(10)
+					elif (item_menu == 11): dim_menus(11)
+					elif (item_menu == 12): dim_menus(12)
+#			elif ((keypress == KEY_LEFT) | (keypress == KEY_RIGHT)):
+#
+#				if (item_menu == 1):
+#					if (keypress == KEY_LEFT):
+#					elif (keypress == KEY_RIGHT):
+#				elif (item_menu == 2):
+#					if (keypress == KEY_LEFT):
+#					elif (keypress == KEY_RIGHT):
+#				elif (item_menu == 3):
+#					if (keypress == KEY_LEFT):
+#					elif (keypress == KEY_RIGHT):
+#				elif (item_menu == 4):
+#					if (keypress == KEY_LEFT):
+#					elif (keypress == KEY_RIGHT):
+#				elif (item_menu == 5):
+#					if (keypress == KEY_LEFT):
+#					elif (keypress == KEY_RIGHT):
+#				elif (item_menu == 6):
+#					if (keypress == KEY_LEFT):
+#					elif (keypress == KEY_RIGHT):
+#				elif (item_menu == 7):
+#					if (keypress == KEY_LEFT):
+#					elif (keypress == KEY_RIGHT):
+#				elif (item_menu == 8):
+#					if (keypress == KEY_LEFT):
+#					elif (keypress == KEY_RIGHT):
+#				elif (item_menu == 9):
+#					if (keypress == KEY_LEFT):
+#					elif (keypress == KEY_RIGHT):
+#				elif (item_menu == 10):
+#					if (keypress == KEY_LEFT):
+#					elif (keypress == KEY_RIGHT):
+#				elif (item_menu == 11):
+#					if (keypress == KEY_LEFT):
+#					elif (keypress == KEY_RIGHT):
+#				elif (item_menu == 12):
+#					if (keypress == KEY_LEFT):
+#					elif (keypress == KEY_RIGHT):
+#				keypress = 999
 
 			if keypress == 27:
 				keypress = ''
