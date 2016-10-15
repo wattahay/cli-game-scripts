@@ -105,21 +105,21 @@ def deteggt(chegg):
 # pawn lists dynamically grows and shrink with 
 
 beasts = [{
-	'frames': ((int(beast_speed / lcd_time)) - 1),
+	'frames': (int(beast_speed / lcd_time)),
 	'frame':0,
 	'chr': BEAST,
 	'pnts': beast_scr 
 	}]
 
 monsters = [{
-	'frames': ((int(monster_speed / lcd_time)) - 1),
+	'frames': (int(monster_speed / lcd_time)),
 	'frame':0,
 	'chr': MONSTER,
 	'pnts': monster_scr
 	}]
 
 eggs = [{
-	'frames': ((int(egg_speed / lcd_time)) - 1),
+	'frames': (int(egg_speed / lcd_time)),
 	'frame':0,
 	'incu_frames': (int(1 / lcd_time)), # incu_frames add up to 1 second
 	'incu_frame': 0,
@@ -270,8 +270,9 @@ def play_audio(filename): system('aplay -q audio/' + filename + '.wav &')
 
 def place_beasts(count):
 
-	global beasts, board, BAKGRD
+	global beasts, board, BAKGRD, beast_speed, lcd_time
 
+	beasts[0]['frames'] = (int(beast_speed / lcd_time))
 	step = 0 
 	while(step < count):
 		row = randint(1, (board_rows - 1))
@@ -286,8 +287,9 @@ def place_beasts(count):
 
 def hatch_monster(row, col):
 
-	global monsters, board, MONSTER
-
+	global monsters, board, MONSTER, lcd_time, monster_speed
+	
+	monsters[0]['frames'] = (int(monster_speed / lcd_time))
 	stagger = randint(1, (monsters[0]['frames']))	
 	board[row][col] = MONSTER
 	monsters.append({'ro':row, 'co':col,'stg':stagger })
@@ -313,9 +315,9 @@ def place_monsters(count):
 
 def lay_egg(row, col):
 
-	global incubate, monsters, beasts, eggs, board
+	global incubate, monsters, beasts, eggs, board, egg_speed, lcd_time
 	enemy_total = len(eggs) + len(beasts) + len(monsters)
-
+	eggs[0]['frames'] = (int(egg_speed / lcd_time))
 	wait_frames = (eggs[0]['incu_frames'] * ( enemy_total * incubate )) + randint(0, (2 * eggs[0]['incu_frames'])) # seconds of wait time before egg starts counting down 
 	stag = randint(1, eggs[0]['frames']) # the frame that the egg counts down on
 	board[row][col] = EGG(32)
@@ -1129,7 +1131,6 @@ def build_level():
 					elif (item_menu == 11): dim_menus(11)
 					elif (item_menu == 12): dim_menus(12)
 			elif ((keypress == KEY_LEFT) | (keypress == KEY_RIGHT)):
-#				if ((not ((main_menu == 1) & (item_menu == 0))) & (not ((main_menu == 2) & (item_menu == 2))) & (not ((main_menu == 3) & (item_menu == 8)))):
 				maxed_cnt = (play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)
 				if (main_menu == 1) & (item_menu == 1):
 					if (keypress == KEY_LEFT):
@@ -1372,6 +1373,17 @@ def take_input():
 		keypress = stdscr.getch()
 		system('echo \'' + str(keypress) + '\' >> level.txt')
 		timeout = 0
+		if keypress == ord('b'):
+			if debug == True:
+				debug = False
+				top_margin = save_top
+				left_margin = save_left
+				system('clear')
+			else:
+				debug = True
+				top_margin = 0
+				left_margin = 0
+				system('clear')
 		if (game_play_mode):
 			if keypress == 27: # the esc key
 				system('clear')
@@ -1379,20 +1391,6 @@ def take_input():
 			elif keypress == ord('p'):
 				keypress = stdscr.getch()
 				keypress = ''
-			elif keypress == ord('r'):
-				plan_the_board()
-				system('clear')
-			elif keypress == ord('b'):
-				if debug == True:
-					debug = False
-					top_margin = save_top
-					left_margin = save_left
-					system('clear')
-				else:
-					debug = True
-					top_margin = 0
-					left_margin = 0
-					system('clear')
 			if pulling == 'switch':
 				if keypress == ord(' '):
 					while (keypress == ord(' ')):
