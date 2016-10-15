@@ -15,6 +15,7 @@ beast_speed = 1.5	# seconds between enemy moves
 monster_speed = 1.1	# seconds between enemy moves
 egg_speed = 3		# seconds between countdown
 incubate = 10    # frame multiplier range for egg incubation 
+
 ##################################-- game scoring balance
 
 beast_scr = 2		# points for killing beasts
@@ -1291,10 +1292,12 @@ def take_input():
 				direct_keypress(keypress)
 			elif pulling == 'single':
 				if keypress == ord(' '):
-					player[1]['tug'] = True
+					while (keypress == ord(' ')):
+						keypress = stdscr.getch()
+						player[1]['tug'] = True
 					direct_keypress(keypress)
-					player[1]['tug'] = False
 				else:
+					player[1]['tug'] = False
 					direct_keypress(keypress)
 
 system('reset')
