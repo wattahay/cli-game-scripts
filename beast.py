@@ -866,16 +866,16 @@ def build_level():
 	elif block_type == KILLBLOCK: mi8_opt = 2
 	normalyellow, dangerousorange = '', ''
 	mi9_shade = '' ###############-- item 9
-	beast_speed_min = .5
-	beast_speed_max = 2.5
+	beast_speed_min = .3
+	beast_speed_max = 2.3
 	beast_speed_inc = .2
 	beast_speed = beast_speed - (beast_speed % beast_speed_inc)
 	if (beast_speed > beast_speed_max): beast_speed = beast_speed_max
 	elif (beast_speed < beast_speed_min): beast_speed = beast_speed_min
-	beast_arrows = int((beast_speed - beast_speed_min ) / beast_speed_inc)
+	beast_arrows = int((beast_speed - beast_speed_min ) / beast_speed_inc) 
 	mi10_shade = '' ##############-- item 10
-	monster_speed_min = .5
-	monster_speed_max = 2.5
+	monster_speed_min = .3
+	monster_speed_max = 2.3
 	monster_speed_inc = .2
 	monster_speed = monster_speed - (monster_speed % monster_speed_inc)
 	if (monster_speed > monster_speed_max): monster_speed = monster_speed_max
@@ -883,7 +883,7 @@ def build_level():
 	monster_arrows = int((monster_speed - monster_speed_min) / monster_speed_inc)
 	mi11_shade = '' ##############-- item 11
 	incubate_min = 4
-	incubate_max = 44
+	incubate_max = 40
 	incubate_inc = 4
 	incubate = incubate - (incubate % incubate_inc)
 	if (incubate > incubate_max): incubate = incubate_max
@@ -891,7 +891,7 @@ def build_level():
 	incubate_arrows = int((incubate - incubate_min) / incubate_inc)
 	mi12_shade = '' ##############-- item 12
 	timer_min = .5
-	timer_max = 4.5
+	timer_max = 5
 	timer_inc = .5
 	egg_speed = egg_speed - (egg_speed % timer_inc)
 	if (egg_speed > timer_max): egg_speed = timer_max
@@ -945,11 +945,11 @@ def build_level():
 		print('\033[u\033[13B' + mi8_shade + block_type + mi8_shade + '\033[40m - Block Type: ' + normalyellow + mi8_shade + ' ' + dangerousorange + mi8_shade + ' \033[37m')
 
 	def main_menu_3():
-		global mi9_shade, mi10_shade, mi11_shade, mi12_shade
-		print('\033[u\033[3B' + mi9_shade + BEAST + mi9_shade + ' - Beast:\t\t slower ' + speedbg + ' faster\033[18D\033[' + str(beast_arrows) + 'C' + speed_arrow)
-		print('\033[u\033[5B' + mi10_shade + MONSTER + mi10_shade + ' - Monster:\t\t slower ' + speedbg + ' faster\033[18D\033[' + str(monster_arrows) + 'C' + speed_arrow)
-		print('\033[u\033[7B' + mi11_shade + EGG(32) + mi11_shade + ' - Egg Incubate:\t slower ' + speedbg + ' faster\033[18D\033[' + str(incubate_arrows) + 'C' + speed_arrow)
-		print('\033[u\033[9B' + mi12_shade + EGG(8320) + mi12_shade + ' - Egg Timer:\t slower ' + speedbg + ' faster\033[18D\033[' + str(timer_arrows) + 'C' + speed_arrow)
+		global mi9_shade, mi10_shade, mi11_shade, mi12_shade, incubate
+		print('\033[u\033[3B' + mi9_shade + BEAST + mi9_shade + ' - Beast:\t\t slower ' + speedbg +          ' faster\033[' + str(beast_arrows + 8) +    'D' + speed_arrow)
+		print('\033[u\033[5B' + mi10_shade + MONSTER + mi10_shade + ' - Monster:\t\t slower ' + speedbg +    ' faster\033[' + str(monster_arrows + 8) +  'D' + speed_arrow)
+		print('\033[u\033[7B' + mi11_shade + EGG(32) + mi11_shade + ' - Egg Incubate:\t slower ' + speedbg + ' faster\033[' + str(incubate_arrows + 8) + 'D' + speed_arrow)
+		print('\033[u\033[9B' + mi12_shade + EGG(8320) + mi12_shade + ' - Egg Timer:\t slower ' + speedbg +  ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow)
 
 	def mi1_controls(opt):
 		global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, wasd, arrows, vi
@@ -1129,9 +1129,9 @@ def build_level():
 					elif (item_menu == 11): dim_menus(11)
 					elif (item_menu == 12): dim_menus(12)
 			elif ((keypress == KEY_LEFT) | (keypress == KEY_RIGHT)):
-				if ((not ((main_menu == 1) & (item_menu == 0))) & (not ((main_menu == 2) & (item_menu == 2))) & (not ((main_menu == 3) & (item_menu == 8)))):
-					play_audio('menu_item_tick')
-				if (item_menu == 1):
+#				if ((not ((main_menu == 1) & (item_menu == 0))) & (not ((main_menu == 2) & (item_menu == 2))) & (not ((main_menu == 3) & (item_menu == 8)))):
+				maxed_cnt = (play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)
+				if (main_menu == 1) & (item_menu == 1):
 					if (keypress == KEY_LEFT):
 						mi1_opt -= 1	
 						if mi1_opt < 1: mi1_opt = 3
@@ -1144,8 +1144,9 @@ def build_level():
 						mi1_controls(2)
 					elif mi1_opt == 3:
 						mi1_controls(3)
+					play_audio('menu_item_tick')
 					keypress = 999
-				elif (item_menu == 2):
+				elif (main_menu == 1) & (item_menu == 2):
 					if (keypress == KEY_LEFT):
 						mi2_opt -= 1
 						if mi2_opt < 1: mi2_opt = 3
@@ -1155,28 +1156,90 @@ def build_level():
 					if mi2_opt == 1: mi2_controls(1)
 					elif mi2_opt == 2: mi2_controls(2)
 					elif mi2_opt == 3: mi2_controls(3)
+					if item_menu != 3: play_audio('menu_item_tick')
 					keypress = 999
 							
-				elif (item_menu == 3):
+				elif (main_menu == 2) & (item_menu == 3):
 					if (keypress == KEY_LEFT):
 						lvl_beast_cnt -= 1
-						if lvl_beast_cnt < min_beast_cnt: lvl_beast_cnt = min_beast_cnt
+						if lvl_beast_cnt < 0: 
+							lvl_beast_cnt = 0
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
 					elif (keypress == KEY_RIGHT):
 						lvl_beast_cnt += 1
-						if lvl_beast_cnt > max_beast_cnt: lvl_beast_cnt = max_beast_cnt
-#				elif (item_menu == 4):
-#					if (keypress == KEY_LEFT):
-#					elif (keypress == KEY_RIGHT):
-#				elif (item_menu == 5):
-#					if (keypress == KEY_LEFT):
-#					elif (keypress == KEY_RIGHT):
-#				elif (item_menu == 6):
-#					if (keypress == KEY_LEFT):
-#					elif (keypress == KEY_RIGHT):
-#				elif (item_menu == 7):
-#					if (keypress == KEY_LEFT):
-#					elif (keypress == KEY_RIGHT):
-				elif (item_menu == 8):
+						if lvl_beast_cnt > maxed_cnt: 
+							lvl_beast_cnt = maxed_cnt
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					keypress = 999
+				elif (main_menu == 2) & (item_menu == 4):
+					if (keypress == KEY_LEFT):
+						lvl_monster_cnt -= 1
+						if lvl_monster_cnt < 0: 
+							lvl_monster_cnt = 0
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					elif (keypress == KEY_RIGHT):
+						lvl_monster_cnt += 1
+						if lvl_monster_cnt > maxed_cnt: 
+							lvl_monster_cnt = maxed_cnt
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					keypress = 999
+				elif (main_menu == 2) & (item_menu == 5):
+					if (keypress == KEY_LEFT):
+						lvl_egg_cnt -= 1
+						if lvl_egg_cnt < 0: 
+							lvl_egg_cnt = 0
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					elif (keypress == KEY_RIGHT):
+						lvl_egg_cnt += 1
+						if lvl_egg_cnt > maxed_cnt: 
+							lvl_egg_cnt = maxed_cnt
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					keypress = 999
+				elif (main_menu == 2) & (item_menu == 6):
+					if (keypress == KEY_LEFT):
+						lvl_box_cnt -= 1
+						if lvl_box_cnt < 0: 
+							lvl_box_cnt = 0
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					elif (keypress == KEY_RIGHT):
+						lvl_box_cnt += 1
+						if lvl_box_cnt > maxed_cnt: 
+							lvl_box_cnt = maxed_cnt
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					keypress = 999
+				elif (main_menu == 2) & (item_menu == 7):
+					if (keypress == KEY_LEFT):
+						lvl_block_cnt -= 1
+						if lvl_block_cnt < 0: 
+							lvl_block_cnt = 0
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					elif (keypress == KEY_RIGHT):
+						lvl_block_cnt += 1
+						if lvl_block_cnt > maxed_cnt: 
+							lvl_block_cnt = maxed_cnt
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					keypress = 999
+				elif (main_menu == 2) & (item_menu == 8):
 					if (keypress == KEY_LEFT):
 						mi8_opt -= 1
 						if mi8_opt < 1: mi8_opt = 2
@@ -1185,20 +1248,76 @@ def build_level():
 						if mi8_opt > 2: mi8_opt = 1
 					if mi8_opt == 1: mi8_controls(1)
 					elif mi8_opt == 2: mi8_controls(2)
+					play_audio('menu_item_tick')
 					keypress = 999
-#				elif (item_menu == 9):
-#					if (keypress == KEY_LEFT):
-#					elif (keypress == KEY_RIGHT):
-#				elif (item_menu == 10):
-#					if (keypress == KEY_LEFT):
-#					elif (keypress == KEY_RIGHT):
-#				elif (item_menu == 11):
-#					if (keypress == KEY_LEFT):
-#					elif (keypress == KEY_RIGHT):
-#				elif (item_menu == 12):
-#					if (keypress == KEY_LEFT):
-#					elif (keypress == KEY_RIGHT):
-#				keypress = 999
+				elif (main_menu == 3) & (item_menu == 9):
+					if (keypress == KEY_RIGHT):
+						beast_speed -= beast_speed_inc
+						if beast_speed < beast_speed_min:
+							beast_speed = beast_speed_min
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					elif (keypress == KEY_LEFT):
+						beast_speed += beast_speed_inc
+						if beast_speed > beast_speed_max:
+							beast_speed = beast_speed_max
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					beast_arrows = int((beast_speed - beast_speed_min ) / beast_speed_inc) 
+					keypress = 999
+				elif (main_menu == 3) & (item_menu == 10):
+					if (keypress == KEY_RIGHT):
+						monster_speed -= monster_speed_inc
+						if monster_speed < monster_speed_min:
+							monster_speed = monster_speed_min
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					elif (keypress == KEY_LEFT):
+						monster_speed += monster_speed_inc
+						if monster_speed > monster_speed_max:
+							monster_speed = monster_speed_max
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					monster_arrows = int((monster_speed - monster_speed_min ) / monster_speed_inc) 
+					keypress = 999
+				elif (main_menu == 3) & (item_menu == 11):
+					if (keypress == KEY_RIGHT):
+						incubate -= incubate_inc
+						if incubate < incubate_min:
+							incubate = incubate_min
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					elif (keypress == KEY_LEFT):
+						incubate += incubate_inc
+						if incubate > incubate_max:
+							incubate = incubate_max
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					incubate_arrows = int((incubate - incubate_min ) / incubate_inc) 
+					keypress = 999
+				elif (main_menu == 3) & (item_menu == 12):
+					if (keypress == KEY_RIGHT):
+						egg_speed -= timer_inc
+						if egg_speed < timer_min:
+							egg_speed = timer_min
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					elif (keypress == KEY_LEFT):
+						egg_speed += timer_inc
+						if egg_speed > timer_max:
+							egg_speed = timer_max
+							play_audio('outofrange')
+						else:
+							play_audio('menu_item_tick')
+					timer_arrows = int((egg_speed - timer_min ) / timer_inc)
+					keypress = 999
 
 			if keypress == 27:
 				keypress = ''
