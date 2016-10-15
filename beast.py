@@ -1386,7 +1386,7 @@ def take_input():
 				system('clear')
 		if (game_play_mode):
 			if keypress == 27: # the esc key
-				system('clear')
+				system('reset')
 				exit()
 			elif keypress == ord('p'):
 				keypress = stdscr.getch()
@@ -1430,7 +1430,7 @@ while(True):
 		keypress = ord('p')
 		timeout = 0
 	if keypress == 27:
-		system('clear')
+		system('reset')
 		exit()
 	elif keypress == ord('p'):
 		pause()
