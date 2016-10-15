@@ -25,9 +25,9 @@ Python(3) script based on the 1984 DOS game, BEAST
 ###----- For Best Results -----
 
 * Terminal Emulator Ranking
-	* xfce4-terminal - Liberation Mono
-	* guake - Liberation Mono
-	* gnome-terminal - Free Mono
+	* xfce4-terminal - Liberation Mono - Tango Color Scheme
+	* guake - Liberation Mono - Tango Color Scheme
+	* gnome-terminal - Liberation Mono - Tango Color Scheme
 	* konsole
 	* xterm
 	* "uxterm" (lxterm)
