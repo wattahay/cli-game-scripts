@@ -948,10 +948,10 @@ def build_level():
 
 	def main_menu_3():
 		global mi9_shade, mi10_shade, mi11_shade, mi12_shade, incubate
-		print('\033[u\033[3B' + mi9_shade + BEAST + mi9_shade + ' - Beast:\t\t slower ' + speedbg +          ' faster\033[' + str(beast_arrows + 8) +    'D' + speed_arrow)
-		print('\033[u\033[5B' + mi10_shade + MONSTER + mi10_shade + ' - Monster:\t\t slower ' + speedbg +    ' faster\033[' + str(monster_arrows + 8) +  'D' + speed_arrow)
-		print('\033[u\033[7B' + mi11_shade + EGG(32) + mi11_shade + ' - Egg Incubate:\t slower ' + speedbg + ' faster\033[' + str(incubate_arrows + 8) + 'D' + speed_arrow)
-		print('\033[u\033[9B' + mi12_shade + EGG(8320) + mi12_shade + ' - Egg Timer:\t slower ' + speedbg +  ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow)
+		print('\033[u\033[3B' + mi9_shade + BEAST + mi9_shade + ' - Beast:\t   slower ' + speedbg +          ' faster\033[' + str(beast_arrows + 8) +    'D' + speed_arrow)
+		print('\033[u\033[5B' + mi10_shade + MONSTER + mi10_shade + ' - Monster:\t   slower ' + speedbg +    ' faster\033[' + str(monster_arrows + 8) +  'D' + speed_arrow)
+		print('\033[u\033[7B' + mi11_shade + EGG(32) + mi11_shade + ' - Egg Incubate:\t   slower ' + speedbg + ' faster\033[' + str(incubate_arrows + 8) + 'D' + speed_arrow)
+		print('\033[u\033[9B' + mi12_shade + EGG(8320) + mi12_shade + ' - Egg Timer:\t   slower ' + speedbg +  ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow)
 
 	def mi1_controls(opt):
 		global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, wasd, arrows, vi
