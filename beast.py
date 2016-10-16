@@ -791,6 +791,8 @@ def build_level():
 		while (keypress != ord(' ')):
 			sleep(.2)
 
+	set_topmid_ref(17, 35)
+	print('\033[37m\033[2m\033[40mPress \033[36mtab \033[37mfor \033[35mSettings\033[30m . . .       \033[0m')
 	sleep(1.2)
 
 	if (lives == 0):
