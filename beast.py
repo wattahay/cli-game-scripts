@@ -72,7 +72,7 @@ keypress = ''
 debug = False
 last_frame = 1
 timeout = 0
-pulling = 'switch' # 'tog' /  'swi' / 'sin'
+pulling = 'auto' # 'tog' /  'swi' / 'sin'
 game_play_mode = False
 ##################################-- formatted character constants
 
@@ -229,11 +229,28 @@ reset_board = build_the_board()
 blank_board = build_the_board()
 
 
+########################################################-- set cursor functions
+
+def set_topleft_ref(top, left):
+	global top_margin, left_margin
+	print('\033[?25l\033[' + str(top_margin + top)  + ';' + str(left_margin + left) + 'H\033[s\033[0m')
+
+def set_topmid_ref(top, leftkeel):
+	global top_margin, left_margin, board_cols	
+	print('\033[' + str(top_margin + 1 + top) + ';' + str(left_margin + int(board_cols) - leftkeel) + 'H\033[s\033[0m')
+
+def set_cursor_avoid():
+	global top_margin, left_margin, board_rows
+	print('\033[' + str(top_margin + board_rows) + ';0H\033[l\033[s\033[0m')
+
+
+######################################################-- print board function
+
 def print_board(board_array): #{
 
 	global ttyCols, top_margin, left_margin, points, score, lives, level, board_rows, board_cols, save_top, save_left, stat_space, stat_rows
 
-	print('\033[?25l\033[0m\033[' + str(top_margin)  + ';' + str(left_margin) + 'H\033[s')
+	set_topleft_ref(0,0)
 						
 	for rowi in range(board_rows + 1):	
 		print('\033[u' + '\033[' + str(rowi) +  'B' + ''.join(board_array[rowi - 1]))		
@@ -250,7 +267,7 @@ def print_board(board_array): #{
 			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1AMonsters: ' + str(monsters[i]))
 			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\tMonster ' + str(i) + ': ' + str(monsters[i]))
 		 
-	print('\033[u' + '\033[' + str(len(board) + 2) + 'B' + '\033[' + str(stat_space) + 'C' + '\033[s' + chr(9477) + 
+	print('\033[u\033[0m\033[37m\033[' + str(len(board) + 2) + 'B' + '\033[' + str(stat_space) + 'C' + '\033[s' + chr(9477) + 
 	' ' + 'TOTAL: ' + str(score)  + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) + 
 	' ' + 'TALLY: ' + str(points) + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 2) + 'C' + chr(9477) + 
 	' ' + 'LIVES: ' + str(lives)  +  	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 3) + 'C' + chr(9477) + 
@@ -351,11 +368,11 @@ def hatch_eggs():
 	
 	di = 0 # keeps track of index to accomodate for egg deletions
 
-	if eggs[0]['frame'] == eggs[0]['frames']:
+	if eggs[0]['frame'] >= eggs[0]['frames']:
 		eggs[0]['frame'] = 0
 	else:
 		eggs[0]['frame'] += 1
-	if eggs[0]['incu_frame'] == eggs[0]['incu_frames']:
+	if eggs[0]['incu_frame'] >= eggs[0]['incu_frames']:
 		eggs[0]['incu_frame'] = 0
 	else:
 		eggs[0]['incu_frame'] += 1
@@ -436,7 +453,7 @@ def move_enemies(pawns): #{
 
 	global board, player, MOVES
 
-	if pawns[0]['frame'] == pawns[0]['frames']:
+	if pawns[0]['frame'] >= pawns[0]['frames']:
 		pawns[0]['frame'] = 0
 	else:
 		pawns[0]['frame'] += 1
@@ -754,10 +771,10 @@ def build_level():
 	board = build_the_board()
 	print_board(board)
 
-	print('\033[' + str(top_margin + 5) + ';' + str(left_margin + (board_cols - 30)) + 'H\033[s\033[0m')
 
 	if (level == 0):
 		sleep(1)
+		set_topmid_ref(3, 29)
 		play_audio('begin')
 		print('\033[u\033[2B' + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*3 + BEAST*1 + BAKGRD*4 + BEAST*3 + BAKGRD*2 + BEAST*5)
 		print('\033[u\033[3B' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*6 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*2 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1)
@@ -766,11 +783,14 @@ def build_level():
 		print('\033[u\033[6B' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1)
 		print('\033[u\033[7B' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1)
 		print('\033[u\033[8B' + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*1 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*2 + BEAST*3 + BAKGRD*4 + BEAST*1)
-		print('\033[u\r\033[' + str(left_margin + 3) + 'C\033[3A\033[40m\033[2mPress the Spacebar to Play . . .\033[1B\033[0m')
+		set_cursor_avoid()
+		sleep(.4)
+		set_topmid_ref(17, 35)
+		print('\033[37m\033[2m\033[40mPress the Spacebar to Play . . .\033[0m')
+		set_cursor_avoid()
 		while (keypress != ord(' ')):
 			sleep(.2)
 
-	print('\033[u\r\033[' + str(left_margin + 3) + 'C\033[3A\033[40m\033[2mPress \'tab\' for Options Menus . . .\033[1B\033[0m\033[8m')
 	sleep(1.2)
 
 	if (lives == 0):
@@ -841,8 +861,8 @@ def build_level():
 	menu_ref = '\033[' + str(top_margin + 3) + ';' + str(left_margin + 6) + 'H\033[s\033[0m'
 	dim = '\033[0m\033[40m\033[2m'
 	norm = '\033[0m\033[40m'
-	ltab = '\033[7m\033[40m'
-	dtab = '\033[7m\033[40m\033[2m'
+	ltab = '\033[0m\033[7m\033[40m'
+	dtab = '\033[0m\033[7m\033[40m\033[2m'
 	speedbg = '\033[40m\033[34m|||\033[32m|||||\033[33m\033[31m||\033[37m\033[40m'
 	speed_arrow = '\033[40m\033[35m' + chr(9632) + '\033[40m' # 10219 (thin double) 9193 (skip) 9670 (diamon)
 	chr_cnt = 0
@@ -854,9 +874,9 @@ def build_level():
 	mi2_opt = 0
 	if pulling == 'toggle':	mi2_opt = 1
 	elif pulling == 'single': mi2_opt = 2
-	elif pulling == 'switch': mi2_opt = 3
+	elif pulling == 'auto': mi2_opt = 3
 	# pulling set globally on line 74
-	toggle, single, switch = '', '', ''
+	toggle, single, auto = '', '', ''
 	mi3_shade = '' ###############-- item 3
 	mi4_shade = '' ###############-- item 4
 	mi5_shade = '' ###############-- item 5
@@ -927,9 +947,9 @@ def build_level():
 		if mi != 12: mi12_shade = dim ##############-- item 12
 		else: mi12_shade = norm
 	def main_menu_1():
-		global mi1_shade, mi2_shade, wasd, arrows, vi, pulling, single, toggle, switch
+		global mi1_shade, mi2_shade, wasd, arrows, vi, pulling, single, toggle, auto
 		print('\033[u\033[3B' + mi1_shade + 'Movement Keys: ' + wasd + mi1_shade + ' ' + arrows + mi1_shade + ' ' + vi)
-		print('\033[u\033[5B' + mi2_shade + 'Pulling Boxes: ' + toggle + mi2_shade + ' ' + single + mi2_shade + ' ' + switch)
+		print('\033[u\033[5B' + mi2_shade + 'Pulling Boxes: ' + toggle + mi2_shade + ' ' + single + mi2_shade + ' ' + auto)
 
 	def main_menu_2():
 		global mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, BLOCK, block_type, KILLBLOCK, normalyellow, dangerousorange,  play_rows, play_cols
@@ -948,10 +968,10 @@ def build_level():
 
 	def main_menu_3():
 		global mi9_shade, mi10_shade, mi11_shade, mi12_shade, incubate
-		print('\033[u\033[3B' + mi9_shade + BEAST + mi9_shade + ' - Beast:\t   slower ' + speedbg +          ' faster\033[' + str(beast_arrows + 8) +    'D' + speed_arrow)
-		print('\033[u\033[5B' + mi10_shade + MONSTER + mi10_shade + ' - Monster:\t   slower ' + speedbg +    ' faster\033[' + str(monster_arrows + 8) +  'D' + speed_arrow)
-		print('\033[u\033[7B' + mi11_shade + EGG(32) + mi11_shade + ' - Egg Incubate:\t   slower ' + speedbg + ' faster\033[' + str(incubate_arrows + 8) + 'D' + speed_arrow)
-		print('\033[u\033[9B' + mi12_shade + EGG(8320) + mi12_shade + ' - Egg Timer:\t   slower ' + speedbg +  ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow)
+		print('\033[u\033[3B' + mi9_shade + BEAST + mi9_shade +        ' - Beast:           slower ' + speedbg + ' faster\033[' + str(beast_arrows + 8) +    'D' + speed_arrow)
+		print('\033[u\033[5B' + mi10_shade + MONSTER + mi10_shade +    ' - Monster:         slower ' + speedbg + ' faster\033[' + str(monster_arrows + 8) +  'D' + speed_arrow)
+		print('\033[u\033[7B' + mi11_shade + EGG(32) + mi11_shade +    ' - Egg Incubate:    slower ' + speedbg + ' faster\033[' + str(incubate_arrows + 8) + 'D' + speed_arrow)
+		print('\033[u\033[9B' + mi12_shade + EGG(8320) + mi12_shade +  ' - Egg Timer:       slower ' + speedbg + ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow)
 
 	def mi1_controls(opt):
 		global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, wasd, arrows, vi
@@ -981,23 +1001,23 @@ def build_level():
 			vi = '[\033[35m h,j,k,l \033[37m]'
 
 	def mi2_controls(opt):
-		global pulling, toggle, single, switch 
+		global pulling, toggle, single, auto 
 		
 		if opt == 1:
 			pulling = 'toggle'
 			toggle = '[\033[35m toggle \033[37m]'
 			single = '  single  '
-			switch = '  switch  '
+			auto = '  auto  '
 		elif opt == 2:
 			pulling = 'single'
 			toggle = '  toggle  '
 			single = '[\033[35m single \033[37m]'
-			switch = '  switch  '
+			auto = '  auto  '
 		elif opt == 3:
-			pulling = 'switch'
+			pulling = 'auto'
 			toggle = '  toggle  '
 			single = '  single  '
-			switch = '[\033[35m switch \033[37m]'
+			auto = '[\033[35m auto \033[37m]'
 
 	def mi8_controls(opt):
 		global block_type, BLOCK, KILLBLOCK, normalyellow, dangerousorange
@@ -1373,25 +1393,29 @@ def take_input():
 		keypress = stdscr.getch()
 		system('echo \'' + str(keypress) + '\' >> level.txt')
 		timeout = 0
-		if keypress == ord('b'):
-			if debug == True:
-				debug = False
-				top_margin = save_top
-				left_margin = save_left
-				system('clear')
-			else:
-				debug = True
-				top_margin = 0
-				left_margin = 0
-				system('clear')
 		if (game_play_mode):
 			if keypress == 27: # the esc key
 				system('reset')
 				exit()
+			elif keypress == ord('r'):
+				keypress = 999
+				plan_the_board()
+				system('clear')
+			elif keypress == ord('b'):
+				if debug == True:
+					debug = False
+					top_margin = save_top
+					left_margin = save_left
+					system('clear')
+				else:
+					debug = True
+					top_margin = 0
+					left_margin = 0
+					system('clear')
 			elif keypress == ord('p'):
 				keypress = stdscr.getch()
 				keypress = ''
-			if pulling == 'switch':
+			if pulling == 'auto':
 				if keypress == ord(' '):
 					while (keypress == ord(' ')):
 						keypress = stdscr.getch()
