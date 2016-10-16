@@ -36,10 +36,10 @@ Python(3) script based on the 1984 DOS game, BEAST
  Most terminals have profiles you can create for individual applications.
 
 * Font Ranking
-	* Free Mono (this is good in Gnome-terminal)
  	* Liberation Mono (closest to original)
 	* Noto Mono
 	* WenQuanYi Micro Hei Mono
+	* Free Mono (this is good in Gnome-terminal)
 	* Ubuntu Mono
  	* DeJaVu Sans Mono
  	* Tlwg Mono looks . . . interesting
