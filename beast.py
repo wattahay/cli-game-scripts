@@ -241,7 +241,7 @@ def set_topmid_ref(top, leftkeel):
 
 def set_cursor_avoid():
 	global top_margin, left_margin, board_rows
-	print('\033[' + str(top_margin + board_rows) + ';0H\033[l\033[s\033[0m')
+	print('\033[' + str(top_margin + board_rows) + ';0H\033[0m\033[30m')
 
 
 ######################################################-- print board function
@@ -335,7 +335,7 @@ def lay_egg(row, col):
 	global incubate, monsters, beasts, eggs, board, egg_speed, lcd_time
 	enemy_total = len(eggs) + len(beasts) + len(monsters)
 	eggs[0]['frames'] = (int(egg_speed / lcd_time))
-	wait_frames = (eggs[0]['incu_frames'] * ( enemy_total * incubate )) + randint(0, (2 * eggs[0]['incu_frames'])) # seconds of wait time before egg starts counting down 
+	wait_frames = int(eggs[0]['incu_frames'] * (( enemy_total * incubate ) / 10) + randint(0, (2 * eggs[0]['incu_frames']))) # seconds of wait time before egg starts counting down 
 	stag = randint(1, eggs[0]['frames']) # the frame that the egg counts down on
 	board[row][col] = EGG(32)
 	eggs.append({'ro': row, 'co': col, 'wait': wait_frames, 'stg': stag, 'sub':32})
@@ -629,7 +629,8 @@ def push_tree(intent):
 				play_audio('hatch')
 				push_move()
 				loop = False						# make space same as preceeding space
-			elif ((wall_space == BAKGRD) | (wall_space == BOX)):
+#			elif ((wall_space == BAKGRD) | (wall_space == BOX)):
+			else:
 				for i in range(1, len(eggs)):
 					if ((eggs[i]['ro'] == probe_r(probe)) & (eggs[i]['co'] == probe_c(probe))):
 						push_eggs = [i] + push_eggs
@@ -970,10 +971,10 @@ def build_level():
 
 	def main_menu_3():
 		global mi9_shade, mi10_shade, mi11_shade, mi12_shade, incubate
-		print('\033[u\033[3B' + mi9_shade + BEAST + mi9_shade +        ' - Beast:           slower ' + speedbg + ' faster\033[' + str(beast_arrows + 8) +    'D' + speed_arrow)
-		print('\033[u\033[5B' + mi10_shade + MONSTER + mi10_shade +    ' - Monster:         slower ' + speedbg + ' faster\033[' + str(monster_arrows + 8) +  'D' + speed_arrow)
-		print('\033[u\033[7B' + mi11_shade + EGG(32) + mi11_shade +    ' - Egg Incubate:    slower ' + speedbg + ' faster\033[' + str(incubate_arrows + 8) + 'D' + speed_arrow)
-		print('\033[u\033[9B' + mi12_shade + EGG(8320) + mi12_shade +  ' - Egg Timer:       slower ' + speedbg + ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow)
+		print('\033[u\033[3B' + mi9_shade + BEAST + mi9_shade +        ' - Beast:           slower ' + speedbg + ' faster\033[' + str(beast_arrows + 8) +    'D' + speed_arrow + '\033[30m')
+		print('\033[u\033[5B' + mi10_shade + MONSTER + mi10_shade +    ' - Monster:         slower ' + speedbg + ' faster\033[' + str(monster_arrows + 8) +  'D' + speed_arrow + '\033[30m')
+		print('\033[u\033[7B' + mi11_shade + EGG(32) + mi11_shade +    ' - Egg Incubate:    slower ' + speedbg + ' faster\033[' + str(incubate_arrows + 8) + 'D' + speed_arrow + '\033[30m')
+		print('\033[u\033[9B' + mi12_shade + EGG(8320) + mi12_shade +  ' - Egg Timer:       slower ' + speedbg + ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow + '\033[30m')
 
 	def mi1_controls(opt):
 		global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, wasd, arrows, vi
@@ -1093,10 +1094,13 @@ def build_level():
 						+ ltab + ' pawn speeds ' + norm + chr(9473)*20)
 			if main_menu == 1:
 				main_menu_1()
+				set_cursor_avoid()
 			elif main_menu == 2:
 				main_menu_2()
+				set_cursor_avoid()
 			elif main_menu == 3:
 				main_menu_3()
+				set_cursor_avoid()
 
 			if ((keypress == KEY_UP) | (keypress == KEY_DOWN)):		
 				if (main_menu == 1):
