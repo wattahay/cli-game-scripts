@@ -653,7 +653,7 @@ def push_tree(intent):
 	
 
 def move_player(direction):
-	global PLAYER, board, MOVES, BAKGRD, BOX, MVU, MVL, MVR, MVD, pulling
+	global PLAYER, player, board, MOVES, BAKGRD, BOX, pulling
 
 	row = player[1]['ro']
 	col = player[1]['co']
