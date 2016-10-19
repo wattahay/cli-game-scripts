@@ -50,29 +50,21 @@ MVDR = 	'DR'
 
 DIR_LIS = (MVU, MVD, MVL, MVR, MVUL, MVUR, MVDL, MVDR)
 
-mi1_opt = 2 # sets the controls:
-if mi1_opt == 1: ###############-- arrows
-	KEY_UP = 259
-	KEY_DOWN = 258
-	KEY_RIGHT = 261
-	KEY_LEFT = 260
-elif mi1_opt == 2: #############-- w,a,s,d
-	KEY_UP = 119
-	KEY_DOWN = 115
-	KEY_RIGHT = 100
-	KEY_LEFT = 97
-elif mi1_opt == 3: #############-- vi (h,j,k,l)
-	KEY_UP = 107
-	KEY_DOWN = 106
-	KEY_RIGHT = 108
-	KEY_LEFT = 104
-
+#mi1_opt = 2 # sets the controls:
+KEY_UP = 259
+KEY_DOWN = 258
+KEY_RIGHT = 261
+KEY_LEFT = 260
+KEY_P_DOWN = 0
+KEY_P_RIGHT = 0
+KEY_P_LEFT = 0
+KEY_P_UP = 0
 
 keypress = '' 
 debug = False
 last_frame = 1
 timeout = 0
-pulling = 'auto' # 'tog' /  'swi' / 'sin'
+pulling = 'auto' # 'hold / 'tog' /  'swi' / 'sin'
 game_play_mode = False
 ##################################-- formatted character constants
 
@@ -661,9 +653,8 @@ def push_tree(intent):
 	
 
 def move_player(direction):
-	global PLAYER, board, MOVES, BAKGRD, BOX, MVU, MVL, MVR, MVD
+	global PLAYER, board, MOVES, BAKGRD, BOX, MVU, MVL, MVR, MVD, pulling
 
-	index = 1
 	row = player[1]['ro']
 	col = player[1]['co']
 	fow = row + MOVES[direction]['ra'] 
@@ -671,13 +662,15 @@ def move_player(direction):
 	rtug = row - MOVES[direction]['ra']
 	ctug = col - MOVES[direction]['ca']
 	board[fow][fol] = PLAYER 
-	if (player[index]['tug']) & (board[rtug][ctug] == BOX):
+	if (player[1]['tug']) & (board[rtug][ctug] == BOX):
 		board[rtug][ctug] = BAKGRD
 		board[row][col] = BOX
+		if (pulling == 'hold'):
+			player[1]['tug'] == False
 	else:
 		board[row][col] = BAKGRD
-	player[index]['ro'] = fow
-	player[index]['co'] = fol
+	player[1]['ro'] = fow
+	player[1]['co'] = fol
 
 
 
@@ -698,7 +691,7 @@ def direct_move(tap_move):
 
 def direct_keypress(tap):
 
-	global player, MOVES, board, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT
+	global player, MOVES, board, KEY_P_UP, KEY_P_DOWN, KEY_P_RIGHT, KEY_P_LEFT, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, pulling
 
 	if (tap == KEY_UP):
 		direct_move('U')
@@ -708,7 +701,23 @@ def direct_keypress(tap):
 		direct_move('D')
 	elif (tap == KEY_RIGHT):
 		direct_move('R')
-
+	if (pulling == 'hold'):
+		if (tap == KEY_P_UP):
+			player[1]['tug'] = True
+			direct_move('U')
+			player[1]['tug'] = False
+		elif (tap == KEY_P_LEFT):
+			player[1]['tug'] = True
+			direct_move('L')
+			player[1]['tug'] = False
+		elif (tap == KEY_P_RIGHT):
+			player[1]['tug'] = True
+			direct_move('R')
+			player[1]['tug'] = False
+		elif (tap == KEY_P_DOWN):
+			player[1]['tug'] = True
+			direct_move('D')
+			player[1]['tug'] = False
 
 
 
@@ -747,14 +756,12 @@ def pause():
 
 def build_level():
 	
-	global incubate, egg_speed, beast_speed, monster_speed, game_play_mode, keypress 
+	global incubate, egg_speed, beast_speed, monster_speed, keypress 
 	global play_rows, play_cols, board_rows, board_cols, reset_board, blank_board 
 	global board, level, lives, score, points
 	global lvl_block_cnt, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt, lvl_box_cnt, block_type
 	global BAKGRD, BLOCK, KILLBLOCK, last_frame, top_margin, left_margin, lcd_time 
-	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, mi1_opt, pulling
-
-	game_play_mode = False # sets the input loop to reject player move functions and other functions reserved for game play time	
+	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT, pulling
 
 	stdscr = curses.initscr() 
 	stdscr.keypad(1)
@@ -871,13 +878,13 @@ def build_level():
 	chr_cnt = 0
 	mi1_shade = '' ###############-- item 1
 
-	#mi1_opt # (set globally on line 52)
-	wasd, arrows, vi = '', '', ''
+	mi1_opt = 2 # (set globally on line 52)
 	mi2_shade = '' ###############-- item 2
 	mi2_opt = 0
-	if pulling == 'toggle':	mi2_opt = 1
-	elif pulling == 'single': mi2_opt = 2
-	elif pulling == 'auto': mi2_opt = 3
+	if pulling == 'hold': mi2_opt = 1
+	elif pulling == 'toggle': mi2_opt = 2
+	elif pulling == 'single': mi2_opt = 3
+	elif pulling == 'auto': mi2_opt = 4
 	# pulling set globally on line 74
 	toggle, single, auto = '', '', ''
 	mi3_shade = '' ###############-- item 3
@@ -951,8 +958,18 @@ def build_level():
 		else: mi12_shade = norm
 	def main_menu_1():
 		global mi1_shade, mi2_shade, wasd, arrows, vi, pulling, single, toggle, auto
-		print('\033[u\033[3B' + mi1_shade + 'Movement Keys: ' + wasd + mi1_shade + ' ' + arrows + mi1_shade + ' ' + vi)
-		print('\033[u\033[5B' + mi2_shade + 'Pulling Boxes: ' + toggle + mi2_shade + ' ' + single + mi2_shade + ' ' + auto)
+
+		print('\033[u\033[3B' + mi1_shade + 'Movement Keys: ' + wasd + mi1_shade + arrows + mi1_shade + vi)
+		print('\033[u\033[5B' + mi2_shade + 'Pulling Boxes: ' + hold + mi2_shade + toggle + mi2_shade + single + mi2_shade + auto)
+		
+		pushkey = ''
+		if (pulling == 'hold'):
+			if (mi1_opt == 1): pushkey = 'Shift   '
+			elif (mi1_opt == 2): pushkey = 'Ctrl    '
+			elif (mi1_opt == 3): pushkey = 'Shift   '
+		else: pushkey = 'Spacebar'
+			
+		print('\033[u\033[8B\033[2m' + ' '*40 + 'Push key: \033[36m' + pushkey + ' \033[0m')	
 
 	def main_menu_2():
 		global mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, BLOCK, block_type, KILLBLOCK, normalyellow, dangerousorange,  play_rows, play_cols
@@ -967,7 +984,7 @@ def build_level():
 		print('\033[u\033[7B' + mi5_shade + EGG(32) + mi5_shade + '\033[40m - Egg Count: \033[35m' + str(lvl_egg_cnt) + ' \033[37m')
 		print('\033[u\033[9B' + mi6_shade + BOX + mi6_shade + '\033[40m - Box Count: \033[35m' + str(lvl_box_cnt) + ' \033[37m')
 		print('\033[u\033[11B' + mi7_shade + block_type + mi7_shade + '\033[40m - Block Count: \033[35m' + str(lvl_block_cnt) + ' \033[37m')
-		print('\033[u\033[13B' + mi8_shade + block_type + mi8_shade + '\033[40m - Block Type: ' + normalyellow + mi8_shade + ' ' + dangerousorange + mi8_shade + ' \033[37m')
+		print('\033[u\033[13B' + mi8_shade + block_type + mi8_shade + '\033[40m - Block Type: ' + normalyellow + mi8_shade + dangerousorange + mi8_shade + ' \033[37m')
 
 	def main_menu_3():
 		global mi9_shade, mi10_shade, mi11_shade, mi12_shade, incubate
@@ -977,50 +994,72 @@ def build_level():
 		print('\033[u\033[9B' + mi12_shade + EGG(8320) + mi12_shade +  ' - Egg Timer:       slower ' + speedbg + ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow + '\033[30m')
 
 	def mi1_controls(opt):
-		global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, wasd, arrows, vi
+		global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT, wasd, arrows, vi, pulling
 		if opt == 1:
+			wasd = '[\033[35m w,a,s,d \033[37m]'
+			arrows = '  arrows  '
+			vi = '  h,j,k,l  '
 			KEY_UP = 119
 			KEY_DOWN = 115
 			KEY_RIGHT = 100
 			KEY_LEFT = 97
-			wasd = '[\033[35m w,a,s,d \033[37m]'
-			arrows = '  arrows  '
-			vi = '  h,j,k,l  '
+			KEY_P_UP = 87
+			KEY_P_DOWN = 83
+			KEY_P_RIGHT = 65
+			KEY_P_LEFT = 68
 		elif opt == 2:
+			wasd = '  w,a,s,d  '
+			arrows = '[\033[35m arrows \33[37m]'
+			vi = '  h,j,k,l  '
 			KEY_UP = 259
 			KEY_DOWN = 258
 			KEY_RIGHT = 261
 			KEY_LEFT = 260
-			wasd = '  w,a,s,d  '
-			arrows = '[\033[35m arrows \33[37m]'
-			vi = '  h,j,k,l  '
+			KEY_P_UP = 566
+			KEY_P_DOWN = 525
+			KEY_P_RIGHT = 560
+			KEY_P_LEFT = 545
 		elif opt == 3:
+			wasd = '  w,a,s,d  '
+			arrows = '  arrows  '
+			vi = '[\033[35m h,j,k,l \033[37m]'
 			KEY_UP = 107
 			KEY_DOWN = 106
 			KEY_RIGHT = 108
 			KEY_LEFT = 104
-			wasd = '  w,a,s,d  '
-			arrows = '  arrows  '
-			vi = '[\033[35m h,j,k,l \033[37m]'
+			KEY_P_UP = 75
+			KEY_P_DOWN = 74
+			KEY_P_RIGHT = 76
+			KEY_P_LEFT = 72
 
 	def mi2_controls(opt):
-		global pulling, toggle, single, auto 
+		global pulling, toggle, single, auto, hold 
 		
 		if opt == 1:
+			pulling = 'hold'
+			hold = '[\033[35m hold \033[37m]'
+			toggle = '  toggle  '
+			single = '  single  '
+			auto = '  auto  '
+		if opt == 2:
 			pulling = 'toggle'
+			hold = '  hold  '
 			toggle = '[\033[35m toggle \033[37m]'
 			single = '  single  '
 			auto = '  auto  '
-		elif opt == 2:
+		elif opt == 3:
 			pulling = 'single'
+			hold = '  hold  '
 			toggle = '  toggle  '
 			single = '[\033[35m single \033[37m]'
 			auto = '  auto  '
-		elif opt == 3:
-			pulling = 'auto'
+		elif opt == 4:
+			pulling = 'auto' 
+			hold = '  hold  '
 			toggle = '  toggle  '
 			single = '  single  '
 			auto = '[\033[35m auto \033[37m]'
+
 
 	def mi8_controls(opt):
 		global block_type, BLOCK, KILLBLOCK, normalyellow, dangerousorange
@@ -1176,13 +1215,14 @@ def build_level():
 				elif (main_menu == 1) & (item_menu == 2):
 					if (keypress == KEY_LEFT):
 						mi2_opt -= 1
-						if mi2_opt < 1: mi2_opt = 3
+						if mi2_opt < 1: mi2_opt = 4
 					elif (keypress == KEY_RIGHT):
 						mi2_opt += 1
-						if mi2_opt > 3: mi2_opt = 1
+						if mi2_opt > 4: mi2_opt = 1
 					if mi2_opt == 1: mi2_controls(1)
 					elif mi2_opt == 2: mi2_controls(2)
 					elif mi2_opt == 3: mi2_controls(3)
+					elif mi2_opt == 4: mi2_controls(4)
 					if item_menu != 3: play_audio('menu_item_tick')
 					keypress = 999
 							
@@ -1379,7 +1419,6 @@ def build_level():
 	place_player()
 	
 	last_frame = 1
-	game_play_mode = True
 
 	play_audio('begin')
 ####################################################################################################
@@ -1435,6 +1474,8 @@ def take_input():
 				if keypress != ord(' '):
 					player[1]['tug'] = False
 					direct_keypress(keypress)
+			elif pulling == 'hold':
+				direct_keypress(keypress)
 			elif pulling == 'toggle':
 				if keypress == ord(' '):
 					player[1]['tug'] = not player[1]['tug']
@@ -1467,9 +1508,11 @@ while(True):
 	else:
 		if ((lives == 0) | ((len(beasts) == 1) & (len(monsters) == 1) & (len(eggs) == 1))):
 			if last_frame == 0:
+				game_play_mode = False
 				if lives == 0: play_audio('loss')
 				elif level != 0: play_audio('win')
-				build_level()								
+				build_level()	
+				game_play_mode = True							
 			last_frame -= 1
 		move_enemies(beasts)
 		move_enemies(monsters)
