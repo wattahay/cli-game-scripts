@@ -14,8 +14,7 @@ lives = 5		# starting lives
 beast_speed = 1.5	# seconds between enemy moves
 monster_speed = 1.1	# seconds between enemy moves
 egg_speed = 3		# seconds between countdown
-incubate = 10    # frame multiplier range for egg incubation 
-
+incubate = 3
 ##################################-- game scoring balance
 
 beast_scr = 2		# points for killing beasts
@@ -39,18 +38,6 @@ MOVES = {
 'DR': {	'ra':1, 	'ca':1	}
 }
 
-MVU  = 	'U'
-MVD  = 	'D'
-MVL  = 	'L'
-MVR  = 	'R'
-MVUL = 	'UL'
-MVUR = 	'UR'
-MVDL = 	'DL'
-MVDR = 	'DR'
-
-DIR_LIS = (MVU, MVD, MVL, MVR, MVUL, MVUR, MVDL, MVDR)
-
-#mi1_opt = 2 # sets the controls:
 KEY_UP = 259
 KEY_DOWN = 258
 KEY_RIGHT = 261
@@ -468,21 +455,21 @@ def move_enemies(pawns): #{
 				distance_ratio = rdistance / cdistance # division of row distance by column distance
 
 			if ((rdistance < 0.0) & (cdistance < 0.0) & (distance_ratio >= .5) & (distance_ratio <= 2.0)):
-				move_priority = [ MVUL, MVU, MVL, MVDL, MVUR, MVD, MVR, MVDR ] # UPPER LEFT range priorities
+				move_priority = [ 'UL', 'U', 'L', 'DL', 'UR', 'D', 'R', 'DR' ] # UPPER LEFT range priorities
 			elif ((rdistance < 0.0) & (cdistance > 0.0) & (distance_ratio <= -.5) & (distance_ratio >= -2.0)):
-				move_priority = [ MVUR, MVU, MVR, MVUL, MVDR, MVL, MVDL, MVD ] # UPPER RIGHT range priorities
+				move_priority = [ 'UR', 'U', 'R', 'UL', 'DR', 'L', 'DL', 'D' ] # UPPER RIGHT range priorities
 			elif ((rdistance > 0.0) & (cdistance > 0.0) & (distance_ratio >= .5) & (distance_ratio <= 2.0)):
-				move_priority = [ MVDR, MVD, MVR, MVDL, MVUR, MVU, MVL, MVUL ] # DOWN RIGHT range priorities
+				move_priority = [ 'DR', 'D', 'R', 'DL', 'UR', 'U', 'L', 'UL' ] # DOWN RIGHT range priorities
 			elif ((rdistance > 0.0) & (cdistance < 0.0) & (distance_ratio <= -.5) & (distance_ratio >= -2.0)):
-				move_priority = [ MVDL, MVD, MVL, MVUL, MVDR, MVU, MVR, MVUR ] # DOWN LEFT range priorities
+				move_priority = [ 'DL', 'D', 'L', 'UL', 'DR', 'U', 'R', 'UR' ] # DOWN LEFT range priorities
 			elif ((rdistance < 0.0) & ((abs(distance_ratio) > 2.0) | (distance_ratio == 0.0))):
-				move_priority = [ MVU, MVUL, MVUR, MVL, MVR, MVDL, MVDR, MVD ] # UPWARD range priorities
+				move_priority = [ 'U', 'UL', 'UR', 'L', 'R', 'DL', 'DR', 'D' ] # UPWARD range priorities
 			elif ((cdistance > 0.0) & ((abs(distance_ratio) < .5) | (distance_ratio == 0.0))):
-				move_priority = [ MVR, MVUR, MVDR, MVU, MVD, MVUL, MVDL, MVL ] # RIGHT range priorities
+				move_priority = [ 'R', 'UR', 'DR', 'U', 'D', 'UL', 'DL', 'L' ] # RIGHT range priorities
 			elif ((rdistance > 0.0) & ((abs(distance_ratio) > 2.0) | (distance_ratio == 0.0))):
-				move_priority = [ MVD, MVDL, MVDR, MVL, MVR, MVUL, MVUR, MVU ] # DOWNWARD range priorities
+				move_priority = [ 'D', 'DL', 'DR', 'L', 'R', 'UL', 'UR', 'U' ] # DOWNWARD range priorities
 			elif ((cdistance < 0.0) & ((abs(distance_ratio) < .5) | (distance_ratio == 0.0))):
-				move_priority = [ MVL, MVUL, MVDL, MVU, MVD, MVUR, MVDR, MVR ] # LEFT range priorities
+				move_priority = [ 'L', 'UL', 'DL', 'U', 'D', 'UR', 'DR', 'R' ] # LEFT range priorities
 
 			priority_odds = [	#145 total
 				[98, False],	#98		**********************************************
@@ -544,7 +531,7 @@ def move_enemies(pawns): #{
 
 def push_tree(intent):
 
-	global player, eggs, board, BLOCK, MOVES, BAKGRD, BOX, MVU, MVL, MVR, MVL, PLAYER
+	global player, eggs, board, BLOCK, MOVES, BAKGRD, BOX, PLAYER
 
 	push_eggs = []
  
