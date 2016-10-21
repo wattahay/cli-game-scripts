@@ -666,7 +666,7 @@ def direct_move(tap_move):
 
 	global player, MOVES, board
 
-	space = board[player[1]['ro'] +  MOVES[tap_move]['ra'] ][ player[1]['co'] + MOVES[tap_move]['ca'] ]
+	space = board[player[1]['ro'] + MOVES[tap_move]['ra'] ][ player[1]['co'] + MOVES[tap_move]['ca'] ]
 
 	if (space == BAKGRD):
 		move_player(tap_move)
@@ -1066,6 +1066,8 @@ def build_level():
 	mi2_controls(mi2_opt)
 	mi8_controls(mi8_opt)
 	if keypress == 9:
+		system('clear')
+		print_board(blank_board)
 		sleep(1.5)
 		keypress == 999
 		print_board(blank_board)
