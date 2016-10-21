@@ -23,7 +23,7 @@ monster_scr = 6		# points for killing monsters
 
 ##################################-- game speed
 
-lcd_time = .04
+LCD_TIME = .04
 
 ####################################-- move constants
 
@@ -47,6 +47,7 @@ KEY_P_RIGHT = 0
 KEY_P_LEFT = 0
 KEY_P_UP = 0
 
+mi1_opt = 2
 keypress = '' 
 debug = False
 last_frame = 1
@@ -84,37 +85,37 @@ def deteggt(chegg):
 # pawn lists dynamically grows and shrink with 
 
 beasts = [{
-	'frames': (int(beast_speed / lcd_time)),
+	'frames': (int(beast_speed / LCD_TIME)),
 	'frame':0,
 	'chr': BEAST,
 	'pnts': beast_scr 
 	}]
 
 monsters = [{
-	'frames': (int(monster_speed / lcd_time)),
+	'frames': (int(monster_speed / LCD_TIME)),
 	'frame':0,
 	'chr': MONSTER,
 	'pnts': monster_scr
 	}]
 
 eggs = [{
-	'frames': (int(egg_speed / lcd_time)),
+	'frames': (int(egg_speed / LCD_TIME)),
 	'frame':0,
-	'incu_frames': (int(1 / lcd_time)), # incu_frames add up to 1 second
+	'incu_frames': (int(1 / LCD_TIME)), # incu_frames add up to 1 second
 	'incu_frame': 0,
 	'pnts': egg_scr
 	}]
 # 'sub'		updated digital unicode reference to subscript character
 # 'wait'	randomized wait time before hatching countdown
 player = [{
-		'flash_frames': (int(.05 / lcd_time) * 2),
+		'flash_frames': (int(.05 / LCD_TIME) * 2),
 		'chr': PLAYER,
 		'pnts': 10 
 	}]
 
 plr_flashes = 5
 plr_flash = 0
-plr_frames = (int(.05 / lcd_time) * 2)
+plr_frames = (int(.05 / LCD_TIME) * 2)
 plr_frame = 0
 	
 # 'tug'
@@ -266,9 +267,9 @@ def play_audio(filename): system('aplay -q audio/' + filename + '.wav &')
 
 def place_beasts(count):
 
-	global beasts, board, BAKGRD, beast_speed, lcd_time
+	global beasts, board, BAKGRD, beast_speed, LCD_TIME
 
-	beasts[0]['frames'] = (int(beast_speed / lcd_time))
+	beasts[0]['frames'] = (int(beast_speed / LCD_TIME))
 	step = 0 
 	while(step < count):
 		row = randint(1, (board_rows - 1))
@@ -283,9 +284,9 @@ def place_beasts(count):
 
 def hatch_monster(row, col):
 
-	global monsters, board, MONSTER, lcd_time, monster_speed
+	global monsters, board, MONSTER, LCD_TIME, monster_speed
 	
-	monsters[0]['frames'] = (int(monster_speed / lcd_time))
+	monsters[0]['frames'] = (int(monster_speed / LCD_TIME))
 	stagger = randint(1, (monsters[0]['frames']))	
 	board[row][col] = MONSTER
 	monsters.append({'ro':row, 'co':col,'stg':stagger })
@@ -311,9 +312,9 @@ def place_monsters(count):
 
 def lay_egg(row, col):
 
-	global incubate, monsters, beasts, eggs, board, egg_speed, lcd_time
+	global incubate, monsters, beasts, eggs, board, egg_speed, LCD_TIME
 	enemy_total = len(eggs) + len(beasts) + len(monsters)
-	eggs[0]['frames'] = (int(egg_speed / lcd_time))
+	eggs[0]['frames'] = (int(egg_speed / LCD_TIME))
 	wait_frames = int(eggs[0]['incu_frames'] * (( enemy_total * incubate ) / 10) + randint(0, (2 * eggs[0]['incu_frames']))) # seconds of wait time before egg starts counting down 
 	stag = randint(1, eggs[0]['frames']) # the frame that the egg counts down on
 	board[row][col] = EGG(32)
@@ -343,7 +344,7 @@ def hatch_eggs():
 	# it transition eggs from wait phase, to countdown, to Monster
 	# wait_time is number of enemies at the time of creation times 4-16 (in seconds)
 	# egg_speed is usually between 2 and 4 seconds. It is the time between countdown numbers
-	global eggs, board, egg_speed, lcd_time, audio
+	global eggs, board, egg_speed, LCD_TIME, audio
 	
 	di = 0 # keeps track of index to accomodate for egg deletions
 
@@ -745,9 +746,9 @@ def build_level():
 	
 	global incubate, egg_speed, beast_speed, monster_speed, keypress 
 	global play_rows, play_cols, board_rows, board_cols, reset_board, blank_board 
-	global board, level, lives, score, points
+	global board, level, lives, score, points, mi1_opt
 	global lvl_block_cnt, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt, lvl_box_cnt, block_type
-	global BAKGRD, BLOCK, KILLBLOCK, last_frame, top_margin, left_margin, lcd_time 
+	global BAKGRD, BLOCK, KILLBLOCK, last_frame, top_margin, left_margin, LCD_TIME 
 	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT, pulling
 
 	stdscr = curses.initscr() 
@@ -865,7 +866,7 @@ def build_level():
 	chr_cnt = 0
 	mi1_shade = '' ###############-- item 1
 
-	mi1_opt = 2 # (set globally on line 52)
+	#mi1_opt = 2 # (set globally on line 52)
 	mi2_shade = '' ###############-- item 2
 	mi2_opt = 0
 	if pulling == 'hold': mi2_opt = 1
@@ -944,7 +945,7 @@ def build_level():
 		if mi != 12: mi12_shade = dim ##############-- item 12
 		else: mi12_shade = norm
 	def main_menu_1():
-		global mi1_shade, mi2_shade, wasd, arrows, vi, pulling, single, toggle, auto
+		global mi1_opt, mi1_shade, mi2_shade, wasd, arrows, vi, pulling, single, toggle, auto
 
 		print('\033[u\033[3B' + mi1_shade + 'Movement Keys: ' + wasd + mi1_shade + arrows + mi1_shade + vi)
 		print('\033[u\033[5B' + mi2_shade + 'Pulling Boxes: ' + hold + mi2_shade + toggle + mi2_shade + single + mi2_shade + auto)
@@ -1378,7 +1379,7 @@ def build_level():
 				print_board(blank_board)
 				sleep(1)
 				break
-			sleep(lcd_time)			
+			sleep(LCD_TIME)			
 
 	box_step = 0
 	block_step = 0	
@@ -1421,7 +1422,7 @@ def take_input():
 	stdscr.refresh()
 	
 	while(True):
-		sleep(lcd_time - .02)
+		sleep(LCD_TIME - .02)
 		keypress = stdscr.getch()
 		system('echo \'' + str(keypress) + '\' >> level.txt')
 		timeout = 0
@@ -1506,7 +1507,7 @@ while(True):
 		hatch_eggs()
 		flash_player()
 		print_board(board)
-	sleep(lcd_time)
+	sleep(LCD_TIME)
 
 ################################################
 input()
