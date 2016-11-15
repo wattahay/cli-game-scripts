@@ -66,7 +66,5 @@ Edit these settings in the beast.py file to change the game.
 
 ###--- Advanced Tweaks ---
 * use xset to change keyboard delay
-	* alternatively, consider changing lcd_time
-* egg wait time algorithm
 
 
