@@ -952,9 +952,9 @@ def build_level():
 		
 		pullkey = ''
 		if (pulling == 'hold'):
-			if (mi1_opt == 1): pushkey = 'Shift   '
-			elif (mi1_opt == 2): pushkey = 'Ctrl    '
-			elif (mi1_opt == 3): pushkey = 'Shift   '
+			if (mi1_opt == 1): pullkey = 'Shift   '
+			elif (mi1_opt == 2): pullkey = 'Ctrl    '
+			elif (mi1_opt == 3): pullkey = 'Shift   '
 		else: pullkey = 'Spacebar'
 			
 		print('\033[u\033[8B\033[2m' + ' '*40 + 'Pull key: \033[36m' + pullkey + ' \033[0m')	
