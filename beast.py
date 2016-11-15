@@ -950,14 +950,14 @@ def build_level():
 		print('\033[u\033[3B' + mi1_shade + 'Movement Keys: ' + wasd + mi1_shade + arrows + mi1_shade + vi)
 		print('\033[u\033[5B' + mi2_shade + 'Pulling Boxes: ' + hold + mi2_shade + toggle + mi2_shade + single + mi2_shade + auto)
 		
-		pushkey = ''
+		pullkey = ''
 		if (pulling == 'hold'):
 			if (mi1_opt == 1): pushkey = 'Shift   '
 			elif (mi1_opt == 2): pushkey = 'Ctrl    '
 			elif (mi1_opt == 3): pushkey = 'Shift   '
-		else: pushkey = 'Spacebar'
+		else: pullkey = 'Spacebar'
 			
-		print('\033[u\033[8B\033[2m' + ' '*40 + 'Push key: \033[36m' + pushkey + ' \033[0m')	
+		print('\033[u\033[8B\033[2m' + ' '*40 + 'Pull key: \033[36m' + pullkey + ' \033[0m')	
 
 	def main_menu_2():
 		global mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, BLOCK, block_type, KILLBLOCK, normalyellow, dangerousorange,  play_rows, play_cols
