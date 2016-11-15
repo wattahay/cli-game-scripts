@@ -18,7 +18,7 @@ Python(3) script based on the 1984 DOS game, BEAST
 * 'p'.............pause
 * 'b'.............debug stats
 * arrows..........move
-* spacebar........pull blocks
+* ctrl............pull blocks
 * 'r'.............restore screen / resized terminal
 
 
