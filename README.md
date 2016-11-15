@@ -48,12 +48,11 @@ Python(3) script based on the 1984 DOS game, BEAST
 	* change font size (changes board size)
 	* change font
 	* change color schemes
-	* allow you to create user profiles
-* change font sizes
+	* make user profiles
 
 
 ###----- File Tweaks -----
-Edit these seetings in the beast.py file to change the game. 
+Edit these settings in the beast.py file to change the game. 
 (These settings might be added to an options menu in the future.
 
 * lcd_time
