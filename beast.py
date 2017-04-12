@@ -176,7 +176,6 @@ def plan_the_board(): #{
 		top_margin = 0
 		left_margin = 0
 
-	global stat_space, save_left, save_top
 	save_top = top_margin # assigned for the debug feature 
 	save_left = left_margin # assigned for the debug feature
 	stat_space = int((board_cols * 2 - (4 * 14 )) / 5) # calculate this for the print_board function
