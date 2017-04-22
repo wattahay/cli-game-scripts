@@ -14,7 +14,8 @@ Python(3) script based on the 1984 DOS game, BEAST
 
 ###----- Controls -----
 
-* 'esc'...........quit
+* 'esc'...........quit game / exit the options menu
+* 'tab'...........enter options menu / switch tabs in options menu
 * 'p'.............pause
 * 'b'.............debug stats
 * arrows..........move
@@ -59,12 +60,13 @@ Edit these settings in the beast.py file to change the game.
 	* change this if there are issues with flickering or player speed
 	* lower (faster) than .02 is usually counter-productive
 	* higher (slower) than .07 makes for clunkly gameplay
-* beast_speed - in seconds
-* monster_speed - in seconds
-* hatch_speed (countdown speed) - in seconds
-* beast_cnt - number of starting beasts
+
 
 ###--- Advanced Tweaks ---
 * use xset to change keyboard delay
+
+###--- Other information ---
+
+See the wiki for information on the old game and other potential plans,
 
 
