@@ -52,7 +52,7 @@ keypress = ''
 debug = False
 last_frame = 1
 timeout = 0
-pulling = 'auto' # 'hold / 'tog' /  'swi' / 'sin'
+pulling = 'hold' # 'hold / 'tog' /  'swi' / 'sin'
 game_play_mode = False
 ##################################-- formatted character constants
 
