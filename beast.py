@@ -762,7 +762,7 @@ def build_level():
 	lvl_beast_cnt = 0
 	lvl_monster_cnt = 0
 	lvl_egg_cnt = 0
-	invisibleBEAST = '\033[40m' + chr(9500) + chr(9508) + '\033[0m'
+	invisibleBEAST = '\033[30m\033[40m' + chr(9500) + chr(9508) + '\033[0m'
 	print_board(board)
 	sleep(.5)
 	board = []
