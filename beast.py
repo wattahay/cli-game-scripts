@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import curses
 from random import randint
 from os import system, popen
