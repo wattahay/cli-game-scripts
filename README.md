@@ -1,16 +1,13 @@
 Python(3) script based on the 1984 DOS game, BEAST
 
-
-
 ###------- Setup -------
-(The game runs in the terminal)
 
-1. download beast.py
-- download audio directory with files 
-	* (the audio directory should be in the same directory as the beast.py file)
-- in a terminal, navigate to the directory
-- run: python3 beast.py
-
+a. Install and run xfce4-terminal in Ubuntu/Mint
+1. On the git page, click the green Clone/Download button to get the .zip file
+2. Extract the zipped files, maintaining the same directory structure
+3. Give the beast.py file executable permissions: chmod +x beast.py
+4. In the terminal, change directory to that of the executable (or else audio will not work)
+5. Run the game: ./beast.py
 
 ###----- Controls -----
 
