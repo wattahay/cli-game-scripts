@@ -960,7 +960,9 @@ def build_level():
 			elif (mi1_opt == 3): pullkey = 'Shift   '
 		else: pullkey = 'Spacebar'
 			
-		print('\033[u\033[8B\033[2m' + ' '*40 + 'Pull key: \033[36m' + pullkey + ' \033[0m')	
+		print('\033[u\033[8B\033[0m\033[40m\033[37m\033[2m' + ' '*32 + 'Block-Pull Key: \033[36m' + pullkey + ' \033[0m')
+		print('\033[u\033[15B\033[0m\033[40m\033[37m\033[2mPress \033[36mESC \033[37mto enter the game')
+		print('\033[u\033[16B\033[0m\033[40m\033[37m\033[2mPress \033[36mTab \033[37mto switch menu tabs\033[0m')	
 
 	def main_menu_2():
 		global mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, BLOCK, block_type, KILLBLOCK, normalyellow, dangerousorange,  play_rows, play_cols
