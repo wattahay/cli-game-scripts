@@ -954,13 +954,12 @@ def build_level():
 		print('\033[u\033[5B' + mi2_shade + 'Pulling Boxes: ' + hold + mi2_shade + toggle + mi2_shade + single + mi2_shade + auto)
 		
 		pullkey = ''
-		if (pulling == 'hold'):
-			if (mi1_opt == 1): pullkey = 'Shift   '
-			elif (mi1_opt == 2): pullkey = 'Ctrl    '
-			elif (mi1_opt == 3): pullkey = 'Shift   '
+		if (pulling == 'hold'): pullkey = 'Shift   '
 		else: pullkey = 'Spacebar'
 			
-		print('\033[u\033[8B\033[2m' + ' '*40 + 'Pull key: \033[36m' + pullkey + ' \033[0m')	
+		print('\033[u\033[8B\033[0m\033[40m\033[37m\033[2m' + ' '*32 + 'Block-Pull Key: \033[36m' + pullkey + ' \033[0m')
+		print('\033[u\033[15B\033[0m\033[40m\033[37m\033[2mPress \033[36mESC \033[37mto enter the game')
+		print('\033[u\033[16B\033[0m\033[40m\033[37m\033[2mPress \033[36mTab \033[37mto switch menu tabs\033[0m')	
 
 	def main_menu_2():
 		global mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, BLOCK, block_type, KILLBLOCK, normalyellow, dangerousorange,  play_rows, play_cols
@@ -996,8 +995,8 @@ def build_level():
 			KEY_LEFT = 97
 			KEY_P_UP = 87
 			KEY_P_DOWN = 83
-			KEY_P_RIGHT = 65
-			KEY_P_LEFT = 68
+			KEY_P_RIGHT = 68
+			KEY_P_LEFT = 65
 		elif opt == 2:
 			wasd = '  w,a,s,d  '
 			arrows = '[\033[35m arrows \33[37m]'
@@ -1006,10 +1005,10 @@ def build_level():
 			KEY_DOWN = 258
 			KEY_RIGHT = 261
 			KEY_LEFT = 260
-			KEY_P_UP = 566
-			KEY_P_DOWN = 525
-			KEY_P_RIGHT = 560
-			KEY_P_LEFT = 545
+			KEY_P_UP = 337
+			KEY_P_DOWN = 336
+			KEY_P_RIGHT = 402
+			KEY_P_LEFT = 393
 		elif opt == 3:
 			wasd = '  w,a,s,d  '
 			arrows = '  arrows  '
