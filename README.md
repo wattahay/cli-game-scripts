@@ -1,6 +1,7 @@
 Python(3) script based on the 1984 DOS game, BEAST
 
-###------- Setup -------
+Setup
+=====
 
 a. Install and run xfce4-terminal in Ubuntu/Mint
 1. On the git page, click the green Clone/Download button to get the .zip file
@@ -9,7 +10,8 @@ a. Install and run xfce4-terminal in Ubuntu/Mint
 4. In the terminal, change directory to that of the executable (or else audio will not work)
 5. Run the game: ./beast.py
 
-###----- Controls -----
+Controls
+========
 
 * 'esc'...........quit game / exit the options menu
 * 'tab'...........enter options menu / switch tabs in options menu
@@ -20,7 +22,8 @@ a. Install and run xfce4-terminal in Ubuntu/Mint
 * 'r'.............restore screen / resized terminal
 
 
-###----- For Best Results -----
+For Best Results
+================
 
 * Terminal Emulator Ranking
 	* xfce4-terminal - Liberation Mono - Tango Color Scheme
@@ -49,7 +52,9 @@ a. Install and run xfce4-terminal in Ubuntu/Mint
 	* make user profiles
 
 
-###----- File Tweaks -----
+File Tweaks
+===========
+
 Edit these settings in the beast.py file to change the game. 
 (These settings might be added to an options menu in the future.
 
@@ -59,11 +64,10 @@ Edit these settings in the beast.py file to change the game.
 	* higher (slower) than .07 makes for clunkly gameplay
 
 
-###--- Advanced Tweaks ---
+Advanced Tweaks
+===============
 * use xset to change keyboard delay
 
-###--- Other information ---
 
-See the wiki for information on the old game and other potential plans,
 
 
