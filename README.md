@@ -97,7 +97,7 @@ Move blocks around to squash the enemy pawns. Get points. Clear the level to pro
 ### Post-Next Features
 
 * Re-Write?
-* Line-of-site movement for pawns
+* Intermittent line-of-site movement for pawns
 * Added form to block placement
 
 
