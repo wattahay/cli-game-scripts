@@ -1,10 +1,12 @@
+### Notes
+
 Linux-Only Python script based on the **1984 DOS game, BEAST**. (Specifically it is created in Fedora.)
 
 This is a very rudimentary script, but it might be entertaining to have a look at.
 
-The game is crude, but it is **not that far from the original**. It cam be addictive.
+The game is crude, but it is **not that far from the original**. It can be addictive.
 
-There is an options to replace the arrow controls with **Vim keys (h,j,k,l)**, which can be used to **train your Vim muscle memory** if nothing else.
+Replace the arrow controls with **Vim keys (h,j,k,l)**, which can be used to **train your Vim muscle memory** if nothing else.
 
 **Visual elements** are Unicode characters drawn using terminal escape sequences.
 
