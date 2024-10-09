@@ -88,6 +88,7 @@ Move blocks around to squash the enemy pawns. Get points. Clear the level to pro
 ### Next Gameplay Features
 
 * Better egg hatching
+	* Pawns can get pregnant when in another pawn's direct path (typically happens in a swarm), and then walk away from player to lay 1 egg
 * Better chaotic movement control for pawns
 * Better default general gameplay balance
 * More gradual levels
