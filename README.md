@@ -2,7 +2,7 @@
 
 Linux-Only Python script based on the **1984 DOS game, BEAST**. (Specifically it is created in Fedora.)
 
-This is a very rudimentary script, but it might be entertaining to have a look at.
+This is a rudimentary script, but it might be entertaining to have a look at.
 
 The game is crude, but it is **not that far from the original**. It can be addictive.
 
