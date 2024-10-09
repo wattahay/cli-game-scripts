@@ -55,14 +55,15 @@ Move blocks around to squash the enemy pawns. Get points. Clear the level to pro
 
 ### Best Terminals
 
-* Terminal Emulator Ranking
-	* xfce4-terminal - Liberation Mono - Tango Color Scheme
-	* guake - Liberation Mono - Tango Color Scheme
-	* gnome-terminal - Liberation Mono - Tango Color Scheme
-	* konsole
-	* xterm
-	* "uxterm" (lxterm)
-	* "Terminator" (x-terminal-emulator)
+1. xfce4-terminal
+2. guake
+3. gnome-terminal 
+4. konsole
+5. xterm
+6. "uxterm" (lxterm)
+7. "Terminator" (x-terminal-emulator)
+
+* Have not tried Wayland terminals yet
 
  Most terminals have profiles you can create for individual applications.
 
@@ -76,7 +77,7 @@ Move blocks around to squash the enemy pawns. Get points. Clear the level to pro
  	* Liberation Mono
  	* DeJaVu Sans Mono
  	* Tlwg Mono looks . . . interesting
-* Alter font sizes for varied results
+* Alter font sizes for higher resolution screens
 
 ### Most Lacking Features
 
@@ -92,8 +93,9 @@ Move blocks around to squash the enemy pawns. Get points. Clear the level to pro
 * Better default general gameplay balance
 * More gradual levels
 
-### Post Next Features
+### Post-Next Features
 
+* Re-Write?
 * Line-of-site movement for pawns
 * Added form to block placement
 
