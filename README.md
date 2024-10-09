@@ -12,7 +12,7 @@ Replace the arrow controls with **Vim keys (h,j,k,l)**, which can be used to **t
 
 ### Setup
 
-A. Set up a terminal with an increased ~26 font size (Monospace), and a Dark Tango color palette.
+A. Set up a terminal with an increased ~26 font size, and a Dark Tango color palette.
 1. On the git page, click the green Clone/Download button to get the .zip file
 2. Extract the zipped files, maintaining the same directory structure
 3. Give the beast.py file executable permissions: chmod +x beast.py
@@ -55,15 +55,14 @@ Move blocks around to squash the enemy pawns. Get points. Clear the level to pro
 
 ### Best Terminals
 
-1. xfce4-terminal
-2. guake
-3. gnome-terminal 
-4. konsole
-5. xterm
-6. "uxterm" (lxterm)
-7. "Terminator" (x-terminal-emulator)
-
-* Have not tried Wayland terminals yet
+1. gnome-terminal
+2. kitty
+3. guake
+4. xfce-terminal
+5. konsole
+6. xterm
+7. "uxterm" (lxterm)
+8. "Terminator" (x-terminal-emulator)
 
  Most terminals have profiles you can create for individual applications.
 
