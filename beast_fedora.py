@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-import curses
-from random import randint
+from curses import initscr
+from random import randint, choices
 from os import system, popen
 from time import sleep
-import threading
+from threading import Thread
 
 
 ##################################-- starting game statistics
@@ -236,19 +236,19 @@ def print_board(board_array): #{
 		print('\033[u' + '\033[' + str(rowi) +  'B' + ''.join(board_array[rowi - 1]))		
 
 	if (debug):
-		print('\033[u' + '\033[' + str(len(board) + 4) + 'B' + '\rPlayer: ' + str(player) )
+		print('\033[u' + '\033[' + str(len(board) + 4) + 'B' + '\r\033[0m\033[37mPlayer: ' + str(player) )
 		for i in range(0, len(eggs)):
-			if i == 0: print('\033[u' + '\033[' + str(len(board) + 6 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1AEggs: ' + str(eggs[i]))
-			else: print('\033[u' + '\033[' + str(len(board) + 6 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\tEgg ' + str(i) + ': ' + str(eggs[i]))
+			if i == 0: print('\033[u' + '\033[' + str(len(board) + 6 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mEggs: ' + str(eggs[i]))
+			else: print('\033[u' + '\033[' + str(len(board) + 6 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mEgg ' + str(i) + ': ' + str(eggs[i]))
 		for i in range(0, len(beasts)):
-			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 7 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1ABeasts: ' + str(beasts[i]))
-			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 7 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\tBeast ' + str(i) + ': ' + str(beasts[i]))
+			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 7 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mBeasts: ' + str(beasts[i]))
+			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 7 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mBeast ' + str(i) + ': ' + str(beasts[i]))
 		for i in range(0, len(monsters)):
-			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1AMonsters: ' + str(monsters[i]))
-			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\tMonster ' + str(i) + ': ' + str(monsters[i]))
+			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mMonsters: ' + str(monsters[i]))
+			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mMonster ' + str(i) + ': ' + str(monsters[i]))
 		 
-	print('\033[u\033[0m\033[37m\033[' + str(len(board) + 2) + 'B' + '\033[' + str(stat_space) + 'C' + '\033[s' + chr(9477) + 
-	' ' + 'TOTAL: ' + str(score)  + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) + 
+	print('\033[u\033[0m\033[37m\033[' + str(len(board) + 1) + 'B' + '\033[' + str(stat_space) + 'C' + '\033[s\033[2K' + chr(9477) + 
+	' ' + 'TOTAL: ' + str(score)  + 	' ' + chr(9477) + '       \033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) + 
 	' ' + 'TALLY: ' + str(points) + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 2) + 'C' + chr(9477) + 
 	' ' + 'LIVES: ' + str(lives)  +  	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 3) + 'C' + chr(9477) + 
 	' ' + 'LEVEL: ' + str(level)  +  	' ' + chr(9477)) 
@@ -278,7 +278,7 @@ def place_beasts(count):
 		row = randint(1, (board_rows - 1))
 		col = randint(1, (board_cols - 1))
 		if(board[row][col] == BAKGRD):
-			board[row][col] = beasts[0]['chr'] 
+			board[row][col] = BEAST 
 			beasts.append({'ro':row, 'co':col, 'stg':0 })
 			step += 1
 			beasts[step]['stg'] = randint(1, (beasts[0]['frames']))
@@ -314,8 +314,9 @@ def place_monsters(count):
 
 
 def lay_egg(row, col):
-
+	
 	global incubate, monsters, beasts, eggs, board, egg_speed, LCD_TIME
+	
 	enemy_total = len(eggs) + len(beasts) + len(monsters)
 	eggs[0]['frames'] = (int(egg_speed / LCD_TIME))
 	wait_frames = int(eggs[0]['incu_frames'] * (( enemy_total * incubate ) / 10) + randint(0, (2 * eggs[0]['incu_frames']))) # seconds of wait time before egg starts counting down 
@@ -443,9 +444,8 @@ def move_enemies(pawns): #{
 
 	move_priority = []
 	move = ''
-
 	breakloop = False
-	lay = False
+	#lay = False
 	likely_moves = []
 
 	for pwni in range(1, (len(pawns))): # in a given frame, loops through all pawns in a list if the pawn is staggered to move in the present frame, the pawn moves to a space
@@ -461,7 +461,7 @@ def move_enemies(pawns): #{
 			if ((rdistance < 0.0) & (cdistance < 0.0) & (distance_ratio >= .5) & (distance_ratio <= 2.0)):
 				move_priority = [ 'UL', 'U', 'L', 'DL', 'UR', 'D', 'R', 'DR' ] # UPPER LEFT range priorities
 			elif ((rdistance < 0.0) & (cdistance > 0.0) & (distance_ratio <= -.5) & (distance_ratio >= -2.0)):
-				move_priority = [ 'UR', 'U', 'R', 'UL', 'DR', 'L', 'DL', 'D' ] # UPPER RIGHT range priorities
+				move_priority = [ 'UR', 'U', 'R', 'UL', 'DR', 'L', 'D', 'DL' ] # UPPER RIGHT range priorities
 			elif ((rdistance > 0.0) & (cdistance > 0.0) & (distance_ratio >= .5) & (distance_ratio <= 2.0)):
 				move_priority = [ 'DR', 'D', 'R', 'DL', 'UR', 'U', 'L', 'UL' ] # DOWN RIGHT range priorities
 			elif ((rdistance > 0.0) & (cdistance < 0.0) & (distance_ratio <= -.5) & (distance_ratio >= -2.0)):
@@ -475,19 +475,19 @@ def move_enemies(pawns): #{
 			elif ((cdistance < 0.0) & ((abs(distance_ratio) < .5) | (distance_ratio == 0.0))):
 				move_priority = [ 'L', 'UL', 'DL', 'U', 'D', 'UR', 'DR', 'R' ] # LEFT range priorities
 
-			priority_odds = [	#145 total
-				[98, False],	#98		**********************************************
-				[18, False],	#18 or 36	* These values determine the odds of moves   *
-				[18, False],	#18 or 36	* for an enemy if those moves are available. *
-				[4, False],	#4 or 8		* If a move has an equivalent priority to    *
-				[4, False],	#4 or 8		* another, but it is a box, then its odds    *
-				[1, False],	#1 or 2		* are absorbed by the other.		     *
-				[1, False],	#1 or 2		* DO NOT CHANGE NUMBER OF PRIORITIES!!!!!!!  *	
-				[1, False]	#1		**********************************************
+			priority_odds = [  #145 total
+				[98, False],   #98		    ***********************************************
+				[18, False],   #18 or 36	* These values determine the odds of moves    *
+				[18, False],   #18 or 36	* for an enemy if those moves are available.  *
+				[4, False],	   #4 or 8		* If a move is not unavailable, then its odds *
+				[4, False],	   #4 or 8		* are absorbed: 1st by its equal counterpart, *
+				[1, False],	   #1 or 2		* or 2nd, by the next lower priority, etc.    *
+				[1, False],	   #1 or 2		*    THE WEIGHTS ARE DIFFICULT TO CHANGE      *	
+				[1, False]	   #1		    ***********************************************
 			]
 
 			for priopti in range(8): 
-				# if the first priority move is the player, then take that move
+				# if the first priority move is the player, then take that move (pawn kills player)
 				if ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ]) == PLAYER ):
 					move = move_priority[0]
 					board[pawns[pwni]['ro']][pawns[pwni]['co']] = BAKGRD
@@ -502,12 +502,11 @@ def move_enemies(pawns): #{
 					priority_odds[priopti][1] = True
 				else:
 					priority_odds[priopti][1] = False
-				# if the pawn is a monster, and there is a monster or beast in the space, then lay an egg
-				if ((pawns[0]['chr'] == MONSTER) & ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == MONSTER) | (board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == BEAST))):
-					lay = True
+					if ((pawns[0]['chr'] == MONSTER) & ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == MONSTER) | (board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == BEAST))):
+						if (choices([True, False], [3, 127], k=1)) == [True]:
+							place_eggs(1)
 
-			if (breakloop):
-				break
+
 	
 			for prioddi in range(8): # loop through priorities to add them to likely_moves if available
 				if (priority_odds[prioddi][1] == True): # if it is true that the priority move is a blank space, then loop through and fill out the likely_moves list
@@ -754,7 +753,7 @@ def build_level():
 	global BAKGRD, BLOCK, KILLBLOCK, last_frame, top_margin, left_margin, LCD_TIME 
 	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT, pulling
 
-	stdscr = curses.initscr() 
+	stdscr = initscr() 
 	stdscr.keypad(1)
 	stdscr.refresh()
 
@@ -1086,12 +1085,12 @@ def build_level():
 					item_menu = 0
 					dim_menus(0)
 					print(menu_ref)
-					print('\033[u' + chr(9473) 
+					print('\033[u' + norm + chr(9473) 
 						+ dtab + ' key options ' + norm + chr(9473) 
 						+ dtab + ' level setup ' + norm + chr(9473) 
 						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
 					sleep(.08)
-					print('\033[u' + chr(9473) 
+					print('\033[u' + norm + chr(9473) 
 						+ ltab + ' key options ' + norm + chr(9473) 
 						+ dtab + ' level setup ' + norm + chr(9473) 
 						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
@@ -1100,12 +1099,12 @@ def build_level():
 					item_menu = 2
 					dim_menus(2)
 					print(menu_ref)
-					print('\033[u' + chr(9473) 
+					print('\033[u' + norm + chr(9473) 
 						+ dtab + ' key options ' + norm + chr(9473) 
 						+ dtab + ' level setup ' + norm + chr(9473) 
 						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
 					sleep(.08)
-					print('\033[u' + chr(9473) 
+					print('\033[u' + norm + chr(9473) 
 						+ dtab + ' key options ' + norm + chr(9473) 
 						+ ltab + ' level setup ' + norm + chr(9473) 
 						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
@@ -1114,12 +1113,12 @@ def build_level():
 					item_menu = 8
 					dim_menus(8)
 					print(menu_ref)
-					print('\033[u' + chr(9473) 
+					print('\033[u' + norm + chr(9473) 
 						+ dtab + ' key options ' + norm + chr(9473) 
 						+ dtab + ' level setup ' + norm + chr(9473) 
 						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
 					sleep(.08)
-					print('\033[u' + chr(9473) 
+					print('\033[u' + norm + chr(9473) 
 						+ dtab + ' key options ' + norm + chr(9473) 
 						+ dtab + ' level setup ' + norm + chr(9473) 
 						+ ltab + ' pawn speeds ' + norm + chr(9473)*20)
@@ -1421,14 +1420,12 @@ def take_input():
 
 	global pulling, stdscr, debug, keypress, player, top_margin, left_margin, save_top, save_left, key_move, timeout, game_play_mode
 
-	stdscr = curses.initscr() 
+	stdscr = initscr() 
 	stdscr.keypad(1)
-	stdscr.refresh()
 	
 	while(True):
 		sleep(LCD_TIME - .02)
 		keypress = stdscr.getch()
-		system('echo \'' + str(keypress) + '\' >> level.txt')
 		timeout = 0
 		if (game_play_mode):
 			if keypress == 27: # the esc key
@@ -1485,7 +1482,7 @@ def take_input():
 system('reset')
 plan_the_board()
 ############################################################################################################
-threading.Thread(target=take_input).start()  ###############-- the main game clock and print loop --#####
+Thread(target=take_input).start()  ###############-- the main game clock and print loop --#####
 last_frame = 1
 
 while(True):
