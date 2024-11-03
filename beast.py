@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from curses import initscr
+from curses import initscr, noecho
 from random import randint, choices
 from os import system, popen
 from time import sleep
@@ -1344,7 +1344,8 @@ def take_input():
 
 	global pulling, stdscr, debug, keypress, player, top_margin, left_margin, save_top, save_left, key_move, timeout, game_play_mode
 
-	stdscr = initscr() 
+	stdscr = initscr()
+	noecho()
 	stdscr.keypad(1)
 	
 	while(True):
