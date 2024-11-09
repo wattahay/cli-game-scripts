@@ -4,9 +4,9 @@ Linux-Only Python script based on the **1984 DOS game, BEAST**. (Specifically it
 
 This is a rudimentary script, but it might be entertaining to have a look at.
 
-The game is crude, but it is **not that far from the original**. It can be addictive.
+The game is actually **not that far from the original**. 
 
-Replace the arrow controls with **Vim keys (h,j,k,l)**, which can be used to **train your Vim muscle memory** if nothing else.
+Probably the best wide-use case for this would be to practice **Vim key muscle memory**, as the direction controls can be assigned to **(h,j,k,l)**.
 
 **Visual elements** are Unicode characters drawn using terminal escape sequences.
 
@@ -40,7 +40,8 @@ Move blocks around to squash the enemy pawns. Get points. Clear the level to pro
 * **Monsters** are double-lined red 'H's
 	* Monsters must be squished right against yellow or orange blocks
 * **Eggs** hatch into monsters
-	* Eggs must be pushed using green blocks, into yellow or orange blocks
+	* **To kill eggs**, they must be pushed into yellow/orange blocks, using green blocks
+	* New eggs might appear in the distance when Monsters swarm around you
 * Green blocks can be **pushed and pulled**
 * Yellow and orange blocks are immovable
 	* Orange blocks destroy/explode green blocks that are pushed into them.
@@ -79,6 +80,7 @@ Most terminals have profiles you can create for individual applications.
 
 ### Most Lacking Features
 
+* keyboard code calibrator (unless the keyboard function changes)
 * persistent settings storage
 * start script with custom level settings profile
 * access the right settings at any time
@@ -87,8 +89,7 @@ Most terminals have profiles you can create for individual applications.
 ### Next Gameplay Features
 
 * Better egg hatching
-	* Pawns can get pregnant when in another pawn's direct path (typically happens in a swarm), and then walk away from player to lay 1 egg
- 	* Nature is beautiful
+	* Instead of eggs simply appearing in the distance, a Monster must leave the swarm, and walk over to lay it.
 * Better chaotic movement control for pawns
 * Better default general gameplay balance
 * More gradual levels
