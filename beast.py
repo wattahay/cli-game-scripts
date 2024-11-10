@@ -11,15 +11,15 @@ def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename
 ######################################-- play audio tick
 play_audio('menu_item_tick')
 ##################################-- formatted character constants ##########################
-# (ANSI styles)	 FG    + 	 BG     + 	  Style        +     Unicode Chars     +   Reset
-BAKGRD 	  =	          	 '\033[40m' +                    '  ' 
-BLOCK 	  =       		 '\033[43m' +	       		     '  '                  + '\033[0m'
+# (ANSI styles)	 FG    +    BG      + 	  Style        +     Unicode Chars     +   Reset
+BAKGRD 	  =	         '\033[40m' +                        '  ' 
+BLOCK 	  =              '\033[43m' +	       		     '  '              + '\033[0m'
 KILLBLOCK = '\033[31m'	 '\033[43m' + '\033[7m\033[2m' + chr(9618) + chr(9618) + '\033[0m'
-BOX       =	'\033[32m' + '\033[40m' +			         chr(9618) + chr(9618) + '\033[0m'
+BOX       = '\033[32m' + '\033[40m' +			 chr(9618) + chr(9618) + '\033[0m'
 XPBOX     = '\033[32m' + '\033[40m' +	'\033[2m'      + chr(9618) + chr(9618) + '\033[0m'
-BEAST     = '\033[31m' + '\033[40m' +			         chr(9500) + chr(9508) + '\033[0m'
-MONSTER   = '\033[31m' + '\033[40m' +			         chr(9568) + chr(9571) + '\033[0m'
-PLAYER    = '\033[34m' + '\033[40m' +			         chr(9664) + chr(9654) + '\033[0m'
+BEAST     = '\033[31m' + '\033[40m' +			 chr(9500) + chr(9508) + '\033[0m'
+MONSTER   = '\033[31m' + '\033[40m' +			 chr(9568) + chr(9571) + '\033[0m'
+PLAYER    = '\033[34m' + '\033[40m' +			 chr(9664) + chr(9654) + '\033[0m'
 # https://en.wikipedia.org/wiki/ANSI_escape_code
 eggsub = 8329   # unicode key for subscript 9 (8328 = 8, and so on)
 egg2nd = 32     # unicode key for a space character 
