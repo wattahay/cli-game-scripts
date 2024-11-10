@@ -16,8 +16,8 @@ Set up a terminal with an increased ~26 font size, and a Dark Tango color palett
 1. On the git page, click the green Clone/Download button to get the .zip file
 2. Extract the zipped files, maintaining the same directory structure
 3. Give the beast.py file executable permissions: chmod +x beast.py
-4. In the terminal, change directory to that of the executable (or else audio will not work)
-5. Run the game: ./beast.py
+4. Run the game: ./beast.py
+	* Alternatively run: **python3 beast.py**
 
 ### Initial Game Start
 
