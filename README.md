@@ -6,7 +6,7 @@ This is a rudimentary script, but it might be entertaining to have a look at.
 
 The game is actually **not that far from the original**. 
 
-Probably the best wide-use case for this would be to practice **Vim key muscle memory**, as the direction controls can be assigned to **(h,j,k,l)**.
+Probably the best appeal for a wide use-case for this would be a quick way to practice **Vim key muscle memory** on the command line. (The direction controls can be assigned to **h,j,k,l**.)
 
 **Visual elements** are Unicode characters drawn using terminal escape sequences.
 
@@ -19,6 +19,15 @@ Set up a terminal with an increased ~26 font size, and a Dark Tango color palett
 4. In the terminal, change directory to that of the executable (or else audio will not work)
 5. Run the game: ./beast.py
 
+### Initial Game Start
+
+1. As stated above: run the game with ./beast.py (or python3 beast.py)
+2. Wait for the start screen to load.
+3. Press 'tab' to enter the settings
+4. Choose your control keys.
+
+**Note:** The pull key changes between 'shift' and 'ctrl' depending on the control keys.
+
 ### Controls
 
 * 'esc'...........quit game / exit the options menu
@@ -26,14 +35,18 @@ Set up a terminal with an increased ~26 font size, and a Dark Tango color palett
 * 'p'.............pause
 * 'b'.............debug stats
 * arrows..........move
-* ctrl............pull blocks
-* 'r'.............restore screen / resized terminal
+* ctrl/shift......pull blocks
+* 'r'.............restore screen for a resized terminal
 
 ### Gameplay
 
 Pawns kill you when they reach you.
 
 Move blocks around to squash the enemy pawns. Get points. Clear the level to progress.
+
+There is a large point penalty, and a level panalty, for losing 5 lives.
+
+The game has no breaks or saves (yet). You can press pause wit 'p'. You have a brief, passing chance to press 'tab' for settings changes before/after each level.
 
 * **Beasts** are red 'H's
 	* Beasts can be squished using regular green blocks
@@ -42,8 +55,8 @@ Move blocks around to squash the enemy pawns. Get points. Clear the level to pro
 * **Eggs** hatch into monsters
 	* **To kill eggs**, they must be pushed into yellow/orange blocks, using green blocks
 	* New eggs might appear in the distance when Monsters swarm around you
-* Green blocks can be **pushed and pulled**
-* Yellow and orange blocks are immovable
+* **Green blocks** can be **pushed and pulled**
+* **Yellow/orange** blocks are immovable
 	* Orange blocks destroy/explode green blocks that are pushed into them.
 	* **Orange blocks kill you** if you walk into them
 
@@ -82,8 +95,8 @@ Most terminals have profiles you can create for individual applications.
 
 * keyboard code calibrator (unless the keyboard function changes)
 * persistent settings storage
+* custom level files
 * start script with custom level settings profile
-* access the right settings at any time
 * better navigation controls between menu/gameplay/program
 
 ### Next Gameplay Features
@@ -92,7 +105,7 @@ Most terminals have profiles you can create for individual applications.
 	* Instead of eggs simply appearing in the distance, a Monster must leave the swarm, and walk over to lay it.
 * Better chaotic movement control for pawns
 * Better default general gameplay balance
-* More gradual levels
+* Better levels
 
 ### Post-Next Features
 
