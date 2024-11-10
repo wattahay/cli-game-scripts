@@ -28,7 +28,7 @@ Set up a terminal with an increased ~26 font size, and a Dark Tango color palett
 5. Press 'tab' to see and change upcoming level setup or pawn speeds
 6. Press 'esc' to escape the settings, and enter the next level
 
-**Note:** The pull key changes between 'shift' and 'ctrl' depending on the control keys.
+**Note:** The pull key changes between 'shift' and 'ctrl' depending on the chosen direction keys.
 
 ### Controls
 
