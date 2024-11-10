@@ -1,34 +1,69 @@
 #!/usr/bin/env python
 from curses import initscr, noecho
 from random import randint, choices
-from os import system, popen
+from os import system, popen, path
 from time import sleep
 from threading import Thread
-##################################-- starting game statistics
-lives = 5		# starting lives
-###############################
+
+######################################-- script's directory path
+script_dir = path.abspath( path.dirname( __file__ ) )
+######################################-- Linux aplay audio function
+def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
+######################################-- play audio tick
+play_audio('menu_item_tick')
+##################################-- formatted character constants ##########################
+# (ANSI styles)	 FG    + 	 BG     + 	  Style        +     Unicode Chars     +   Reset
+BAKGRD 	  =	          	 '\033[40m' +                    '  ' 
+BLOCK 	  =       		 '\033[43m' +	       		     '  '                  + '\033[0m'
+KILLBLOCK = '\033[31m'	 '\033[43m' + '\033[7m\033[2m' + chr(9618) + chr(9618) + '\033[0m'
+BOX       =	'\033[32m' + '\033[40m' +			         chr(9618) + chr(9618) + '\033[0m'
+XPBOX     = '\033[32m' + '\033[40m' +	'\033[2m'      + chr(9618) + chr(9618) + '\033[0m'
+BEAST     = '\033[31m' + '\033[40m' +			         chr(9500) + chr(9508) + '\033[0m'
+MONSTER   = '\033[31m' + '\033[40m' +			         chr(9568) + chr(9571) + '\033[0m'
+PLAYER    = '\033[34m' + '\033[40m' +			         chr(9664) + chr(9654) + '\033[0m'
+# https://en.wikipedia.org/wiki/ANSI_escape_code
+eggsub = 8329   # unicode key for subscript 9 (8328 = 8, and so on)
+egg2nd = 32     # unicode key for a space character 
+def EGG(sub):
+	return '\033[37m\033[40m\033[2m' + chr(11052) + '\033[1m' + chr(sub) + '\033[0m'
+
+def deteggt(chegg):
+	if (chegg[0:15] == '\033[37m\033[40m\033[2m' + chr(11052)): return True
+
+#############################################################################################
+###################################################### Configured Variables #################
+#############################################################################################
+lives = 5           # starting level lives
 beast_speed = 1.5	# seconds between enemy moves
 monster_speed = 1.1	# seconds between enemy moves
-egg_speed = 3		# seconds between countdown
-incubate = 3
-##################################-- game scoring balance
-beast_scr = 2		# points for killing beasts
-egg_scr = 4		# points for killing eggs
-monster_scr = 6		# points for killing monsters
-##################################-- game speed
-LCD_TIME = .04
-####################################-- move constants
-MOVES = {
- 'U': {	'ra':-1,	'ca':0	}, 	# ra - "row adjustment"
- 'D': {	'ra':1, 	'ca':0	},	# ca - "column adjustment"
- 'L': {	'ra':0, 	'ca':-1	},
- 'R': {	'ra':0, 	'ca':1	},
-'UL': {	'ra':-1, 	'ca':-1	},
-'UR': {	'ra':-1, 	'ca':1	},
-'DL': {	'ra':1, 	'ca':-1	},
-'DR': {	'ra':1, 	'ca':1	}
-}
-
+egg_speed = 3		# seconds to increment hatching countdown
+incubate = 3        # multiplier for egg incubation
+################################################### pawn values
+beast_scr = 3       # points for killing beasts
+egg_scr = 4	        # points for killing eggs
+monster_scr = 6	    # points for killing monsters
+################################################### game frame time
+LCD_TIME = .03
+################################################### game levels
+GAME_LEVELS = [
+		{'beasts':3, 'monsters':0, 'eggs':0, 'block': BLOCK}, # 1
+		{'beasts':5, 'monsters':0, 'eggs':0, 'block': KILLBLOCK}, # 2
+		{'beasts':5, 'monsters':0, 'eggs':2, 'block': BLOCK}, # 3
+		{'beasts':4, 'monsters':1, 'eggs':1, 'block': KILLBLOCK}, # 4
+		{'beasts':4, 'monsters':2, 'eggs':2, 'block': BLOCK}, # 5
+		{'beasts':8, 'monsters':0, 'eggs':0, 'block': KILLBLOCK}, # 6
+		{'beasts':0, 'monsters':0, 'eggs':8, 'block': KILLBLOCK}, # 7
+		{'beasts':0, 'monsters':8, 'eggs':0, 'block': KILLBLOCK}, # 8
+		{'beasts':3, 'monsters':3, 'eggs':3, 'block': BLOCK}, # 9
+		{'beasts':2, 'monsters':4, 'eggs':3, 'block': BLOCK}, # 10
+		{'beasts':1, 'monsters':5, 'eggs':4, 'block': KILLBLOCK}, # 11
+		{'beasts':1, 'monsters':6, 'eggs':4, 'block': KILLBLOCK}, # 12  
+		{'beasts':0, 'monsters':0, 'eggs':12, 'block': KILLBLOCK}, # 13
+		{'beasts':0, 'monsters':12, 'eggs':0, 'block': KILLBLOCK}, # 14
+		{'beasts':15, 'monsters':0, 'eggs':0, 'block': KILLBLOCK}, # 15
+	]
+	
+#################################### initial settings
 KEY_UP = 259
 KEY_DOWN = 258
 KEY_RIGHT = 261
@@ -45,24 +80,17 @@ last_frame = 1
 timeout = 0
 pulling = 'hold' # 'hold / 'tog' /  'swi' / 'sin'
 game_play_mode = False
-##################################-- formatted character constants
-# (ANSI styles)	 FG   + 	BG   + 		Style +		Characters +			Reset
-BAKGRD 	  =			'\033[40m' +			'  ' 
-BLOCK 	  =       		'\033[43m' +	       		'  ' + 				'\033[0m'
-KILLBLOCK = 	'\033[31m'	'\033[43m' + '\033[7m\033[2m' + chr(9618) + chr(9618) + 	'\033[0m'
-BOX 	  =	'\033[32m' +	'\033[40m' +			chr(9618) + chr(9618) +		'\033[0m'
-XPBOX 	  = 	'\033[32m' + 	'\033[40m' +	'\033[2m' +	chr(9618) + chr(9618) + 	'\033[0m'
-BEAST 	  = 	'\033[31m' +	'\033[40m' +			chr(9500) + chr(9508) +		'\033[0m'
-MONSTER   = 	'\033[31m' +	'\033[40m' +			chr(9568) + chr(9571) +		'\033[0m'
-PLAYER    = 	'\033[34m' +	'\033[40m' +			chr(9664) + chr(9654) +		'\033[0m'
-# http://wiki.bash-hackers.org/scripting/terminalcodes
-eggsub = 8329			# unicode key for subscript 9 (8328 = 8, and so on)
-egg2nd = 32			# unicode key for a space character 
-def EGG(sub):
-	return '\033[37m\033[40m\033[2m' + chr(11052) + '\033[1m' + chr(sub) + '\033[0m'
-
-def deteggt(chegg):
-	if (chegg[0:15] == '\033[37m\033[40m\033[2m' + chr(11052)): return True
+####################################-- move constants
+MOVES = {
+ 'U': {	'ra':-1,	'ca':0	}, 	# ra - "row adjustment"
+ 'D': {	'ra':1, 	'ca':0	},	# ca - "column adjustment"
+ 'L': {	'ra':0, 	'ca':-1	},
+ 'R': {	'ra':0, 	'ca':1	},
+'UL': {	'ra':-1, 	'ca':-1	},
+'UR': {	'ra':-1, 	'ca':1	},
+'DL': {	'ra':1, 	'ca':-1	},
+'DR': {	'ra':1, 	'ca':1	}
+}
 ###################################-- Pawn Classes (Dictionaries)
 beasts = [{
 	'frames': (int(beast_speed / LCD_TIME)),
@@ -97,34 +125,27 @@ plr_flashes = 5
 plr_flash = 0
 plr_frames = (int(.05 / LCD_TIME) * 2)
 plr_frame = 0
-	
-# 'tug'
-# 'ro'		row
-# 'co'		col
-# 'stg'		"stagger" (frame of movement) compared to others
-################################################################################################
-####################################################################-- level 1 setup --#########
-################################################################################################
-level = 0	# change in order to start on a specific level
+
+###############################################################-- game start setup --#########
+level = 0	# change in order to start on a specific level 
 score = 0	# in-game total score
 points = 0	# in-game level points added at end of level
 ################################################################################################
 board = [] #########################################################-- board setup --###########
-blank_board = [] ###############################################################################
-reset_board = [] ###########-- classic board size variables
-play_rows = 20	# only change this in-game
-play_cols = 40	# only change this in-game
+blank_board = [] 
+reset_board = []
+play_rows = 20
+play_cols = 40
 board_rows = play_rows + 2
 board_cols = play_cols + 2
 ######################################-- board dimensions
-classic = True
 left_margin = 0 
 top_margin = 0
 stat_rows = 3
 
 def plan_the_board(): #{
 
-	global save_top, save_left, top_margin, left_margin, board_rows, board_cols, play_rows, play_cols, stat_rows, stat_space, classic, ttyCols, ttyRows
+	global save_top, save_left, top_margin, left_margin, board_rows, board_cols, play_rows, play_cols, stat_rows, stat_space, ttyCols, ttyRows
 
 	ttyRows, ttyCols = popen('stty size', 'r').read().split()
 	ttyRows = int(ttyRows)
@@ -132,24 +153,10 @@ def plan_the_board(): #{
 	screen_rows = ttyRows
 	screen_cols = int(ttyCols / 2)
 
-	if (screen_cols < 44) & (ttyRows < 28):	classic = False
-	elif (ttyCols < 60) & (ttyRows < 20):
-		print('This area is impossibly small')
-		sleep(3)
-		system('reset')
-	else: classic = True
-
-	if (classic):
-		board_rows = play_rows + 2
-		board_cols = play_cols + 2
-		top_margin = int((screen_rows - board_rows - stat_rows) / 2)
-		left_margin = int((ttyCols - board_cols*2) / 2)
-	else:
-		stat_space = 0
-		board_rows = screen_rows - stat_rows - 1 
-		board_cols = screen_cols
-		top_margin = 0
-		left_margin = 0
+	board_rows = play_rows + 2
+	board_cols = play_cols + 2
+	top_margin = int((screen_rows - board_rows - stat_rows) / 2)
+	left_margin = int((ttyCols - board_cols*2) / 2)
 
 	save_top = top_margin # assigned for the debug feature 
 	save_left = left_margin # assigned for the debug feature
@@ -213,23 +220,13 @@ def print_board(board_array): #{
 			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mMonster ' + str(i) + ': ' + str(monsters[i]))
 		 
 	print('\033[u\033[0m\033[37m\033[' + str(len(board) + 1) + 'B' + '\033[' + str(stat_space) + 'C' + '\033[s\033[2K' + chr(9477) + 
-	' ' + 'TOTAL: ' + str(score)  + 	' ' + chr(9477) + '       \033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) + 
-	' ' + 'TALLY: ' + str(points) + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 2) + 'C' + chr(9477) + 
-	' ' + 'LIVES: ' + str(lives)  +  	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 3) + 'C' + chr(9477) + 
+	' ' + 'TOTAL: ' + str(score)  + 	' ' + chr(9477) + '      \033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) + 
+	' ' + 'TALLY: ' + str(points) + 	' ' + chr(9477) +       '\033[u\033[' + str((stat_space + 14) * 2) + 'C' + chr(9477) + 
+	' ' + 'LIVES: ' + str(lives)  +  	' ' + chr(9477) +       '\033[u\033[' + str((stat_space + 14) * 3) + 'C' + chr(9477) + 
 	' ' + 'LEVEL: ' + str(level)  +  	' ' + chr(9477)) 
 
 	print('\033[H\033[8m')
-
-##########################################################################################################
-##############################################################################-- play audio function --###
-##########################################################################################################
-def play_audio(filename): system('aplay -q audio/' + filename + '.wav &')
-
-play_audio('menu_item_tick')
-
-##########################################################################################################
-###############################################################################-- place the pieces -- ####
-##########################################################################################################
+##########################################-- place the pieces -- ####
 def place_beasts(count):
 
 	global beasts, board, BAKGRD, beast_speed, LCD_TIME
@@ -244,7 +241,7 @@ def place_beasts(count):
 			beasts.append({'ro':row, 'co':col, 'stg':0 })
 			step += 1
 			beasts[step]['stg'] = randint(1, (beasts[0]['frames']))
-###########################################################################################
+#####################################################################
 def hatch_monster(row, col):
 
 	global monsters, board, MONSTER, LCD_TIME, monster_speed
@@ -265,9 +262,7 @@ def place_monsters(count):
 		if(board[row][col] == BAKGRD):
 			hatch_monster(row, col)
 			step += 1
-###########################################################################################################
-########################################################################################-- EGGS --#########
-###########################################################################################################
+##################################################-- EGGS --#########
 def lay_egg(row, col):
 	
 	global incubate, monsters, beasts, eggs, board, egg_speed, LCD_TIME
@@ -278,7 +273,7 @@ def lay_egg(row, col):
 	stag = randint(1, eggs[0]['frames']) # the frame that the egg counts down on
 	board[row][col] = EGG(32)
 	eggs.append({'ro': row, 'co': col, 'wait': wait_frames, 'stg': stag, 'sub':32})
-##############################################################################################
+#####################################################################
 def place_eggs(count):
 
 	global board, BAKGRD
@@ -290,7 +285,6 @@ def place_eggs(count):
 		if(board[row][col] == BAKGRD):
 			lay_egg(row, col)
 			step += 1
-
 #####################################################################
 def hatch_eggs():
 	# this function runs through all the eggs, and increments their time
@@ -325,9 +319,7 @@ def hatch_eggs():
 				del eggs[i - di]
 				play_audio('hatch')
 				di += 1
-##############################################################################
-###############################################-- move pieces --##############
-##############################################################################
+#####################################-- move pieces --##############
 def flash_player():
 
 	global player, PLAYER, plr_flashes, plr_flash, plr_frames, plr_frame
@@ -420,14 +412,14 @@ def move_enemies(pawns): #{
 				move_priority = [ 'L', 'UL', 'DL', 'U', 'D', 'UR', 'DR', 'R' ] # LEFT range priorities
 
 			priority_odds = [  #145 total
-				[98, False],   #98		    ***********************************************
-				[18, False],   #18 or 36	* These values determine the odds of moves    *
-				[18, False],   #18 or 36	* for an enemy if those moves are available.  *
-				[4, False],	   #4 or 8		* If a move is not unavailable, then its odds *
-				[4, False],	   #4 or 8		* are absorbed: 1st by its equal counterpart, *
-				[1, False],	   #1 or 2		* or 2nd, by the next lower priority, etc.    *
-				[1, False],	   #1 or 2		*    THE WEIGHTS ARE DIFFICULT TO CHANGE      *	
-				[1, False]	   #1		    ***********************************************
+				[98, False],   #98          ***********************************************
+				[18, False],   #18 or 36    * These values determine the odds of moves    *
+				[18, False],   #18 or 36    * for an enemy if those moves are available.  *
+				[4, False],	   #4 or 8	    * If a move is not unavailable, then its odds *
+				[4, False],	   #4 or 8	    * are absorbed: 1st by its equal counterpart, *
+				[1, False],    #1 or 2	    * or 2nd, by the next lower priority, etc.    *
+				[1, False],    #1 or 2	    *    THE WEIGHTS ARE DIFFICULT TO CHANGE      *	
+				[1, False]     #1           ***********************************************
 			]
 
 			for priopti in range(8): 
@@ -642,9 +634,7 @@ def direct_keypress(tap):
 			player[1]['tug'] = True
 			direct_move('D')
 			player[1]['tug'] = False
-######################################################################
-########################-- question user about board-size --##########
-######################################################################
+
 def pause():
 
 	global board_rows, board_cols, left_margin, top_margin
@@ -668,12 +658,10 @@ def pause():
 		sleep(.08)
 
 	play_audio('pause')
-#####################################################################################################
-#######################################################-- main function calls -######################
-#####################################################################################################
+#####################################################################################-- level functions -################
 def build_level():
 	
-	global incubate, egg_speed, beast_speed, monster_speed, keypress 
+	global GAME_LEVELS, incubate, egg_speed, beast_speed, monster_speed, keypress 
 	global play_rows, play_cols, board_rows, board_cols, reset_board, blank_board 
 	global board, level, lives, score, points, mi1_opt
 	global lvl_block_cnt, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt, lvl_box_cnt, block_type
@@ -699,7 +687,7 @@ def build_level():
 	if (level == 0):
 		sleep(1)
 		set_topmid_ref(3, 29)
-		play_audio('begin')
+		play_audio('begin') ################################################ BEAST Intro Screen ############################################################################################################
 		print('\033[u\033[2B' + invisibleBEAST + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*3 + BEAST*1 + BAKGRD*4 + BEAST*3 + BAKGRD*2 + BEAST*5)
 		print('\033[u\033[3B' + invisibleBEAST + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*6 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*2 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1)
 		print('\033[u\033[4B' + invisibleBEAST + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*7 + BEAST*1)
@@ -737,35 +725,11 @@ def build_level():
 		points = 0
 		for i in range(1, len(player)): del player[1]
 
-	def lvl_set(beas, mons, egs, blctp):
-		global block_type, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt
-		lvl_beast_cnt = beas
-		lvl_monster_cnt = mons
-		lvl_egg_cnt = egs
-		block_type = blctp
-
-	def lvl_set(beas, mons, egs, blctp):
-		global lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt, block_type
-		lvl_beast_cnt = beas
-		lvl_monster_cnt = mons
-		lvl_egg_cnt = egs
-		block_type = blctp
-
-	if level == 1: lvl_set(3, 0, 0, BLOCK)
-	elif level == 2: lvl_set(5, 0, 0, KILLBLOCK)
-	elif level == 3: lvl_set(5, 0, 2, BLOCK)
-	elif level == 4: lvl_set(4, 1, 1, KILLBLOCK)
-	elif level == 5: lvl_set(4, 2, 2, BLOCK)
-	elif level == 6: lvl_set(8, 0, 0, KILLBLOCK)
-	elif level == 7: lvl_set(0, 0, 8, KILLBLOCK)
-	elif level == 8: lvl_set(0, 8, 0, KILLBLOCK)
-	elif level == 9: lvl_set(3, 3, 3, BLOCK)
-	elif level == 10: lvl_set(2, 4, 3, BLOCK)
-	elif level == 11: lvl_set(1, 5, 4, KILLBLOCK)
-	elif level == 12: lvl_set(1, 6, 4, KILLBLOCK)
-	elif level == 13: lvl_set(0, 0, 12, KILLBLOCK)
-	elif level == 14: lvl_set(0, 12, 0, KILLBLOCK)
-	elif level == 15: lvl_set(15, 0, 0, KILLBLOCK)
+	if level > 0:
+		lvl_beast_cnt = GAME_LEVELS[level-1]["beasts"]
+		lvl_monster_cnt = GAME_LEVELS[level-1]["monsters"]
+		lvl_egg_cnt = GAME_LEVELS[level-1]["eggs"]
+		block_type = GAME_LEVELS[level -1]["block"]
 	else:
 		lvl_beast_cnt =	int(level / 3)
 		lvl_monster_cnt = int(level / 3)
@@ -1337,9 +1301,7 @@ def build_level():
 	last_frame = 1
 
 	play_audio('begin')
-####################################################################################################
-#########################################################################-- take input func -- #####
-####################################################################################################
+##############################################-- take input loop function -- #####
 def take_input():
 
 	global pulling, stdscr, debug, keypress, player, top_margin, left_margin, save_top, save_left, key_move, timeout, game_play_mode
