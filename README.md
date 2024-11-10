@@ -24,7 +24,9 @@ Set up a terminal with an increased ~26 font size, and a Dark Tango color palett
 1. As stated above: run the game with ./beast.py (or python3 beast.py)
 2. Wait for the start screen to load.
 3. Press 'tab' to enter the settings
-4. Choose your control keys.
+4. Choose your control keys. (the change takes place immediately)
+5. Press 'tab' to see and change upcoming level setup or pawn speeds
+6. Press 'esc' to escape the settings, and enter the next level
 
 **Note:** The pull key changes between 'shift' and 'ctrl' depending on the control keys.
 
