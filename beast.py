@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from curses import initscr, noecho
 from random import randint, choices
 from os import system, popen, path
@@ -45,25 +44,50 @@ monster_scr = 6	    # points for killing monsters
 ################################################### game frame time
 LCD_TIME = .03
 ################################################### game levels
-GAME_LEVELS = [
-		{'beasts':3, 'monsters':0, 'eggs':0, 'block': BLOCK}, # 1
-		{'beasts':5, 'monsters':0, 'eggs':0, 'block': KILLBLOCK}, # 2
-		{'beasts':5, 'monsters':0, 'eggs':2, 'block': BLOCK}, # 3
-		{'beasts':4, 'monsters':1, 'eggs':1, 'block': KILLBLOCK}, # 4
-		{'beasts':4, 'monsters':2, 'eggs':2, 'block': BLOCK}, # 5
-		{'beasts':8, 'monsters':0, 'eggs':0, 'block': KILLBLOCK}, # 6
-		{'beasts':0, 'monsters':0, 'eggs':8, 'block': KILLBLOCK}, # 7
-		{'beasts':0, 'monsters':8, 'eggs':0, 'block': KILLBLOCK}, # 8
-		{'beasts':3, 'monsters':3, 'eggs':3, 'block': BLOCK}, # 9
-		{'beasts':2, 'monsters':4, 'eggs':3, 'block': BLOCK}, # 10
-		{'beasts':1, 'monsters':5, 'eggs':4, 'block': KILLBLOCK}, # 11
-		{'beasts':1, 'monsters':6, 'eggs':4, 'block': KILLBLOCK}, # 12  
-		{'beasts':0, 'monsters':0, 'eggs':12, 'block': KILLBLOCK}, # 13
-		{'beasts':0, 'monsters':12, 'eggs':0, 'block': KILLBLOCK}, # 14
-		{'beasts':15, 'monsters':0, 'eggs':0, 'block': KILLBLOCK}, # 15
+# You can create as many or few levels as you want to.
+# Each level is surrounded by curly brackets, while the enclosing brackets are square
+# Make sure all bracketted levels are followed by a comma (except for the last level)
+GAME_LEVELS = [ 
+		{'beasts':3, 'monsters':0, 'eggs':0, 'block': BLOCK},      # Level 1
+		{'beasts':5, 'monsters':0, 'eggs':0, 'block': KILLBLOCK},  # Level 2
+		{'beasts':5, 'monsters':0, 'eggs':2, 'block': BLOCK},      # Level 3
+		{'beasts':4, 'monsters':1, 'eggs':1, 'block': KILLBLOCK},  # Level 4
+		{'beasts':4, 'monsters':2, 'eggs':2, 'block': BLOCK},      # Level 5
+		{'beasts':8, 'monsters':0, 'eggs':0, 'block': KILLBLOCK},  # Level 6
+		{'beasts':0, 'monsters':0, 'eggs':8, 'block': KILLBLOCK},  # Level 7
+		{'beasts':0, 'monsters':8, 'eggs':0, 'block': KILLBLOCK},  # Level 8
+		{'beasts':3, 'monsters':3, 'eggs':3, 'block': BLOCK},      # Level 9
+		{'beasts':2, 'monsters':4, 'eggs':3, 'block': BLOCK},      # Level 10
+		{'beasts':1, 'monsters':5, 'eggs':4, 'block': KILLBLOCK},  # Level 11
+		{'beasts':1, 'monsters':6, 'eggs':4, 'block': KILLBLOCK},  # Level 12  
+		{'beasts':0, 'monsters':0, 'eggs':12, 'block': KILLBLOCK}, # Level 13
+		{'beasts':0, 'monsters':12, 'eggs':0, 'block': KILLBLOCK}, # Level 14
+		{'beasts':15, 'monsters':0, 'eggs':0, 'block': KILLBLOCK}  # Level 15
 	]
-	
-#################################### initial settings
+
+################################################### enemy pawn movement odds
+# These values are the odds of moves for an enemy if . . . |---------| 
+# those moves are available to it. If a move is not  . . . | 5  4  3 |
+# available, then its odds are absorbed: 1st by its equal  | 4  H  2 |
+# counterpart, and then by the next lower priority, etc. . | 3  2  1 |
+# Each of the 5 priorities must be at least greater  . . . |---------|
+# than the sum of all of its lower priorities. . . . .   5 Move Priorities
+PRIORITY_ODDS = [
+		[100, False], # Forward (1st priority)
+		[20, False], # Front-Side (2nd priority)
+		[20, False], # Front-Side (2nd priority)
+		[4, False], #  Sideways (3rd priority)
+		[4, False], #  Sideways (3rd priority)
+		[1, False], #  Rear-Side (4th priority)
+		[1, False], #  Rear-Side (4th priority)
+		[1, False]  #  Backwards (5th priority)
+	]
+################# Randomness Examples ########
+# Max Randomness . 1, 1, 1, 4, 4, 12, 36
+# High . . . . . . 1, 1, 1, 4, 4, 16, 50 . . . 1, 2, 2, 6, 6, 18, 18, 55
+# Medium . . . . . 1, 1, 1, 4, 4, 22, 85 . . . 1, 2, 2, 8, 8, 26, 26, 90
+# Low Randomness . 1, 3, 3, 12, 12, 40, 40, 200
+#################################### initial arrow key codes
 KEY_UP = 259
 KEY_DOWN = 258
 KEY_RIGHT = 261
@@ -72,8 +96,8 @@ KEY_P_DOWN = 0
 KEY_P_RIGHT = 0
 KEY_P_LEFT = 0
 KEY_P_UP = 0
-
-mi1_opt = 2
+##################################### other variables
+mi1_opt = 2 # initial settings option
 keypress = '' 
 debug = False
 last_frame = 1
@@ -125,11 +149,10 @@ plr_flashes = 5
 plr_flash = 0
 plr_frames = (int(.05 / LCD_TIME) * 2)
 plr_frame = 0
-
 ###############################################################-- game start setup --#########
-level = 0	# change in order to start on a specific level 
-score = 0	# in-game total score
-points = 0	# in-game level points added at end of level
+level = 0 #   change in order to start on a specific level 
+score = 0 #   in-game total score
+points = 0 #  in-game level points added at end of level
 ################################################################################################
 board = [] #########################################################-- board setup --###########
 blank_board = [] 
@@ -371,7 +394,7 @@ def kill_player():
 
 def move_enemies(pawns): #{
 
-	global board, player, MOVES
+	global board, player, MOVES, PRIORITY_ODDS
 
 	if pawns[0]['frame'] >= pawns[0]['frames']:
 		pawns[0]['frame'] = 0
@@ -411,17 +434,6 @@ def move_enemies(pawns): #{
 			elif ((cdistance < 0.0) & ((abs(distance_ratio) < .5) | (distance_ratio == 0.0))):
 				move_priority = [ 'L', 'UL', 'DL', 'U', 'D', 'UR', 'DR', 'R' ] # LEFT range priorities
 
-			priority_odds = [  #145 total
-				[98, False],   #98          ***********************************************
-				[18, False],   #18 or 36    * These values determine the odds of moves    *
-				[18, False],   #18 or 36    * for an enemy if those moves are available.  *
-				[4, False],	   #4 or 8	    * If a move is not unavailable, then its odds *
-				[4, False],	   #4 or 8	    * are absorbed: 1st by its equal counterpart, *
-				[1, False],    #1 or 2	    * or 2nd, by the next lower priority, etc.    *
-				[1, False],    #1 or 2	    *    THE WEIGHTS ARE DIFFICULT TO CHANGE      *	
-				[1, False]     #1           ***********************************************
-			]
-
 			for priopti in range(8): 
 				# if the first priority move is the player, then take that move (pawn kills player)
 				if ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ]) == PLAYER ):
@@ -435,20 +447,20 @@ def move_enemies(pawns): #{
 					break
 				# else if the priority move is not available, then mark it as unavailable
 				elif ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[priopti]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[priopti]]['ca'])) ]) == BAKGRD ):
-					priority_odds[priopti][1] = True
+					PRIORITY_ODDS[priopti][1] = True
 				else:
-					priority_odds[priopti][1] = False
+					PRIORITY_ODDS[priopti][1] = False
 					if ((pawns[0]['chr'] == MONSTER) & ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == MONSTER) | (board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == BEAST))):
 						if (choices([True, False], [3, 127], k=1)) == [True]:
 							place_eggs(1)
 	
 			for prioddi in range(8): # loop through priorities to add them to likely_moves if available
-				if (priority_odds[prioddi][1] == True): # if it is true that the priority move is a blank space, then loop through and fill out the likely_moves list
-					for ti in range(priority_odds[prioddi][0]): # loop through by number in "priorities" loop, to fill out likely_moves list
+				if (PRIORITY_ODDS[prioddi][1] == True): # if it is true that the priority move is a blank space, then loop through and fill out the likely_moves list
+					for ti in range(PRIORITY_ODDS[prioddi][0]): # loop through by number in "priorities" loop, to fill out likely_moves list
 						likely_moves.append(move_priority[prioddi])
 				if ((prioddi == 2) | (prioddi == 4) | (prioddi == 6)):
-					if ((not priority_odds[prioddi - 1][1]) & (priority_odds[prioddi][1] == True)):
-						for ti in range(priority_odds[prioddi][0]):
+					if ((not PRIORITY_ODDS[prioddi - 1][1]) & (PRIORITY_ODDS[prioddi][1] == True)):
+						for ti in range(PRIORITY_ODDS[prioddi][0]):
 							likely_moves.append(move_priority[prioddi])
 
 			# the move is finally decided out of the available set in the list
@@ -758,14 +770,13 @@ def build_level():
 	chr_cnt = 0
 	mi1_shade = '' ###############-- item 1
 
-	#mi1_opt = 2 # (set globally on line 52)
+	#mi1_opt = 2 # (set globally at the beginning of the script)
 	mi2_shade = '' ###############-- item 2
 	mi2_opt = 0
 	if pulling == 'hold': mi2_opt = 1
 	elif pulling == 'toggle': mi2_opt = 2
 	elif pulling == 'single': mi2_opt = 3
 	elif pulling == 'auto': mi2_opt = 4
-	# pulling set globally on line 74
 	toggle, single, auto = '', '', ''
 	mi3_shade = '' ###############-- item 3
 	mi4_shade = '' ###############-- item 4
