@@ -73,7 +73,7 @@ GAME_LEVELS = [
 # Each of the 5 priorities must be at least greater  . . . |---------|
 # than the sum of all of its lower priorities. . . . .   5 Move Priorities
 PRIORITY_ODDS = [
-		[100, False], # Forward (1st priority)
+		[90, False], # Forward (1st priority)
 		[20, False], # Front-Side (2nd priority)
 		[20, False], # Front-Side (2nd priority)
 		[4, False], #  Sideways (3rd priority)
