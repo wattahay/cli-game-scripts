@@ -1,6 +1,5 @@
 import curses
 from os import system
-from time import sleep
 
 stdscr = curses.initscr()
 stdscr.keypad(1)
