@@ -2,17 +2,14 @@ import curses
 from os import system
 from time import sleep
 
-keyNum = 0;
-
-
-stdscr = curses.initscr() 
+stdscr = curses.initscr()
 stdscr.keypad(1)
 stdscr.refresh()
-	
+curses.curs_set(False)
 
-while(True):
-    sleep(.05)
-    keypress = stdscr.getch()
-    system('echo \'' + str(keypress) + '\' >> level.txt')
-
-system('reset')
+try:
+    while True:
+        keypress = stdscr.getch()
+        print('\033[0K\033[HCode: ' + str(keypress) + '\033[1E\033[2K')
+except KeyboardInterrupt:
+        system('reset')
