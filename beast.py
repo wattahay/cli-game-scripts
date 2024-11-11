@@ -93,7 +93,7 @@ PRIORITY_ODDS = [
 # 0 = Arrows, 1 = w,a,s,d, 2 = h,j,k,l
 dir_keys = 2
 
-KYBD = [ # Get individual key codes using: python3 examples/getkeycode.py (included in the git repo)
+KYBD = [ # See individual key codes using: python3 getkeycode.py (included in the git repo)
 		{"title":"w,a,s,d", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97, "PK_UP":87, "PK_DOWN":83, "PK_RIGHT":68, "PK_LEFT":65},
 		{"title":"arrows", "K_UP":259, "K_DOWN":258, "K_RIGHT":261, "K_LEFT":260, "PK_UP":337, "PK_DOWN":336, "PK_RIGHT":402, "PK_LEFT":393},
 		{"title":"h,j,k,l", "K_UP":107, "K_DOWN":106, "K_RIGHT":108, "K_LEFT":104, "PK_UP":75, "PK_DOWN":74, "PK_RIGHT":76, "PK_LEFT":72}
