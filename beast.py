@@ -28,23 +28,22 @@ def EGG(sub):
 
 def deteggt(chegg):
 	if (chegg[0:15] == '\033[37m\033[40m\033[2m' + chr(11052)): return True
-
-#############################################################################################
-####################################################-- Configured Variables --###############
-#############################################################################################
+################################################################################################
+###########################################################-- Useful Variables --###############
+################################################################################################
 lives = 5           # starting level lives
-beast_speed = 1.5	# seconds between enemy moves
-monster_speed = 1.1	# seconds between enemy moves
-egg_speed = 3		# seconds to increment hatching countdown
-incubate = 3        # multiplier for egg incubation
-###################################################-- pawn values
+beast_speed = 1.3	# .3 - 2.3 (higher is slower)
+monster_speed = 1	# .3 - 2.3 (higher is slower)
+incubate = 25       # 4 - 40 (higher is longer)
+egg_speed = 3		# .5 to 5 (higher is longer)
+#########################################################-- pawn values
 beast_scr = 3       # points for killing beasts
 egg_scr = 4	        # points for killing eggs
 monster_scr = 6	    # points for killing monsters
-###################################################-- game frame time
+#########################################################-- game frame time
 LCD_TIME = .03
-###################################################-- game levels
-# You can create as many or few levels as you want to.
+#########################################################-- game levels
+# You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the enclosing brackets are square
 # Make sure all bracketted levels are followed by a comma (except for the last level)
 GAME_LEVELS = [ 
@@ -65,13 +64,13 @@ GAME_LEVELS = [
 		{'beasts':15, 'monsters':0, 'eggs':0, 'block': KILLBLOCK} #  Level 15
 	]
 
-#################################################-- enemy pawn movement odds
-# These values are the odds of moves for an enemy if . . . |---------| 
-# those moves are available to it. If a move is not  . . . | 5  4  3 |
-# available, then its odds are absorbed: 1st by its equal  | 4  H  2 |
-# counterpart, and then by the next lower priority, etc. . | 3  2  1 |
-# Each of the 5 priorities must be at least greater  . . . |---------|
-# than the sum of all of its lower priorities. . . . .   5 Move Priorities
+########################################################-- enemy movement odds
+# These values are the odds of moves for an enemy if . . . . |---------| 
+# those moves are available to it. If a move is not  . . . . | 5  4  3 |
+# available, then its odds are absorbed: 1st by its equal  . | 4  H  2 |
+# counterpart, and then by the next lower priority, etc. . . | 3  2  1 |
+# Each of the 5 priorities will typically be at least  . . . |---------|
+# greater than the sum of all of its lower priorities  . . 5 Move Priorities
 PRIORITY_ODDS = [
 		[90, False], # Forward (1st priority)
 		[20, False], # Front-Side (2nd priority)
@@ -82,23 +81,23 @@ PRIORITY_ODDS = [
 		[1, False], #  Rear-Side (4th priority)
 		[1, False]  #  Backwards (5th priority)
 	]
-
 ###############-- Randomness Examples 
-# Max Randomness . 1, 1, 1, 4, 4, 12, 25
-# High . . . . . . 1, 1, 1, 4, 4, 16, 50 . . . 1, 2, 2, 6, 6, 18, 18, 55
-# Medium . . . . . 1, 1, 1, 4, 4, 22, 85 . . . 1, 2, 2, 8, 8, 26, 26, 90
+# Max Randomness . 1, 1, 1, 4, 4, 12, 12, 25
+# High . . . . . . 1, 1, 1, 4, 4, 16, 16, 50 . . . 1, 2, 2, 6, 6, 18, 18, 55
+# Medium . . . . . 1, 1, 1, 4, 4, 20, 20, 90 . . . 1, 2, 2, 8, 8, 26, 26, 98
 # Low Randomness . 1, 3, 3, 12, 12, 40, 40, 200
+#####################################################-- player direction controls
+# Default:      0=wasd     1=arrows     2=hjkl
+dir_keys = 0
 
-##################################################-- direction key codes
-# 0 = Arrows, 1 = w,a,s,d, 2 = h,j,k,l
-dir_keys = 2
-
-KYBD = [ # See individual key codes using: python3 getkeycode.py (included in the git repo)
+KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in the git repo)
 		{"title":"w,a,s,d", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97, "PK_UP":87, "PK_DOWN":83, "PK_RIGHT":68, "PK_LEFT":65},
 		{"title":"arrows", "K_UP":259, "K_DOWN":258, "K_RIGHT":261, "K_LEFT":260, "PK_UP":337, "PK_DOWN":336, "PK_RIGHT":402, "PK_LEFT":393},
 		{"title":"h,j,k,l", "K_UP":107, "K_DOWN":106, "K_RIGHT":108, "K_LEFT":104, "PK_UP":75, "PK_DOWN":74, "PK_RIGHT":76, "PK_LEFT":72}
 	]
-
+################################################################################################
+###########################################################-- More Variables --#################
+################################################################################################
 KEY_UP = KYBD[dir_keys]["K_UP"]
 KEY_DOWN = KYBD[dir_keys]["K_DOWN"]
 KEY_RIGHT = KYBD[dir_keys]["K_RIGHT"]
@@ -109,14 +108,13 @@ KEY_P_RIGHT = KYBD[dir_keys]["PK_RIGHT"]
 KEY_P_LEFT = KYBD[dir_keys]["PK_LEFT"]
 
 mi1_opt = dir_keys + 1 # initial keyboard setting
-##################################################-- other variables
 keypress = '' 
 debug = False
 last_frame = 1
 timeout = 0
 pulling = 'hold' # 'hold / 'tog' /  'swi' / 'sin'
 game_play_mode = False
-######################################-- move constants
+################################################-- move constants
 MOVES = {
  'U': {	'ra':-1,	'ca':0	}, 	# ra - "row adjustment"
  'D': {	'ra':1, 	'ca':0	},	# ca - "column adjustment"
@@ -127,7 +125,7 @@ MOVES = {
 'DL': {	'ra':1, 	'ca':-1	},
 'DR': {	'ra':1, 	'ca':1	}
 }
-#####################################-- Pawn Classes (Dictionaries)
+################################################-- Pawn Classes (Dictionaries)
 beasts = [{ 'frames': (int(beast_speed / LCD_TIME)), 'frame':0, 'chr': BEAST, 'pnts': beast_scr }]
 monsters = [{ 'frames': (int(monster_speed / LCD_TIME)), 'frame':0, 'chr': MONSTER, 'pnts': monster_scr }]
 eggs = [{ 'frames': (int(egg_speed / LCD_TIME)), 'frame':0, 'incu_frames': (int(1 / LCD_TIME)), 'incu_frame': 0, 'pnts': egg_scr }]
@@ -137,19 +135,19 @@ plr_flashes = 5
 plr_flash = 0
 plr_frames = (int(.05 / LCD_TIME) * 2)
 plr_frame = 0
-###############################################################-- game start setup --#########
+################################################-- game start setup 
 level = 0 #   change in order to start on a specific level 
 score = 0 #   in-game total score
 points = 0 #  in-game level points added at end of level
-################################################################################################
-board = [] #########################################################-- board setup --###########
+################################################-- board setup
+board = [] 
 blank_board = [] 
 reset_board = []
 play_rows = 20
 play_cols = 40
 board_rows = play_rows + 2
 board_cols = play_cols + 2
-########################################-- board dimensions
+################################################-- board dimensions
 left_margin = 0 
 top_margin = 0
 stat_rows = 3
@@ -235,7 +233,7 @@ def print_board(board_array): #{
 	' ' + 'LEVEL: ' + str(level)  +  	' ' + chr(9477)) 
 
 	print('\033[H\033[8m')
-##########################################-- place the pieces -- ####
+##########################################-- place the pieces
 def place_beasts(count):
 	global beasts, board, BAKGRD, beast_speed, LCD_TIME
 
@@ -249,7 +247,7 @@ def place_beasts(count):
 			beasts.append({'ro':row, 'co':col, 'stg':0 })
 			step += 1
 			beasts[step]['stg'] = randint(1, (beasts[0]['frames']))
-#####################################################################
+
 def hatch_monster(row, col):
 	global monsters, board, MONSTER, LCD_TIME, monster_speed
 	
@@ -268,7 +266,7 @@ def place_monsters(count):
 		if(board[row][col] == BAKGRD):
 			hatch_monster(row, col)
 			step += 1
-##################################################-- EGGS --#########
+##################################################-- EGGS
 def lay_egg(row, col):
 	global incubate, monsters, beasts, eggs, board, egg_speed, LCD_TIME
 	
@@ -278,7 +276,7 @@ def lay_egg(row, col):
 	stag = randint(1, eggs[0]['frames']) # the frame that the egg counts down on
 	board[row][col] = EGG(32)
 	eggs.append({'ro': row, 'co': col, 'wait': wait_frames, 'stg': stag, 'sub':32})
-#####################################################################
+
 def place_eggs(count):
 	global board, BAKGRD
 
@@ -289,7 +287,7 @@ def place_eggs(count):
 		if(board[row][col] == BAKGRD):
 			lay_egg(row, col)
 			step += 1
-#####################################################################
+
 def hatch_eggs():
 	# this function runs through all the eggs, and increments their time
 	# it transition eggs from wait phase, to countdown, to Monster
@@ -323,7 +321,7 @@ def hatch_eggs():
 				del eggs[i - di]
 				play_audio('hatch')
 				di += 1
-#####################################-- move pieces --##############
+#####################################-- move pieces 
 def flash_player():
 	global player, PLAYER, plr_flashes, plr_flash, plr_frames, plr_frame
 
@@ -479,7 +477,6 @@ def push_tree(intent):
 		return player[1]['co'] + (p_ind - 1) * MOVES[intent]['ca']
 
 	def push_move():
-
 		global BOX, BAKGRD, PLAYER, player 
 
 		for i in range(probe):
@@ -497,7 +494,6 @@ def push_tree(intent):
 		board[intend_r][intend_c] = PLAYER						# move_player()
 	
 	def kill_enemy(pawns, row, col):
-
 		global points, board
 
 		del_index = 0
@@ -581,7 +577,6 @@ def move_player(direction):
 	player[1]['co'] = fol
 
 def direct_move(tap_move):
-
 	global player, MOVES, board
 
 	space = board[player[1]['ro'] + MOVES[tap_move]['ra'] ][ player[1]['co'] + MOVES[tap_move]['ca'] ]
@@ -594,7 +589,6 @@ def direct_move(tap_move):
 		kill_player()
 
 def direct_keypress(tap):
-
 	global player, MOVES, board, KEY_P_UP, KEY_P_DOWN, KEY_P_RIGHT, KEY_P_LEFT, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, pulling
 
 	if (tap == KEY_UP):
