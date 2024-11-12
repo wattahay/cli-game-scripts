@@ -36,9 +36,9 @@ monster_speed = 1	# (.3 - 2.3) higher is slower
 incubate = 25		# (4 - 40) higher is longer
 egg_speed = 3		# (.5 to 5) higher is longer
 lives = 5			# starting level lives
-beast_scr = 3		# points for killing beasts
-egg_scr = 4			# points for killing eggs
-monster_scr = 6		# points for killing monsters
+BEAST_SCR = 3		# points for killing beasts
+EGG_SCR = 4			# points for killing eggs
+MONSTER_SCR = 6		# points for killing monsters
 NO_LIVES = 50		# point penalty for losing all lives
 #########################################################-- game frame time
 LCD_TIME = .03		# game frame time
@@ -124,9 +124,9 @@ MOVES = {
 'DR': {	'ra':1, 	'ca':1	}
 }
 ################################################-- Pawn Classes (Dictionaries)
-beasts = [{ 'frames': (int(beast_speed / LCD_TIME)), 'frame':0, 'chr': BEAST, 'pnts': beast_scr }]
-monsters = [{ 'frames': (int(monster_speed / LCD_TIME)), 'frame':0, 'chr': MONSTER, 'pnts': monster_scr }]
-eggs = [{ 'frames': (int(egg_speed / LCD_TIME)), 'frame':0, 'incu_frames': (int(1 / LCD_TIME)), 'incu_frame': 0, 'pnts': egg_scr }]
+beasts = [{ 'frames': (int(beast_speed / LCD_TIME)), 'frame':0, 'chr': BEAST, 'pnts': BEAST_SCR }]
+monsters = [{ 'frames': (int(monster_speed / LCD_TIME)), 'frame':0, 'chr': MONSTER, 'pnts': MONSTER_SCR }]
+eggs = [{ 'frames': (int(egg_speed / LCD_TIME)), 'frame':0, 'incu_frames': (int(1 / LCD_TIME)), 'incu_frame': 0, 'pnts': EGG_SCR }]
 player = [{ 'flash_frames': (int(.05 / LCD_TIME) * 2), 'chr': PLAYER, 'pnts': 10 }]
 
 plr_flashes = 5
