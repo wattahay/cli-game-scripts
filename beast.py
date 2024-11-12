@@ -11,15 +11,15 @@ def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename
 ######################################-- play audio tick
 play_audio('menu_item_tick')
 ##################################-- formatted character constants --########################
-# (ANSI escape sequence styles)	Foreground + Background + Style + Unicode Chars + Reset
-BAKGRD = '\033[40m' + '  ' 
-BLOCK = '\033[43m' + '  ' + '\033[0m'
-KILLBLOCK = '\033[31m' + '\033[43m' + '\033[7m\033[2m' + chr(9618) + chr(9618) + '\033[0m'
-BOX = '\033[32m' + '\033[40m' + chr(9618) + chr(9618) + '\033[0m'
-XPBOX = '\033[32m' + '\033[40m' + '\033[2m' + chr(9618) + chr(9618) + '\033[0m'
-BEAST = '\033[31m' + '\033[40m' + chr(9500) + chr(9508) + '\033[0m'
-MONSTER = '\033[31m' + '\033[40m' + chr(9568) + chr(9571) + '\033[0m'
-PLAYER = '\033[34m' + '\033[40m' + chr(9664) + chr(9654) + '\033[0m'
+# 			Foreground	+	Background	+	Style			+	Unicode Chars 			+ Reset
+BAKGRD =	'\033[40m'	+										'  '
+BLOCK =		'\033[43m'	+										'  '					+	'\033[0m'
+KILLBLOCK =	'\033[31m'	+	'\033[43m'	+	'\033[7m\033[2m'+	chr(9618) + chr(9618)	+	'\033[0m'
+BOX =		'\033[32m'	+ 	'\033[40m'	+						chr(9618) + chr(9618)	+	'\033[0m'
+XPBOX =		'\033[32m'	+	'\033[40m'	+	'\033[2m'		+	chr(9618) + chr(9618)	+	'\033[0m'
+BEAST =		'\033[31m'	+	'\033[40m'	+						chr(9500) + chr(9508)	+	'\033[0m'
+MONSTER =	'\033[31m'	+	'\033[40m'	+						chr(9568) + chr(9571)	+ 	'\033[0m'
+PLAYER =	'\033[34m'	+	'\033[40m'	+						chr(9664) + chr(9654)	+	'\033[0m'
 # https://en.wikipedia.org/wiki/ANSI_escape_code
 eggsub = 8329   # unicode key for subscript 9 (8328 = 8, and so on)
 egg2nd = 32     # unicode key for a space character 
@@ -31,64 +31,62 @@ def deteggt(chegg):
 ################################################################################################
 ###########################################################-- Useful Variables --###############
 ################################################################################################
-lives = 5           # starting level lives
-beast_speed = 1.3	# .3 - 2.3 (higher is slower)
-monster_speed = 1	# .3 - 2.3 (higher is slower)
-incubate = 25       # 4 - 40 (higher is longer)
-egg_speed = 3		# .5 to 5 (higher is longer)
-#########################################################-- pawn values
-beast_scr = 3       # points for killing beasts
-egg_scr = 4	        # points for killing eggs
-monster_scr = 6	    # points for killing monsters
+beast_speed = 1.3	# (.3 - 2.3) higher is slower
+monster_speed = 1	# (.3 - 2.3) higher is slower
+incubate = 25		# (4 - 40) higher is longer
+egg_speed = 3		# (.5 to 5) higher is longer
+lives = 5			# starting level lives
+beast_scr = 3		# points for killing beasts
+egg_scr = 4			# points for killing eggs
+monster_scr = 6		# points for killing monsters
+NO_LIVES = 50		# point penalty for losing all lives
 #########################################################-- game frame time
-LCD_TIME = .03
+LCD_TIME = .03		# game frame time
 #########################################################-- game levels
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the enclosing brackets are square
 # Make sure all bracketted levels are followed by a comma (except for the last level)
 GAME_LEVELS = [ 
-		{'beasts':3, 'monsters':0, 'eggs':0, 'block': BLOCK}, # . .  Level 1
-		{'beasts':5, 'monsters':0, 'eggs':0, 'block': KILLBLOCK}, #  Level 2
-		{'beasts':5, 'monsters':0, 'eggs':2, 'block': BLOCK}, # . .  Level 3
-		{'beasts':4, 'monsters':1, 'eggs':1, 'block': KILLBLOCK}, #  Level 4
-		{'beasts':4, 'monsters':2, 'eggs':2, 'block': BLOCK}, #  . . Level 5
-		{'beasts':8, 'monsters':0, 'eggs':0, 'block': KILLBLOCK}, #  Level 6
-		{'beasts':0, 'monsters':0, 'eggs':8, 'block': KILLBLOCK}, #  Level 7
-		{'beasts':0, 'monsters':8, 'eggs':0, 'block': KILLBLOCK}, #  Level 8
-		{'beasts':3, 'monsters':3, 'eggs':3, 'block': BLOCK}, #  . . Level 9
-		{'beasts':2, 'monsters':4, 'eggs':3, 'block': BLOCK}, #  . . Level 10
-		{'beasts':1, 'monsters':5, 'eggs':4, 'block': KILLBLOCK}, #  Level 11
-		{'beasts':1, 'monsters':6, 'eggs':4, 'block': KILLBLOCK}, #  Level 12  
-		{'beasts':0, 'monsters':0, 'eggs':12, 'block': KILLBLOCK}, # Level 13
-		{'beasts':0, 'monsters':12, 'eggs':0, 'block': KILLBLOCK}, # Level 14
-		{'beasts':15, 'monsters':0, 'eggs':0, 'block': KILLBLOCK} #  Level 15
+		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': BLOCK}, 		# Level 1
+		{'beasts':5,	'monsters':0,	'eggs':0,	'block': KILLBLOCK},	# Level 2
+		{'beasts':5,	'monsters':0,	'eggs':2,	'block': BLOCK}, 		# Level 3
+		{'beasts':4,	'monsters':1,	'eggs':1,	'block': KILLBLOCK},	# Level 4
+		{'beasts':4,	'monsters':2,	'eggs':2,	'block': BLOCK}, 		# Level 5
+		{'beasts':8,	'monsters':0,	'eggs':0,	'block': KILLBLOCK}, 	# Level 6
+		{'beasts':0,	'monsters':0,	'eggs':8,	'block': KILLBLOCK}, 	# Level 7
+		{'beasts':0,	'monsters':8,	'eggs':0,	'block': KILLBLOCK}, 	# Level 8
+		{'beasts':3,	'monsters':3,	'eggs':3,	'block': BLOCK},		# Level 9
+		{'beasts':2,	'monsters':4,	'eggs':3,	'block': BLOCK}, 		# Level 10
+		{'beasts':1,	'monsters':5,	'eggs':4,	'block': KILLBLOCK}, 	# Level 11
+		{'beasts':1,	'monsters':6,	'eggs':4,	'block': KILLBLOCK}, 	# Level 12  
+		{'beasts':0,	'monsters':0,	'eggs':12,	'block': KILLBLOCK},	# Level 13
+		{'beasts':0,	'monsters':12,	'eggs':0,	'block': KILLBLOCK},	# Level 14
+		{'beasts':15,	'monsters':0,	'eggs':0,	'block': KILLBLOCK} 	# Level 15
 	]
-
 ########################################################-- enemy movement odds
-# These values are the odds of moves for an enemy if . . . . |---------| 
-# those moves are available to it. If a move is not  . . . . | 5  4  3 |
-# available, then its odds are absorbed: 1st by its equal  . | 4  H  2 |
-# counterpart, and then by the next lower priority, etc. . . | 3  2  1 |
-# Each of the 5 priorities will typically be at least  . . . |---------|
-# greater than the sum of all of its lower priorities  . . 5 Move Priorities
+# These values are the odds of moves for an enemy if 		|---------| 
+# those moves are available to it. If a move is not 		| 5  4  3 |
+# available, then its odds are absorbed: 1st by its equal	| 4  H  2 |
+# counterpart, and then by the next lower priority, etc. 	| 3  2  1 |
+# Each of the 5 priorities will typically be at least 		|---------|
+# greater than the sum of all of its lower priorities. 	 5 Move Priorities
 PRIORITY_ODDS = [
-		[90, False], # Forward (1st priority)
-		[20, False], # Front-Side (2nd priority)
-		[20, False], # Front-Side (2nd priority)
-		[4, False], #  Sideways (3rd priority)
-		[4, False], #  Sideways (3rd priority)
-		[1, False], #  Rear-Side (4th priority)
-		[1, False], #  Rear-Side (4th priority)
-		[1, False]  #  Backwards (5th priority)
+		[90, False],	# Forward (1st priority)
+		[20, False],	# Front-Side (2nd priority)
+		[20, False],	# Front-Side (2nd priority)
+		[4, False],		# Sideways (3rd priority)
+		[4, False],		# Sideways (3rd priority)
+		[1, False],		# Rear-Side (4th priority)
+		[1, False],		# Rear-Side (4th priority)
+		[1, False] 		# Backwards (5th priority)
 	]
 ###############-- Randomness Examples 
-# Max Randomness . 1, 1, 1, 4, 4, 12, 12, 25
-# High . . . . . . 1, 1, 1, 4, 4, 16, 16, 50 . . . 1, 2, 2, 6, 6, 18, 18, 55
-# Medium . . . . . 1, 1, 1, 4, 4, 20, 20, 90 . . . 1, 2, 2, 8, 8, 26, 26, 98
-# Low Randomness . 1, 3, 3, 12, 12, 40, 40, 200
+# Max Randomness	1, 1, 1, 4, 4, 12, 12, 25
+# High				1, 1, 1, 4, 4, 16, 16, 50		1, 2, 2, 6, 6, 18, 18, 55
+# Medium			1, 1, 1, 4, 4, 20, 20, 90		1, 2, 2, 8, 8, 26, 26, 98
+# Low Randomness	1, 3, 3, 12, 12, 40, 40, 200
 #####################################################-- player direction controls
-# Default:      0=wasd     1=arrows     2=hjkl
-dir_keys = 0
+dir_keys = 0 #   0=wasd     1=arrows     2=hjkl
 
 KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in the git repo)
 		{"title":"w,a,s,d", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97, "PK_UP":87, "PK_DOWN":83, "PK_RIGHT":68, "PK_LEFT":65},
@@ -116,7 +114,7 @@ pulling = 'hold' # 'hold / 'tog' /  'swi' / 'sin'
 game_play_mode = False
 ################################################-- move constants
 MOVES = {
- 'U': {	'ra':-1,	'ca':0	}, 	# ra - "row adjustment"
+ 'U': {	'ra':-1,	'ca':0	},	# ra - "row adjustment"
  'D': {	'ra':1, 	'ca':0	},	# ca - "column adjustment"
  'L': {	'ra':0, 	'ca':-1	},
  'R': {	'ra':0, 	'ca':1	},
@@ -136,9 +134,9 @@ plr_flash = 0
 plr_frames = (int(.05 / LCD_TIME) * 2)
 plr_frame = 0
 ################################################-- game start setup 
-level = 0 #   change in order to start on a specific level 
-score = 0 #   in-game total score
-points = 0 #  in-game level points added at end of level
+level = 0 	# change in order to start on a specific level 
+score = 0 	# in-game total score
+points = 0 	# in-game level points added at end of level
 ################################################-- board setup
 board = [] 
 blank_board = [] 
@@ -151,7 +149,9 @@ board_cols = play_cols + 2
 left_margin = 0 
 top_margin = 0
 stat_rows = 3
-
+################################################################################################
+###########################################################-- Functions --######################
+################################################################################################
 def plan_the_board(): #{
 	global save_top, save_left, top_margin, left_margin, board_rows, board_cols, play_rows, play_cols, stat_rows, stat_space, ttyCols, ttyRows
 
@@ -639,9 +639,11 @@ def pause():
 		sleep(.08)
 
 	play_audio('pause')
-#####################################################################################-- level functions -################
+################################################################################################
+############################################################-- Level Function --################
+################################################################################################
 def build_level():
-	global GAME_LEVELS, incubate, egg_speed, beast_speed, monster_speed, keypress 
+	global GAME_LEVELS, NO_LIVES, incubate, egg_speed, beast_speed, monster_speed, keypress 
 	global play_rows, play_cols, board_rows, board_cols, reset_board, blank_board 
 	global board, level, lives, score, points, mi1_opt
 	global lvl_block_cnt, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt, lvl_box_cnt, block_type
@@ -663,11 +665,11 @@ def build_level():
 	board = []
 	board = build_the_board()
 	print_board(board)
-
+########################################################-- Level 0 Intro Screen
 	if (level == 0):
 		sleep(1)
 		set_topmid_ref(3, 29)
-		play_audio('begin') ##############################################-- BEAST Intro Screen --#########################################################################################################
+		play_audio('begin') 
 		print('\033[u\033[2B' + invisibleBEAST + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*3 + BEAST*1 + BAKGRD*4 + BEAST*3 + BAKGRD*2 + BEAST*5)
 		print('\033[u\033[3B' + invisibleBEAST + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*6 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*2 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1)
 		print('\033[u\033[4B' + invisibleBEAST + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*7 + BEAST*1)
@@ -689,8 +691,8 @@ def build_level():
 
 	if (lives == 0):
 		score += points
-		if level != 0: score -= 75
-		level -= 3
+		if level != 0: score -= NO_LIVES #### Death Point Penalty
+		level -= 3 ### Death Level Penalty
 		if level < 1: level = 1
 		lives = 5
 		points = 0
@@ -704,7 +706,7 @@ def build_level():
 		score += points
 		points = 0
 		for i in range(1, len(player)): del player[1]
-
+#################################################################-- Primary Level Setup
 	if level > 0:
 		lvl_beast_cnt = GAME_LEVELS[level-1]["beasts"]
 		lvl_monster_cnt = GAME_LEVELS[level-1]["monsters"]
@@ -723,8 +725,9 @@ def build_level():
 
 	lower_boxes = int(play_rows * play_cols / 4 - 10)
 	upper_boxes = int(play_rows * play_cols / 4 + 10)
-	lvl_box_cnt = randint(lower_boxes, upper_boxes)
+	lvl_box_cnt = randint(lower_boxes, upper_boxes) # Default Level Boxes
 	lvl_block_cnt = 10
+#################################################################-- Settings Variables
 	main_menu = 0
 	item_menu = 0
 	controls_menu = 9
@@ -735,10 +738,9 @@ def build_level():
 	dtab = '\033[0m\033[7m\033[40m\033[2m'
 	speedbg = '\033[40m\033[34m|||\033[32m|||||\033[33m\033[31m||\033[37m\033[40m'
 	speed_arrow = '\033[40m\033[35m' + chr(9632) + '\033[40m' # 10219 (thin double) 9193 (skip) 9670 (diamon)
-	chr_cnt = 0
+	chr_cnt = 0	
 	mi1_shade = '' ###############-- item 1
-
-	#mi1_opt = 2 # (set globally at the beginning of the script)
+	#mi1_opt = #  (set globally at the beginning of the script)
 	mi2_shade = '' ###############-- item 2
 	mi2_opt = 0
 	if pulling == 'hold': mi2_opt = 1
@@ -788,7 +790,7 @@ def build_level():
 	if (egg_speed > timer_max): egg_speed = timer_max
 	elif (egg_speed < timer_min): egg_speed = timer_min
 	timer_arrows = int((egg_speed - timer_min) / timer_inc) 
-
+#################################################################-- Settings Functions
 	def dim_menus(mi):
 		global mi1_shade, mi2_shade, mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, mi9_shade, mi10_shade, mi11_shade, mi12_shade
 		if mi != 1: mi1_shade = dim ##############-- item 1
@@ -831,7 +833,6 @@ def build_level():
 
 	def main_menu_2():
 		global mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, BLOCK, block_type, KILLBLOCK, normalyellow, dangerousorange,  play_rows, play_cols
-		#global lvl_block_cnt, lvl_box_cnt, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt,
 		global lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt
 		print('\033[u\033[4B\033[34C' + dim + 'Total Spaces: \033[36m' + str(play_rows * play_cols) + ' \033[37m')
 		print('\033[u\033[5B\033[35C' + dim + 'Used Spaces: \033[36m' + str(lvl_box_cnt + lvl_block_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt) + ' \033[37m')
@@ -879,7 +880,6 @@ def build_level():
 		KEY_P_DOWN = KYBD[dir_keys]["PK_DOWN"]
 		KEY_P_RIGHT = KYBD[dir_keys]["PK_RIGHT"]
 		KEY_P_LEFT = KYBD[dir_keys]["PK_LEFT"]
-
 
 	def mi2_controls(opt):
 		global pulling, toggle, single, auto, hold 
@@ -1271,7 +1271,9 @@ def build_level():
 	last_frame = 1
 
 	play_audio('begin')
-##############################################-- take input loop function -- #####
+################################################################################################
+###########################################################-- Input Function --#################
+################################################################################################
 def take_input():
 	global pulling, stdscr, debug, keypress, player, top_margin, left_margin, save_top, save_left, key_move, timeout, game_play_mode
 
