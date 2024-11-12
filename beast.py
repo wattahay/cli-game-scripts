@@ -12,8 +12,8 @@ def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename
 play_audio('menu_item_tick')
 ##################################-- formatted character constants --########################
 # 			Foreground	+	Background	+	Style			+	Unicode Chars 			+ Reset
-BAKGRD =	'\033[40m'	+										'  '
-BLOCK =		'\033[43m'	+										'  '					+	'\033[0m'
+BAKGRD =					'\033[40m'	+						'  '
+BLOCK =						'\033[43m'	+						'  '					+	'\033[0m'
 KILLBLOCK =	'\033[31m'	+	'\033[43m'	+	'\033[7m\033[2m'+	chr(9618) + chr(9618)	+	'\033[0m'
 BOX =		'\033[32m'	+ 	'\033[40m'	+						chr(9618) + chr(9618)	+	'\033[0m'
 XPBOX =		'\033[32m'	+	'\033[40m'	+	'\033[2m'		+	chr(9618) + chr(9618)	+	'\033[0m'
