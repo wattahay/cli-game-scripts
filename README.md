@@ -65,8 +65,6 @@ The game has no breaks or saves (yet). You can press pause wit 'p'. You have a b
 	* Orange blocks destroy/explode green blocks that are pushed into them.
 	* **Orange blocks kill you** if you walk into them
 
-**Note:** You have brief chances to access the settings before every level. You must press the **Tab** key right after/before each level.
-
 ### Change Many Default Settings in the beast.py Script
 
 **Useful Variables**
