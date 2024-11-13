@@ -28,17 +28,20 @@ Set up a terminal with an increased ~26 font size, and a Dark Tango color palett
 5. Press 'tab' to see and change upcoming level setup or pawn speeds
 6. Press 'esc' to escape the settings, and enter the next level
 
-**Note:** The pull key changes between 'shift' and 'ctrl' depending on the chosen direction keys.
-
 ### Controls
 
 * 'esc'...........quit game / exit the options menu
 * 'tab'...........enter options menu / switch tabs in options menu
 * 'p'.............pause
 * 'b'.............debug stats
-* arrows..........move
 * ctrl/shift......pull blocks
 * 'r'.............restore screen for a resized terminal
+
+Player movement control has 3 options in the settings menu:
+
+* w,a,s,d
+* arrow keys
+* h,j,k,l
 
 ### Gameplay
 
@@ -62,12 +65,21 @@ The game has no breaks or saves (yet). You can press pause wit 'p'. You have a b
 	* Orange blocks destroy/explode green blocks that are pushed into them.
 	* **Orange blocks kill you** if you walk into them
 
+**Note:** You have brief chances to access the settings before every level. You must press the **Tab** key right after/before each level.
 
-### Settings & Controls
+### Change Many Default Settings in the beast.py Script
 
-* You have brief chances to access the settings before every level
-	* (Press the **Tab** key right after/before each level.)
+''Useful Variables''
 
+**Note:** If you open the script in a text editor, you will see the commented section: **Useful Variables**
+
+* Enemy kill points
+* Enemy speeds
+* Loss point penalty
+* Default player controls setting
+* Enemies per level
+* Game clock speed
+* OS keyboard codes
 
 ### Best Terminals
 
