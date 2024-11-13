@@ -76,9 +76,10 @@ The game has no breaks or saves (yet). You can press pause wit 'p'. You have a b
 * Enemy kill points
 * Enemy speeds
 * Loss point penalty
+* Game clock speed
 * Default player controls setting
 * Enemies per level
-* Game clock speed
+* Randomness of enemy movement
 * OS keyboard codes
 
 ### Best Terminals
