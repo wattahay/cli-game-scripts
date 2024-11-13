@@ -9,6 +9,6 @@ curses.curs_set(False)
 try:
     while True:
         keypress = stdscr.getch()
-        print('\033[0K\033[HCode: ' + str(keypress) + '\033[1E\033[2K')
+        print('\033[0K\033[HCode: ' + str(keypress) + '          \033[1E\033[2K')
 except KeyboardInterrupt:
         system('reset')
