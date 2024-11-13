@@ -69,9 +69,9 @@ The game has no breaks or saves (yet). You can press pause wit 'p'. You have a b
 
 ### Change Many Default Settings in the beast.py Script
 
-''Useful Variables''
+**Useful Variables**
 
-**Note:** If you open the script in a text editor, you will see the commented section: **Useful Variables**
+If you open the script in a text editor, you will see the commented section: **Useful Variables**
 
 * Enemy kill points
 * Enemy speeds
