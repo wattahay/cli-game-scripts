@@ -57,7 +57,6 @@ The game has no breaks or saves (yet). You can press pause wit 'p'. You have a b
 	* Beasts can be crushed using regular green blocks
 * **Monsters** are double-lined red 'H's
 	* Monsters must be crushed right against yellow or orange blocks
-   	* When monsters swarm around you, then eggs gain chances to appear in the distance
 * **Eggs** hatch into monsters
 	* **To kill eggs**, they must be pushed into yellow/orange blocks, using green blocks
 	* New eggs might appear in the distance when Monsters swarm around you
