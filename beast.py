@@ -81,7 +81,7 @@ PRIORITY_ODDS = [
 		[1, False] 		# Backwards (5th priority)
 	]
 ###############-- Randomness Examples 
-# Max Randomness	1, 1, 1, 4, 4, 12, 12, 25
+# Max Randomness	1, 1, 1, 4, 4, 12, 12, 36
 # High				1, 1, 1, 4, 4, 16, 16, 50		1, 2, 2, 6, 6, 18, 18, 55
 # Medium			1, 1, 1, 4, 4, 20, 20, 90		1, 2, 2, 8, 8, 26, 26, 98
 # Low Randomness	1, 3, 3, 12, 12, 40, 40, 200
