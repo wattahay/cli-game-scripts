@@ -1,6 +1,6 @@
 ### Notes
 
-Linux-Only Python script based on the **1984 DOS game, BEAST**. (Specifically it is created in Fedora.)
+Linux-Only Python script based on the **[1984 DOS game, BEAST](https://github.com/wattahay/cli-game-scripts/wiki)**. (Specifically it is created in Fedora.)
 
 This is a rudimentary script, but it might be entertaining to have a look at.
 
