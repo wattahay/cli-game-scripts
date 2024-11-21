@@ -68,8 +68,8 @@ GAME_LEVELS = [
 # those moves are available to it. If a move is not 		| 5  4  3 |
 # available, then its odds are absorbed: 1st by its equal	| 4  H  2 |
 # counterpart, and then by the next lower priority, etc. 	| 3  2  1 |
-# Each of the 5 priorities will typically be at least 		|---------|
-# greater than the sum of all of its lower priorities. 	 5 Move Priorities
+# Each of the 5 priorities is typically at least equal		|---------|
+# or greater than the sum of its lower priorities.	 	 5 Move Priorities
 PRIORITY_ODDS = [
 		[90, False],	# Forward (1st priority)
 		[20, False],	# Front-Side (2nd priority)
@@ -81,7 +81,7 @@ PRIORITY_ODDS = [
 		[1, False] 		# Backwards (5th priority)
 	]
 ###############-- Randomness Examples 
-# Max Randomness	1, 1, 1, 4, 4, 12, 12, 36
+# Max Randomness	1, 1, 1, 3, 3, 9, 9, 27
 # High				1, 1, 1, 4, 4, 16, 16, 50		1, 2, 2, 6, 6, 18, 18, 55
 # Medium			1, 1, 1, 4, 4, 20, 20, 90		1, 2, 2, 8, 8, 26, 26, 98
 # Low Randomness	1, 3, 3, 12, 12, 40, 40, 200
