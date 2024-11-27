@@ -8,7 +8,7 @@ The game is actually **not that far from the original**.
 
 Probably the best appeal for a wide use-case for this would be a quick way to practice **Vim key muscle memory** on the command line. (The direction controls can be assigned to **h,j,k,l**.)
 
-**Visual elements** are Unicode characters drawn using terminal escape sequences.
+**Visual elements** are Unicode characters drawn using **[terminal escape sequences](https://github.com/wattahay/cli-game-scripts/wiki/Inline-Cursor-Movement)**.
 
 ### Setup
 
