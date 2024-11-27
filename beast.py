@@ -1,7 +1,7 @@
 from curses import initscr, noecho
 from random import randint, choices
 from os import system, popen, path
-from time import sleep
+from time import sleep, time
 from threading import Thread
 
 ######################################-- script's directory path
@@ -41,7 +41,7 @@ EGG_SCR = 4			# points for killing eggs
 MONSTER_SCR = 6		# points for killing monsters
 NO_LIVES = 50		# point penalty for losing all lives
 #########################################################-- game frame time
-LCD_TIME = .03		# game frame time
+LCD_TIME = .02		# game frame time
 #########################################################-- game levels
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the enclosing brackets are square
@@ -86,7 +86,7 @@ PRIORITY_ODDS = [
 # Medium			1, 1, 1, 4, 4, 20, 20, 90		1, 2, 2, 8, 8, 26, 26, 98
 # Low Randomness	1, 3, 3, 12, 12, 40, 40, 200
 #####################################################-- player direction controls
-dir_keys = 0 #   0=wasd     1=arrows     2=hjkl
+dir_keys = 2 #   0=wasd     1=arrows     2=hjkl
 
 KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in the git repo)
 		{"title":"w,a,s,d", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
@@ -104,6 +104,12 @@ KEY_P_UP = KYBD[dir_keys]["PK_UP"]
 KEY_P_DOWN = KYBD[dir_keys]["PK_DOWN"]
 KEY_P_RIGHT = KYBD[dir_keys]["PK_RIGHT"]
 KEY_P_LEFT = KYBD[dir_keys]["PK_LEFT"]
+
+frame_start = 0
+frame_end = 0
+frame_time = 0
+frame_longest = 0
+frame_shortest = 5
 
 mi1_opt = dir_keys + 1 # initial keyboard setting
 keypress = '' 
@@ -207,24 +213,31 @@ def set_cursor_avoid():
 	print('\033[' + str(top_margin + board_rows) + ';0H\033[0m\033[30m')
 ########################################################-- print board function
 def print_board(board_array): #{
-	global ttyCols, top_margin, left_margin, points, score, lives, level, board_rows, board_cols, save_top, save_left, stat_space, stat_rows
+	global frame_longest, frame_shortest, frame_time, ttyCols, top_margin, left_margin, points, score, lives, level, board_rows, board_cols, save_top, save_left, stat_space, stat_rows
 
 	set_topleft_ref(0,0)
 						
 	for rowi in range(board_rows + 1):	
 		print('\033[u' + '\033[' + str(rowi) +  'B' + ''.join(board_array[rowi - 1]))		
 
-	if (debug):
-		print('\033[u' + '\033[' + str(len(board) + 4) + 'B' + '\r\033[0m\033[37mPlayer: ' + str(player) )
+	if (debug):	
+		if (frame_time > frame_longest):
+			frame_longest = frame_time
+		elif (frame_time < frame_shortest):
+			frame_shortest = frame_time
+		print('\033[u' + '\033[' + str(len(board) + 6) + 'B' + '\r\033[0m\033[37mPlayer: ' + str(player) )
 		for i in range(0, len(eggs)):
-			if i == 0: print('\033[u' + '\033[' + str(len(board) + 6 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mEggs: ' + str(eggs[i]))
-			else: print('\033[u' + '\033[' + str(len(board) + 6 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mEgg ' + str(i) + ': ' + str(eggs[i]))
+			if i == 0: print('\033[u' + '\033[' + str(len(board) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mEggs: ' + str(eggs[i]))
+			else: print('\033[u' + '\033[' + str(len(board) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mEgg ' + str(i) + ': ' + str(eggs[i]))
 		for i in range(0, len(beasts)):
-			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 7 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mBeasts: ' + str(beasts[i]))
-			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 7 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mBeast ' + str(i) + ': ' + str(beasts[i]))
+			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 9 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mBeasts: ' + str(beasts[i]))
+			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 9 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mBeast ' + str(i) + ': ' + str(beasts[i]))
 		for i in range(0, len(monsters)):
-			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mMonsters: ' + str(monsters[i]))
-			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mMonster ' + str(i) + ': ' + str(monsters[i]))
+			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 10 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mMonsters: ' + str(monsters[i]))
+			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 10 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mMonster ' + str(i) + ': ' + str(monsters[i]))
+		print('\033[u' + '\033[' + str(len(board) + 2) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mFrame Execution Time: \t' + str(frame_time))
+		print('\033[u' + '\033[' + str(len(board) + 3) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37m\tLongest: \t' + str(frame_longest))
+		print('\033[u' + '\033[' + str(len(board) + 4) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37m\tShortest: \t' + str(frame_shortest) + '\t (Press \'b\' to reset.)')
 		 
 	print('\033[u\033[0m\033[37m\033[' + str(len(board) + 1) + 'B' + '\033[' + str(stat_space) + 'C' + '\033[s\033[2K' + chr(9477) + 
 	' ' + 'TOTAL: ' + str(score)  + 	' ' + chr(9477) + '      \033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) + 
@@ -1275,30 +1288,25 @@ def build_level():
 ###########################################################-- Input Function --#################
 ################################################################################################
 def take_input():
-	global pulling, stdscr, debug, keypress, player, top_margin, left_margin, save_top, save_left, key_move, timeout, game_play_mode
+	global frame_longest, frame_shortest, frame_time, pulling, stdscr, debug, keypress, player, top_margin, left_margin, save_top, save_left, key_move, timeout, game_play_mode
 
 	stdscr = initscr()
 	noecho()
 	stdscr.keypad(1)
 
 	while(True):
-		sleep(LCD_TIME - .02)
+		sleep(LCD_TIME - .002)
 		keypress = stdscr.getch()
 		timeout = 0
 		if (game_play_mode):
-			if keypress == 27: # the esc key
-				system('reset')
-				exit()
-			elif keypress == ord('r'):
+			if keypress == ord('r'):
 				keypress = 999
 				plan_the_board()
 				system('clear')
 			elif keypress == ord('b'):
 				if debug == True:
-					debug = False
-					top_margin = save_top
-					left_margin = save_left
-					system('clear')
+					frame_longest = 0
+					frame_shortest = 5
 				else:
 					debug = True
 					top_margin = 0
@@ -1349,12 +1357,20 @@ try:
 	last_frame = 1
 
 	while(True):
+		frame_start = time()
 		if timeout > 2:
 			keypress = ord('p')
 			timeout = 0
 		if keypress == 27:
-			system('reset')
-			exit()
+			if debug == True:
+				keypress = 999
+				debug = False
+				top_margin = save_top
+				left_margin = save_left
+				system('clear')
+			else:
+				system('reset')
+				exit()
 		elif keypress == ord('p'):
 			pause()
 		else:
@@ -1371,8 +1387,11 @@ try:
 			hatch_eggs()
 			flash_player()
 			print_board(board)
-		sleep(LCD_TIME)
-	################################################
+		frame_end = time()
+		frame_time = frame_end - frame_start
+		if (LCD_TIME > frame_time):
+			sleep(LCD_TIME - frame_time)
+###################################################
 
 except KeyboardInterrupt:
 	system('reset')
