@@ -46,10 +46,10 @@ LCD_TIME = .02		# game frame time
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the enclosing brackets are square
 # Make sure all bracketted levels are followed by a comma (except for the last level)
-GAME_LEVELS = [
-		{'beasts':1,	'monsters':0,	'eggs':0, 	'block': BLOCK}, 		# Level 1
-		{'beasts':1,	'monsters':0,	'eggs':0, 	'block': BLOCK}, 		# Level 1
-		{'beasts':1,	'monsters':0,	'eggs':0, 	'block': BLOCK}, 		# Level 1
+GAME_LEVELS = [ 
+		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': BLOCK}, 		# Level 1
+		{'beasts':5,	'monsters':0,	'eggs':0,	'block': KILLBLOCK},	# Level 2
+		{'beasts':5,	'monsters':0,	'eggs':2,	'block': BLOCK}, 		# Level 3
 		{'beasts':4,	'monsters':1,	'eggs':1,	'block': KILLBLOCK},	# Level 4
 		{'beasts':4,	'monsters':2,	'eggs':2,	'block': BLOCK}, 		# Level 5
 		{'beasts':8,	'monsters':0,	'eggs':0,	'block': KILLBLOCK}, 	# Level 6
@@ -86,7 +86,7 @@ PRIORITY_ODDS = [
 # Medium			1, 1, 1, 4, 4, 20, 20, 90		1, 2, 2, 8, 8, 26, 26, 98
 # Low Randomness	1, 3, 3, 12, 12, 40, 40, 200
 #####################################################-- player direction controls
-dir_keys = 2 #   0=wasd     1=arrows     2=hjkl
+dir_keys = 0 #   0=wasd     1=arrows     2=hjkl
 
 KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in the git repo)
 		{"title":"w,a,s,d", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
