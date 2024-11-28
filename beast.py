@@ -108,7 +108,6 @@ KEY_P_LEFT = KYBD[dir_keys]["PK_LEFT"]
 mi1_opt = dir_keys + 1 # initial keyboard setting
 keypress = ''
 debug = False
-last_frame = 1
 timeout = 0
 pulling = 'hold' # 'hold / 'tog' /  'swi' / 'sin'
 game_play_mode = False
@@ -645,7 +644,7 @@ def build_level():
 	global play_rows, play_cols, board_rows, board_cols, reset_board, blank_board
 	global board, level, lives, score, points, mi1_opt
 	global lvl_block_cnt, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt, lvl_box_cnt, block_type
-	global BAKGRD, BLOCK, KILLBLOCK, last_frame, top_margin, left_margin, LCD_TIME
+	global BAKGRD, BLOCK, KILLBLOCK, game_play_mode, top_margin, left_margin, LCD_TIME
 	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT, pulling
 
 	stdscr = initscr()
@@ -1265,7 +1264,7 @@ def build_level():
 	place_eggs(lvl_egg_cnt)
 	place_player()
 
-	last_frame = 1
+	game_play_mode = False
 
 	play_audio('begin')
 ################################################################################################
@@ -1348,8 +1347,6 @@ try:
 	main_input.daemon = True
 	main_input.start()
 
-	last_frame = 1
-
 	while(True):
 		exec_start = time()
 		if timeout > 2:
@@ -1362,13 +1359,11 @@ try:
 			pause()
 		else:
 			if ((lives == 0) | ((len(beasts) == 1) & (len(monsters) == 1) & (len(eggs) == 1))):
-				if last_frame == 0:
-					game_play_mode = False
-					if lives == 0: play_audio('loss')
-					elif level != 0: play_audio('win')
-					build_level()
-					game_play_mode = True
-				last_frame -= 1
+				game_play_mode = False
+				if lives == 0: play_audio('loss')
+				elif level != 0: play_audio('win')
+				build_level()
+				game_play_mode = True
 			move_enemies(beasts)
 			move_enemies(monsters)
 			hatch_eggs()
