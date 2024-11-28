@@ -41,15 +41,15 @@ EGG_SCR = 4			# points for killing eggs
 MONSTER_SCR = 6		# points for killing monsters
 NO_LIVES = 50		# point penalty for losing all lives
 #########################################################-- game frame time
-LCD_TIME = .02		# game frame time
+LCD_TIME = .03		# game frame time
 #########################################################-- game levels
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the enclosing brackets are square
 # Make sure all bracketted levels are followed by a comma (except for the last level)
-GAME_LEVELS = [ 
-		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': BLOCK}, 		# Level 1
-		{'beasts':5,	'monsters':0,	'eggs':0,	'block': KILLBLOCK},	# Level 2
-		{'beasts':5,	'monsters':0,	'eggs':2,	'block': BLOCK}, 		# Level 3
+GAME_LEVELS = [
+		{'beasts':1,	'monsters':0,	'eggs':0, 	'block': BLOCK}, 		# Level 1
+		{'beasts':1,	'monsters':0,	'eggs':0,	'block': KILLBLOCK},	# Level 2
+		{'beasts':0,	'monsters':0,	'eggs':1,	'block': BLOCK}, 		# Level 3
 		{'beasts':4,	'monsters':1,	'eggs':1,	'block': KILLBLOCK},	# Level 4
 		{'beasts':4,	'monsters':2,	'eggs':2,	'block': BLOCK}, 		# Level 5
 		{'beasts':8,	'monsters':0,	'eggs':0,	'block': KILLBLOCK}, 	# Level 6
@@ -68,12 +68,12 @@ GAME_LEVELS = [
 # those moves are available to it. If a move is not 		| 5  4  3 |
 # available, then its odds are absorbed: 1st by its equal	| 4  H  2 |
 # counterpart, and then by the next lower priority, etc. 	| 3  2  1 |
-# Each of the 5 priorities is typically at least equal		|---------|
-# or greater than the sum of its lower priorities.	 	 5 Move Priorities
+# Each of the 5 priorities will typically be at least 		|---------|
+# greater than the sum of all of its lower priorities. 	 5 Move Priorities
 PRIORITY_ODDS = [
-		[90, False],	# Forward (1st priority)
-		[20, False],	# Front-Side (2nd priority)
-		[20, False],	# Front-Side (2nd priority)
+		[99, False],	# Forward (1st priority)
+		[22, False],	# Front-Side (2nd priority)
+		[22, False],	# Front-Side (2nd priority)
 		[4, False],		# Sideways (3rd priority)
 		[4, False],		# Sideways (3rd priority)
 		[1, False],		# Rear-Side (4th priority)
@@ -81,12 +81,12 @@ PRIORITY_ODDS = [
 		[1, False] 		# Backwards (5th priority)
 	]
 ###############-- Randomness Examples
-# Max Randomness	1, 1, 1, 3, 3, 9, 9, 27
+# Max Randomness	1, 1, 1, 4, 4, 12, 12, 36
 # High				1, 1, 1, 4, 4, 16, 16, 50		1, 2, 2, 6, 6, 18, 18, 55
 # Medium			1, 1, 1, 4, 4, 20, 20, 90		1, 2, 2, 8, 8, 26, 26, 98
 # Low Randomness	1, 3, 3, 12, 12, 40, 40, 200
 #####################################################-- player direction controls
-dir_keys = 0 #   0=wasd     1=arrows     2=hjkl
+dir_keys = 2 #   0=wasd     1=arrows     2=hjkl
 
 KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in the git repo)
 		{"title":"w,a,s,d", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
@@ -104,12 +104,6 @@ KEY_P_UP = KYBD[dir_keys]["PK_UP"]
 KEY_P_DOWN = KYBD[dir_keys]["PK_DOWN"]
 KEY_P_RIGHT = KYBD[dir_keys]["PK_RIGHT"]
 KEY_P_LEFT = KYBD[dir_keys]["PK_LEFT"]
-
-frame_start = 0
-frame_end = 0
-frame_time = 0
-frame_longest = 0
-frame_shortest = 5
 
 mi1_opt = dir_keys + 1 # initial keyboard setting
 keypress = ''
@@ -146,7 +140,6 @@ points = 0 	# in-game level points added at end of level
 ################################################-- board setup
 board = []
 blank_board = []
-reset_board = []
 play_rows = 20
 play_cols = 40
 board_rows = play_rows + 2
@@ -197,7 +190,6 @@ def build_the_board(): #{
 	return screen_board
 #}
 board = build_the_board()
-reset_board = build_the_board()
 blank_board = build_the_board()
 ########################################################-- set cursor functions
 def set_topleft_ref(top, left):
@@ -213,7 +205,7 @@ def set_cursor_avoid():
 	print('\033[' + str(top_margin + board_rows) + ';0H\033[0m\033[30m')
 ########################################################-- print board function
 def print_board(board_array): #{
-	global frame_longest, frame_shortest, frame_time, ttyCols, top_margin, left_margin, points, score, lives, level, board_rows, board_cols, save_top, save_left, stat_space, stat_rows
+	global ttyCols, top_margin, left_margin, points, score, lives, level, board_rows, board_cols, save_top, save_left, stat_space, stat_rows
 
 	set_topleft_ref(0,0)
 
@@ -221,23 +213,16 @@ def print_board(board_array): #{
 		print('\033[u' + '\033[' + str(rowi) +  'B' + ''.join(board_array[rowi - 1]))
 
 	if (debug):
-		if (frame_time > frame_longest):
-			frame_longest = frame_time
-		elif (frame_time < frame_shortest):
-			frame_shortest = frame_time
-		print('\033[u' + '\033[' + str(len(board) + 6) + 'B' + '\r\033[0m\033[37mPlayer: ' + str(player) )
+		print('\033[u' + '\033[' + str(len(board) + 4) + 'B' + '\r\033[0m\033[37mPlayer: ' + str(player) )
 		for i in range(0, len(eggs)):
-			if i == 0: print('\033[u' + '\033[' + str(len(board) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mEggs: ' + str(eggs[i]))
-			else: print('\033[u' + '\033[' + str(len(board) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mEgg ' + str(i) + ': ' + str(eggs[i]))
+			if i == 0: print('\033[u' + '\033[' + str(len(board) + 6 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mEggs: ' + str(eggs[i]))
+			else: print('\033[u' + '\033[' + str(len(board) + 6 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mEgg ' + str(i) + ': ' + str(eggs[i]))
 		for i in range(0, len(beasts)):
-			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 9 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mBeasts: ' + str(beasts[i]))
-			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 9 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mBeast ' + str(i) + ': ' + str(beasts[i]))
+			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 7 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mBeasts: ' + str(beasts[i]))
+			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + 7 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mBeast ' + str(i) + ': ' + str(beasts[i]))
 		for i in range(0, len(monsters)):
-			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 10 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mMonsters: ' + str(monsters[i]))
-			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 10 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mMonster ' + str(i) + ': ' + str(monsters[i]))
-		print('\033[u' + '\033[' + str(len(board) + 2) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mFrame Execution Time: \t' + str(frame_time))
-		print('\033[u' + '\033[' + str(len(board) + 3) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37m\tLongest: \t' + str(frame_longest))
-		print('\033[u' + '\033[' + str(len(board) + 4) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37m\tShortest: \t' + str(frame_shortest) + '\t (Press \'b\' to reset.)')
+			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mMonsters: ' + str(monsters[i]))
+			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mMonster ' + str(i) + ': ' + str(monsters[i]))
 
 	print('\033[u\033[0m\033[37m\033[' + str(len(board) + 1) + 'B' + '\033[' + str(stat_space) + 'C' + '\033[s\033[2K' + chr(9477) +
 	' ' + 'TOTAL: ' + str(score)  + 	' ' + chr(9477) + '      \033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) +
@@ -672,7 +657,6 @@ def build_level():
 	lvl_beast_cnt = 0
 	lvl_monster_cnt = 0
 	lvl_egg_cnt = 0
-	invisibleBEAST = '\033[30m\033[40m' + chr(9500) + chr(9508) + '\033[0m'
 	print_board(board)
 	sleep(.5)
 	board = []
@@ -683,13 +667,13 @@ def build_level():
 		sleep(1)
 		set_topmid_ref(3, 29)
 		play_audio('begin')
-		print('\033[u\033[2B' + invisibleBEAST + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*3 + BEAST*1 + BAKGRD*4 + BEAST*3 + BAKGRD*2 + BEAST*5)
-		print('\033[u\033[3B' + invisibleBEAST + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*6 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*2 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1)
-		print('\033[u\033[4B' + invisibleBEAST + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*7 + BEAST*1)
-		print('\033[u\033[5B' + invisibleBEAST + BEAST*4 + BAKGRD*2 + BEAST*3 + BAKGRD*3 + BEAST*5 + BAKGRD*2 + BEAST*3 + BAKGRD*4 + BEAST*1)
-		print('\033[u\033[6B' + invisibleBEAST + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1)
-		print('\033[u\033[7B' + invisibleBEAST + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1)
-		print('\033[u\033[8B' + invisibleBEAST + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*1 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*2 + BEAST*3 + BAKGRD*4 + BEAST*1)
+		print('\033[u\033[2B\033[0m' + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*3 + BEAST*1 + BAKGRD*4 + BEAST*3 + BAKGRD*2 + BEAST*5)
+		print('\033[u\033[3B\033[0m' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*6 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*2 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1)
+		print('\033[u\033[4B\033[0m' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*7 + BEAST*1)
+		print('\033[u\033[5B\033[0m' + BEAST*4 + BAKGRD*2 + BEAST*3 + BAKGRD*3 + BEAST*5 + BAKGRD*2 + BEAST*3 + BAKGRD*4 + BEAST*1)
+		print('\033[u\033[6B\033[0m' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1)
+		print('\033[u\033[7B\033[0m' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1)
+		print('\033[u\033[8B\033[0m' + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*1 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*2 + BEAST*3 + BAKGRD*4 + BEAST*1)
 		set_cursor_avoid()
 		sleep(.4)
 		set_topmid_ref(17, 35)
@@ -752,26 +736,26 @@ def build_level():
 	speedbg = '\033[40m\033[34m|||\033[32m|||||\033[33m\033[31m||\033[37m\033[40m'
 	speed_arrow = '\033[40m\033[35m' + chr(9632) + '\033[40m' # 10219 (thin double) 9193 (skip) 9670 (diamon)
 	chr_cnt = 0
-	mi1_shade = '' ###############-- item 1
+	mi1_shade = '' ########### 1 -- direction keys group
 	#mi1_opt = #  (set globally at the beginning of the script)
-	mi2_shade = '' ###############-- item 2
+	mi2_shade = '' ########### 2 -- block-pull method
 	mi2_opt = 0
 	if pulling == 'hold': mi2_opt = 1
 	elif pulling == 'toggle': mi2_opt = 2
 	elif pulling == 'single': mi2_opt = 3
 	elif pulling == 'auto': mi2_opt = 4
 	toggle, single, auto = '', '', ''
-	mi3_shade = '' ###############-- item 3
-	mi4_shade = '' ###############-- item 4
-	mi5_shade = '' ###############-- item 5
-	mi6_shade = '' ###############-- item 6
-	mi7_shade = '' ###############-- item 7
-	mi8_shade = '' ###############-- item 8
+	mi3_shade = '' ############ 3 -- level beast count
+	mi4_shade = '' ############ 4 -- level monster count
+	mi5_shade = '' ############ 5 -- level egg count
+	mi6_shade = '' ############ 6 -- level box count
+	mi7_shade = '' ############ 7 -- level block count
+	mi8_shade = '' ############ 8 -- level block type
 	mi8_opt = 0
 	if block_type == BLOCK: mi8_opt = 1
 	elif block_type == KILLBLOCK: mi8_opt = 2
 	normalyellow, dangerousorange = '', ''
-	mi9_shade = '' ###############-- item 9
+	mi9_shade = '' ############ 9 -- beast speed
 	beast_speed_min = .3
 	beast_speed_max = 2.3
 	beast_speed_inc = .2
@@ -779,7 +763,7 @@ def build_level():
 	if (beast_speed > beast_speed_max): beast_speed = beast_speed_max
 	elif (beast_speed < beast_speed_min): beast_speed = beast_speed_min
 	beast_arrows = int((beast_speed - beast_speed_min ) / beast_speed_inc)
-	mi10_shade = '' ##############-- item 10
+	mi10_shade = '' ########## 10 -- monster speed
 	monster_speed_min = .3
 	monster_speed_max = 2.3
 	monster_speed_inc = .2
@@ -787,7 +771,7 @@ def build_level():
 	if (monster_speed > monster_speed_max): monster_speed = monster_speed_max
 	elif (monster_speed < monster_speed_min): monster_speed = monster_speed_min
 	monster_arrows = int((monster_speed - monster_speed_min) / monster_speed_inc)
-	mi11_shade = '' ##############-- item 11
+	mi11_shade = '' ########## 11 -- egg incubation time
 	incubate_min = 4
 	incubate_max = 40
 	incubate_inc = 4
@@ -795,7 +779,7 @@ def build_level():
 	if (incubate > incubate_max): incubate = incubate_max
 	elif (incubate < incubate_min): incubate = incubate_min
 	incubate_arrows = int((incubate - incubate_min) / incubate_inc)
-	mi12_shade = '' ##############-- item 12
+	mi12_shade = '' ########## 12 -- egg countdown speed
 	timer_min = .5
 	timer_max = 5
 	timer_inc = .5
@@ -806,31 +790,31 @@ def build_level():
 #################################################################-- Settings Functions
 	def dim_menus(mi):
 		global mi1_shade, mi2_shade, mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, mi9_shade, mi10_shade, mi11_shade, mi12_shade
-		if mi != 1: mi1_shade = dim ##############-- item 1
+		if mi != 1: mi1_shade = dim ########### 1 -- direction keys group
 		else: mi1_shade = norm
-		if mi != 2: mi2_shade = dim ##############-- item 2
+		if mi != 2: mi2_shade = dim ########### 2 -- block-pull method
 		else: mi2_shade = norm
-		if mi != 3: mi3_shade = dim ##############-- item 3
+		if mi != 3: mi3_shade = dim ########### 3 -- level beast count
 		else: mi3_shade = norm
-		if mi != 4: mi4_shade = dim ##############-- item 4
+		if mi != 4: mi4_shade = dim ########### 4 -- level monster count
 		else: mi4_shade = norm
-		if mi != 5: mi5_shade = dim ##############-- item 5
+		if mi != 5: mi5_shade = dim ########### 5 -- level egg count
 		else: mi5_shade = norm
-		if mi != 6: mi6_shade = dim ##############-- item 6
+		if mi != 6: mi6_shade = dim ########### 6 -- level box count
 		else: mi6_shade = norm
-		if mi != 7: mi7_shade = dim ##############-- item 7
+		if mi != 7: mi7_shade = dim ########### 7 -- level block count
 		else: mi7_shade = norm
-		if mi != 8: mi8_shade = dim ##############-- item 8
+		if mi != 8: mi8_shade = dim ########### 8 -- level block type
 		else: mi8_shade = norm
-		if mi != 9: mi9_shade = dim ##############-- item 9
+		if mi != 9: mi9_shade = dim ########### 9 -- beast speed
 		else: mi9_shade = norm
-		if mi != 10: mi10_shade = dim ##############-- item 10
+		if mi != 10: mi10_shade = dim ######## 10 -- monster speed
 		else: mi10_shade = norm
-		if mi != 11: mi11_shade = dim ##############-- item 11
+		if mi != 11: mi11_shade = dim ######## 11 -- egg incubation time
 		else: mi11_shade = norm
-		if mi != 12: mi12_shade = dim ##############-- item 12
+		if mi != 12: mi12_shade = dim ######## 12 -- egg countdown speed
 		else: mi12_shade = norm
-	def main_menu_1():
+	def main_menu_1(): #### -- First Tab
 		global mi1_opt, mi1_shade, mi2_shade, wasd, arrows, vi, pulling, single, toggle, auto
 
 		print('\033[u\033[3B' + mi1_shade + 'Movement Keys: ' + wasd + mi1_shade + arrows + mi1_shade + vi)
@@ -1288,25 +1272,30 @@ def build_level():
 ###########################################################-- Input Function --#################
 ################################################################################################
 def take_input():
-	global frame_longest, frame_shortest, frame_time, pulling, stdscr, debug, keypress, player, top_margin, left_margin, save_top, save_left, key_move, timeout, game_play_mode
+	global pulling, stdscr, debug, keypress, player, top_margin, left_margin, save_top, save_left, key_move, timeout, game_play_mode
 
 	stdscr = initscr()
 	noecho()
 	stdscr.keypad(1)
 
 	while(True):
-		sleep(LCD_TIME - .002)
+		sleep(LCD_TIME - .02)
 		keypress = stdscr.getch()
 		timeout = 0
 		if (game_play_mode):
-			if keypress == ord('r'):
+			if keypress == 27: # the esc key
+				system('reset')
+				exit()
+			elif keypress == ord('r'):
 				keypress = 999
 				plan_the_board()
 				system('clear')
 			elif keypress == ord('b'):
 				if debug == True:
-					frame_longest = 0
-					frame_shortest = 5
+					debug = False
+					top_margin = save_top
+					left_margin = save_left
+					system('clear')
 				else:
 					debug = True
 					top_margin = 0
@@ -1345,9 +1334,14 @@ def take_input():
 					player[1]['tug'] = False
 					direct_keypress(keypress)
 
-############################################################################################################
+################################################################################################
+##################-- This is the beginning of the program's main execution --###################
+################################################################################################
 system('reset')
+game_play_mode = True
 plan_the_board()
+exec_start = 0.0
+exec_end = 0.0
 
 try:
 	main_input = Thread(target=take_input)  ###############-- the main game clock and print loop --#####
@@ -1357,20 +1351,13 @@ try:
 	last_frame = 1
 
 	while(True):
-		frame_start = time()
+		exec_start = time()
 		if timeout > 2:
 			keypress = ord('p')
 			timeout = 0
 		if keypress == 27:
-			if debug == True:
-				keypress = 999
-				debug = False
-				top_margin = save_top
-				left_margin = save_left
-				system('clear')
-			else:
-				system('reset')
-				exit()
+			system('reset')
+			exit()
 		elif keypress == ord('p'):
 			pause()
 		else:
@@ -1387,11 +1374,11 @@ try:
 			hatch_eggs()
 			flash_player()
 			print_board(board)
-		frame_end = time()
-		frame_time = frame_end - frame_start
-		if (LCD_TIME > frame_time):
-			sleep(LCD_TIME - frame_time)
-###################################################
+		exec_end = time()
+		exec_time = exec_end - exec_start
+		if (LCD_TIME > exec_time):
+			sleep(LCD_TIME - exec_time)
+	################################################
 
 except KeyboardInterrupt:
 	system('reset')
