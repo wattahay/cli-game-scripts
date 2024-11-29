@@ -41,6 +41,10 @@ MONSTER_SCR = 6		# points for killing monsters
 NO_LIVES = 50		# point penalty for losing all lives
 #########################################################-- game frame time
 LCD_TIME = .02		# game frame time
+#########################################################-- size of the board
+# The game has been created around 20 rows and 40 columns
+play_rows = 20 # lowest = 20, use even numbers
+play_cols = 40 # lowest = 40, use even numbers
 #########################################################-- game levels
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the enclosing brackets are square
@@ -138,8 +142,6 @@ points = 0 	# in-game level points added at end of level
 ################################################-- board setup
 board = []
 blank_board = []
-play_rows = 20
-play_cols = 40
 board_rows = play_rows + 2
 board_cols = play_cols + 2
 ################################################-- board dimensions
@@ -219,11 +221,11 @@ def print_board(board_array): #{
 			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mMonsters: ' + str(monsters[i]))
 			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mMonster ' + str(i) + ': ' + str(monsters[i]))
 
-	print('\033[u\033[0m\033[37m\033[' + str(len(board) + 1) + 'B' + '\033[' + str(stat_space) + 'C' + '\033[s\033[2K' + chr(9477) +
-	' ' + 'TOTAL: ' + str(score)  + 	' ' + chr(9477) + '      \033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) +
-	' ' + 'TALLY: ' + str(points) + 	' ' + chr(9477) +       '\033[u\033[' + str((stat_space + 14) * 2) + 'C' + chr(9477) +
-	' ' + 'LIVES: ' + str(lives)  +  	' ' + chr(9477) +       '\033[u\033[' + str((stat_space + 14) * 3) + 'C' + chr(9477) +
-	' ' + 'LEVEL: ' + str(level)  +  	' ' + chr(9477))
+	print('\033[u\033[0m\033[37m\033[' + str(len(board) + 1) + 'B' + '\033[' + str(stat_space) + 'C' + '\033[s' + chr(9477) +
+	'\033[0K ' + 'TOTAL: ' + str(score)  + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) +
+	'\033[0K ' + 'TALLY: ' + str(points) + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 2) + 'C' + chr(9477) +
+	'\033[0K ' + 'LIVES: ' + str(lives)  +  	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 3) + 'C' + chr(9477) +
+	'\033[0K ' + 'LEVEL: ' + str(level)  +  	' ' + chr(9477))
 
 	print('\033[H\033[8m')
 ##########################################-- place the pieces
@@ -719,7 +721,7 @@ def build_level():
 	lower_boxes = int(play_rows * play_cols / 4 - 10)
 	upper_boxes = int(play_rows * play_cols / 4 + 10)
 	lvl_box_cnt = randint(lower_boxes, upper_boxes) # Default Level Boxes
-	lvl_block_cnt = 10
+	lvl_block_cnt = int(play_rows * play_cols * .012)
 #################################################################-- Settings Variables
 	main_menu = 0
 	item_menu = 0
