@@ -16,7 +16,6 @@ BAKGRD =					'\033[40m'	+						'  '
 BLOCK =						'\033[43m'	+						'  '					+	'\033[0m'
 KILLBLOCK =	'\033[31m'	+	'\033[43m'	+	'\033[7m\033[2m'+	chr(9618) + chr(9618)	+	'\033[0m'
 BOX =		'\033[32m'	+ 	'\033[40m'	+						chr(9618) + chr(9618)	+	'\033[0m'
-XPBOX =		'\033[32m'	+	'\033[40m'	+	'\033[2m'		+	chr(9618) + chr(9618)	+	'\033[0m'
 BEAST =		'\033[31m'	+	'\033[40m'	+						chr(9500) + chr(9508)	+	'\033[0m'
 MONSTER =	'\033[31m'	+	'\033[40m'	+						chr(9568) + chr(9571)	+ 	'\033[0m'
 PLAYER =	'\033[34m'	+	'\033[40m'	+						chr(9664) + chr(9654)	+	'\033[0m'
@@ -41,15 +40,15 @@ EGG_SCR = 4			# points for killing eggs
 MONSTER_SCR = 6		# points for killing monsters
 NO_LIVES = 50		# point penalty for losing all lives
 #########################################################-- game frame time
-LCD_TIME = .03		# game frame time
+LCD_TIME = .02		# game frame time
 #########################################################-- game levels
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the enclosing brackets are square
 # Make sure all bracketted levels are followed by a comma (except for the last level)
 GAME_LEVELS = [
-		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': BLOCK}, 		# Level 1
-		{'beasts':5,	'monsters':0,	'eggs':0,	'block': KILLBLOCK},	# Level 2
-		{'beasts':5,	'monsters':0,	'eggs':2,	'block': BLOCK}, 		# Level 3
+		{'beasts':1,	'monsters':0,	'eggs':0, 	'block': BLOCK}, 		# Level 1
+		{'beasts':1,	'monsters':0,	'eggs':0,	'block': KILLBLOCK},	# Level 2
+		{'beasts':0,	'monsters':0,	'eggs':1,	'block': BLOCK}, 		# Level 3
 		{'beasts':4,	'monsters':1,	'eggs':1,	'block': KILLBLOCK},	# Level 4
 		{'beasts':4,	'monsters':2,	'eggs':2,	'block': BLOCK}, 		# Level 5
 		{'beasts':8,	'monsters':0,	'eggs':0,	'block': KILLBLOCK}, 	# Level 6
@@ -71,7 +70,7 @@ GAME_LEVELS = [
 # Each of the 5 priorities will typically be at least 		|---------|
 # greater than the sum of all of its lower priorities. 	 5 Move Priorities
 PRIORITY_ODDS = [
-		[99, False],	# Forward (1st priority)
+		[98, False],	# Forward (1st priority)
 		[22, False],	# Front-Side (2nd priority)
 		[22, False],	# Front-Side (2nd priority)
 		[4, False],		# Sideways (3rd priority)
@@ -86,7 +85,7 @@ PRIORITY_ODDS = [
 # Medium			1, 1, 1, 4, 4, 20, 20, 90		1, 2, 2, 8, 8, 26, 26, 98
 # Low Randomness	1, 3, 3, 12, 12, 40, 40, 200
 #####################################################-- player direction controls
-dir_keys = 0 #   0=wasd     1=arrows     2=hjkl
+dir_keys = 2 #   0=wasd     1=arrows     2=hjkl
 
 KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in the git repo)
 		{"title":"w,a,s,d", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
@@ -632,6 +631,7 @@ def pause():
 	while(keypress == ord('p')):
 		sleep(.03)
 
+
 	play_audio('pause')
 ################################################################################################
 ############################################################-- Level Function --################
@@ -922,7 +922,6 @@ def build_level():
 		system('clear')
 		print_board(blank_board)
 		sleep(1.5)
-		keypress == 999
 		print_board(blank_board)
 		print(menu_ref)
 		while (True):############################################################
@@ -1296,7 +1295,7 @@ def take_input():
 					system('clear')
 			elif keypress == ord('p'):
 				keypress = stdscr.getch()
-				keypress = ''
+				keypress = 999
 			if pulling == 'auto':
 				if keypress == ord(' '):
 					while (keypress == ord(' ')):
