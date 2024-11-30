@@ -380,8 +380,6 @@ def move_enemies(pawns): #{
 
 	move_priority = []
 	move = ''
-	breakloop = False
-	#lay = False
 	likely_moves = []
 
 	for pwni in range(1, (len(pawns))): # in a given frame, loops through all pawns in a list if the pawn is staggered to move in the present frame, the pawn moves to a space
@@ -420,13 +418,10 @@ def move_enemies(pawns): #{
 					pawns[pwni]['co'] = player[1]['co']
 					kill_player()
 					board[pawns[pwni]['ro']][pawns[pwni]['co']] = pawns[0]['chr']
-					breakloop = True
-					break
+					return 0
 				# else if the priority move is not available, then mark it as unavailable
 				elif ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[priopti]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[priopti]]['ca'])) ]) == BAKGRD ):
 					PRIORITY_ODDS[priopti][1] = True
-					#if (move is out of bounds):
-						# mark the move as false
 				else:
 					PRIORITY_ODDS[priopti][1] = False
 					if ((pawns[0]['chr'] == MONSTER) & ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == MONSTER) | (board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == BEAST))):
