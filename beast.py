@@ -22,9 +22,10 @@ PLAYER =	'\033[34m'	+	'\033[40m'	+						chr(9664) + chr(9654)	+	'\033[0m'
 # https://en.wikipedia.org/wiki/ANSI_escape_code
 eggsub = 8329   # unicode key for subscript 9 (8328 = 8, and so on)
 egg2nd = 32     # unicode key for a space character
+# The below function returns and egg character with the appropriate subscript
 def EGG(sub):
 	return '\033[37m\033[40m\033[2m' + chr(11052) + '\033[1m' + chr(sub) + '\033[0m'
-
+# The below function is used to detect an egg independent of its changing subscript
 def deteggt(chegg):
 	if (chegg[0:15] == '\033[37m\033[40m\033[2m' + chr(11052)): return True
 ################################################################################################
@@ -40,11 +41,11 @@ EGG_SCR = 4			# points for killing eggs
 MONSTER_SCR = 6		# points for killing monsters
 NO_LIVES = 50		# point penalty for losing all lives
 #########################################################-- game frame time
-LCD_TIME = .02		# game frame time
+LCD_TIME = .018		# game frame time between .015 and .05
 #########################################################-- size of the board
-# The game has been created around 20 rows and 40 columns
-play_rows = 20 # lowest = 20, use even numbers
-play_cols = 40 # lowest = 40, use even numbers
+# The game and levels were created around 20 rows and 40 columns
+play_rows = 21		# lowest = 20, odd numbers are not accepted
+play_cols = 41 		# lowest = 40, odd numbers are not accepted
 #########################################################-- game levels
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the enclosing brackets are square
@@ -135,36 +136,43 @@ plr_flashes = 5
 plr_flash = 0
 plr_frames = (int(.05 / LCD_TIME) * 2)
 plr_frame = 0
-################################################-- game start setup
+################################################-- stat variables
 level = 0 	# change in order to start on a specific level
 score = 0 	# in-game total score
 points = 0 	# in-game level points added at end of level
-################################################-- board setup
+################################################-- board variables
 board = []
 blank_board = []
+if (play_rows < 20): play_rows = int(20)
+else: play_rows = int(play_rows)
+if (play_cols < 40): play_rows = int(40)
+else: play_cols = int(play_cols)
+if (play_rows % 2 != 0): play_rows -= 1
+if (play_cols % 2 != 0): play_cols -= 1
 board_rows = play_rows + 2
 board_cols = play_cols + 2
-################################################-- board dimensions
+################################################-- spacing variables
 left_margin = 0
 top_margin = 0
-stat_rows = 3
+stat_rows = 2
+stat_pad = 0
+stat_space = 0
 ################################################################################################
 ###########################################################-- Functions --######################
 ################################################################################################
-def plan_the_board(): #{
-	global save_top, save_left, top_margin, left_margin, board_rows, board_cols, play_rows, play_cols, stat_rows, stat_space, ttyCols, ttyRows
 
-	ttyRows, ttyCols = popen('stty size', 'r').read().split()
-	ttyRows = int(ttyRows)
-	ttyCols = int(ttyCols)
-	screen_rows = ttyRows
+def plan_the_board(): #{
+	global save_top, save_left, top_margin, left_margin, board_rows, board_cols, play_rows, play_cols, stat_rows, stat_space, stat_pad
+
+	screen_rows, ttyCols = [int(x) for x in popen('stty size', 'r').read().split()]
 	screen_cols = int(ttyCols / 2)
 
 	top_margin = int((screen_rows - board_rows - stat_rows) / 2)
-	left_margin = int((ttyCols - board_cols*2) / 2)
+	left_margin = int((screen_cols - board_cols))
 	save_top = top_margin # assigned for the debug feature
 	save_left = left_margin # assigned for the debug feature
-	stat_space = int((board_cols * 2 - (4 * 14 )) / 5) # calculate this for the print_board function
+	stat_pad = 3 # columns to pad on the left and right of game stats
+	stat_space = int(((board_cols * 2) - (stat_pad * 2) - (3 * 13 )) / 4) # This directly corresponds to
 	if stat_space < 0: stat_space = 0
 	#}
 # BUILDS a blank board
@@ -186,9 +194,8 @@ def build_the_board(): #{
 
 	return screen_board
 #}
-board = build_the_board()
-blank_board = build_the_board()
-########################################################-- set cursor functions
+
+########################################################-- cursor preset functions
 def set_topleft_ref(top, left):
 	global top_margin, left_margin
 	print('\033[?25l\033[' + str(top_margin + top)  + ';' + str(left_margin + left) + 'H\033[s\033[0m')
@@ -202,7 +209,7 @@ def set_cursor_avoid():
 	print('\033[' + str(top_margin + board_rows) + ';0H\033[0m\033[30m')
 ########################################################-- print board function
 def print_board(board_array): #{
-	global ttyCols, top_margin, left_margin, points, score, lives, level, board_rows, board_cols, save_top, save_left, stat_space, stat_rows
+	global top_margin, left_margin, points, score, lives, level, board_rows, board_cols, save_top, save_left, stat_space, stat_rows
 
 	set_topleft_ref(0,0)
 
@@ -221,11 +228,11 @@ def print_board(board_array): #{
 			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mMonsters: ' + str(monsters[i]))
 			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mMonster ' + str(i) + ': ' + str(monsters[i]))
 
-	print('\033[u\033[0m\033[37m\033[' + str(len(board) + 1) + 'B' + '\033[' + str(stat_space) + 'C' + '\033[s' + chr(9477) +
-	'\033[0K ' + 'TOTAL: ' + str(score)  + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 1) + 'C' + chr(9477) +
-	'\033[0K ' + 'TALLY: ' + str(points) + 	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 2) + 'C' + chr(9477) +
-	'\033[0K ' + 'LIVES: ' + str(lives)  +  	' ' + chr(9477) + '\033[u\033[' + str((stat_space + 14) * 3) + 'C' + chr(9477) +
-	'\033[0K ' + 'LEVEL: ' + str(level)  +  	' ' + chr(9477))
+		# See the definition of stat_space in the function: plan_the_board
+	print('\033[u\033[0m\033[37m\033[' + str(len(board) + 1) + 'B' + '  '*stat_pad +
+		chr(9477) + ' LEVEL: ' + str(level) 			+ ' ' + chr(9477) + '  '*(stat_space - int(len(str(score+points))/2)) +
+		chr(9477) + ' SCORE: ' + str(score + points)	+ ' ' + chr(9477) + '  '*(stat_space + int(len(str(score+points))/2)) +
+		chr(9477) + ' LIVES: ' + str(lives)				+ ' ' + chr(9477) + '     ')
 
 	print('\033[H\033[8m')
 ##########################################-- place the pieces
@@ -418,6 +425,8 @@ def move_enemies(pawns): #{
 				# else if the priority move is not available, then mark it as unavailable
 				elif ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[priopti]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[priopti]]['ca'])) ]) == BAKGRD ):
 					PRIORITY_ODDS[priopti][1] = True
+					#if (move is out of bounds):
+						# mark the move as false
 				else:
 					PRIORITY_ODDS[priopti][1] = False
 					if ((pawns[0]['chr'] == MONSTER) & ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == MONSTER) | (board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == BEAST))):
@@ -645,10 +654,6 @@ def build_level():
 	global lvl_block_cnt, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt, lvl_box_cnt, block_type
 	global BAKGRD, BLOCK, KILLBLOCK, game_play_mode, top_margin, left_margin, LCD_TIME
 	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT, pulling
-
-	stdscr = initscr()
-	stdscr.keypad(1)
-	stdscr.refresh()
 
 	block_type = BLOCK
 	lvl_block_cnt = 10
@@ -1276,7 +1281,7 @@ def take_input():
 	stdscr.keypad(1)
 
 	while(True):
-		sleep(LCD_TIME - .02)
+		sleep(LCD_TIME - .002)
 		keypress = stdscr.getch()
 		timeout = 0
 		if (game_play_mode):
@@ -1331,11 +1336,15 @@ def take_input():
 ################################################################################################
 ##################-- This is the beginning of the program's main execution --###################
 ################################################################################################
-system('reset')
-game_play_mode = True
 plan_the_board()
-exec_start = 0.0
-exec_end = 0.0
+board = build_the_board()
+blank_board = build_the_board()
+print('\033[2J')
+game_play_mode = True
+exec_start = 0
+exec_end = 0
+exec_time = 0
+
 
 try:
 	main_input = Thread(target=take_input)
