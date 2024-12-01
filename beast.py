@@ -48,12 +48,12 @@ NO_LEVEL = 3		# level penalty for losing all lives
 #########################################################-- game frame time
 LCD_TIME = .02		# example: .03 = 1 frame every .03 seconds (3 hundredths of a second)
 #########################################################-- size of the board
-# The game and levels were created around 20 rows and 40 columns
-play_rows = 20		# lowest = 20
-play_cols = 40		# lowest = 40
+# Possible values depend on screen resolution and terminal text size
+play_rows = 20		# 20 - 60
+play_cols = 40		# 40 - 120
 #########################################################-- game levels
 # You can create as many or few levels as you want to here.
-# Each level is surrounded by curly brackets, while the enclosing brackets are square
+# Each level is surrounded by curly brackets, while the outer brackets are square
 # Make sure all bracketted levels are followed by a comma (except for the last level)
 GAME_LEVELS = [
 		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': BLOCK}, 		# Level 1
@@ -86,9 +86,9 @@ GAME_LEVELS = [
 # Low Randomness	1, 3, 3, 12, 12, 40, 40, 200
 
 PRIORITY_ODDS = [
-		[99, False],	# Forward (1st priority)
-		[22, False],	# Front-Side (2nd priority)
-		[22, False],	# Front-Side (2nd priority)
+		[98, False],	# Forward (1st priority)
+		[28, False],	# Front-Side (2nd priority)
+		[28, False],	# Front-Side (2nd priority)
 		[4, False],		# Sideways (3rd priority)
 		[4, False],		# Sideways (3rd priority)
 		[1, False],		# Rear-Side (4th priority)
@@ -97,7 +97,7 @@ PRIORITY_ODDS = [
 	]
 
 #####################################################-- player direction controls
-dir_keys = 2 #   0=wasd     1=arrows     2=hjkl
+dir_keys = 1 #   0=wasd     1=arrows     2=hjkl
 
 KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in the git repo)
 		{"title":"w,a,s,d", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
@@ -1374,7 +1374,6 @@ try:
 		exec_time = exec_end - exec_start
 		if (LCD_TIME > exec_time):
 			sleep(LCD_TIME - exec_time)
-	################################################
-
 except KeyboardInterrupt:
 	close_game()
+
