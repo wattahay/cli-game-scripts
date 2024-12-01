@@ -40,12 +40,13 @@ BEAST_SCR = 3		# points for killing beasts
 EGG_SCR = 4			# points for killing eggs
 MONSTER_SCR = 6		# points for killing monsters
 NO_LIVES = 50		# point penalty for losing all lives
+NO_LEVEL = 3		# level penalty for losing all lives
 #########################################################-- game frame time
-LCD_TIME = .018		# game frame time between .015 and .05
+LCD_TIME = .02		# game frame time between .015 and .05
 #########################################################-- size of the board
 # The game and levels were created around 20 rows and 40 columns
-play_rows = 21		# lowest = 20, odd numbers are not accepted
-play_cols = 41 		# lowest = 40, odd numbers are not accepted
+play_rows = 20		# lowest = 20, odd numbers are not accepted
+play_cols = 40 		# lowest = 40, odd numbers are not accepted
 #########################################################-- game levels
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the enclosing brackets are square
@@ -97,6 +98,7 @@ KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in t
 		{"title":"arrows",  "K_UP":259, "K_DOWN":258, "K_RIGHT":261, "K_LEFT":260, "PK_UP":337, "PK_DOWN":336, "PK_RIGHT":402, "PK_LEFT":393},
 		{"title":"h,j,k,l", "K_UP":107, "K_DOWN":106, "K_RIGHT":108, "K_LEFT":104, "PK_UP":75,  "PK_DOWN":74,  "PK_RIGHT":76,  "PK_LEFT":72}
 	]
+
 ################################################################################################
 ###########################################################-- More Variables --#################
 ################################################################################################
@@ -112,7 +114,7 @@ KEY_P_LEFT = KYBD[dir_keys]["PK_LEFT"]
 mi1_opt = dir_keys + 1 # initial keyboard setting
 keypress = ''
 debug = False
-timeout = 0
+timeout = 0 # variable for automatic game pause with no activity
 pulling = 'hold' # 'hold / 'tog' /  'swi' / 'sin'
 game_play_mode = False
 ################################################-- move constants
@@ -139,7 +141,6 @@ plr_frame = 0
 ################################################-- stat variables
 level = 0 	# change in order to start on a specific level
 score = 0 	# in-game total score
-points = 0 	# in-game level points added at end of level
 ################################################-- board variables
 board = []
 blank_board = []
@@ -171,8 +172,9 @@ def plan_the_board(): #{
 	left_margin = int((screen_cols - board_cols))
 	save_top = top_margin # assigned for the debug feature
 	save_left = left_margin # assigned for the debug feature
-	stat_pad = 3 # columns to pad on the left and right of game stats
-	stat_space = int(((board_cols * 2) - (stat_pad * 2) - (3 * 13 )) / 4) # This directly corresponds to
+	             # #######################################################################
+	stat_pad = 6 # |stat_pad->|LEVEL|<-stat_space->|SCORE|<-stat_space->|LIVES|<-stat_pad|
+	stat_space = int(((board_cols * 2) - (stat_pad * 2) - (3 * 13 )) / 2)
 	if stat_space < 0: stat_space = 0
 	#}
 # BUILDS a blank board
@@ -209,7 +211,7 @@ def set_cursor_avoid():
 	print('\033[' + str(top_margin + board_rows) + ';0H\033[0m\033[30m')
 ########################################################-- print board function
 def print_board(board_array): #{
-	global top_margin, left_margin, points, score, lives, level, board_rows, board_cols, save_top, save_left, stat_space, stat_rows
+	global top_margin, left_margin, score, lives, level, board_rows, board_cols, save_top, save_left, stat_space, stat_rows
 
 	set_topleft_ref(0,0)
 
@@ -228,11 +230,15 @@ def print_board(board_array): #{
 			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mMonsters: ' + str(monsters[i]))
 			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mMonster ' + str(i) + ': ' + str(monsters[i]))
 
-		# See the definition of stat_space in the function: plan_the_board
-	print('\033[u\033[0m\033[37m\033[' + str(len(board) + 1) + 'B' + '  '*stat_pad +
-		chr(9477) + ' LEVEL: ' + str(level) 			+ ' ' + chr(9477) + '  '*(stat_space - int(len(str(score+points))/2)) +
-		chr(9477) + ' SCORE: ' + str(score + points)	+ ' ' + chr(9477) + '  '*(stat_space + int(len(str(score+points))/2)) +
-		chr(9477) + ' LIVES: ' + str(lives)				+ ' ' + chr(9477) + '     ')
+	level_stat = chr(9477) + ' LEVEL: ' + str(level) + ' ' + chr(9477)
+	score_stat = chr(9477) + ' SCORE: ' + str(score) + ' ' + chr(9477)
+	lives_stat = chr(9477) + ' LIVES: ' + str(lives) + ' ' + chr(9477)
+
+	# See the definition of stat_pad and stat_space in the function: plan_the_board
+	print('\033[u\033[0m\033[37m\033[' + str(len(board) + 1) + 'B' +
+		'\033[' + str(stat_pad) + 'C\033[s' + 											level_stat + '   ' +
+		'\033[u\033[' + str(board_cols - stat_pad - int(len(score_stat)/2)) + 	'C' + 	score_stat + '   ' +
+		'\033[u\033[' + str(board_cols*2 - stat_pad*2 - len(lives_stat)) + 		'C' + 	lives_stat + '   ')
 
 	print('\033[H\033[8m')
 ##########################################-- place the pieces
@@ -493,7 +499,7 @@ def push_tree(intent):
 		board[intend_r][intend_c] = PLAYER						# move_player()
 
 	def kill_enemy(pawns, row, col):
-		global points, board
+		global score, board
 
 		del_index = 0
 
@@ -502,7 +508,7 @@ def push_tree(intent):
 				del_index = i
 				break
 		del pawns[del_index]
-		points += pawns[0]['pnts']
+		score += pawns[0]['pnts']
 
 	probe = 2
 	loop = True
@@ -643,18 +649,13 @@ def pause():
 ############################################################-- Level Function --################
 ################################################################################################
 def build_level():
-	global GAME_LEVELS, NO_LIVES, incubate, egg_speed, beast_speed, monster_speed, keypress
+	global GAME_LEVELS, NO_LIVES, NO_LEVEL, incubate, egg_speed, beast_speed, monster_speed, keypress
 	global play_rows, play_cols, board_rows, board_cols, reset_board, blank_board
-	global board, level, lives, score, points, mi1_opt
+	global board, level, lives, score, mi1_opt
 	global lvl_block_cnt, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt, lvl_box_cnt, block_type
 	global BAKGRD, BLOCK, KILLBLOCK, game_play_mode, top_margin, left_margin, LCD_TIME
 	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT, pulling
 
-	block_type = BLOCK
-	lvl_block_cnt = 10
-	lvl_beast_cnt = 0
-	lvl_monster_cnt = 0
-	lvl_egg_cnt = 0
 	print_board(board)
 	sleep(.5)
 	board = []
@@ -685,12 +686,10 @@ def build_level():
 	sleep(1.2)
 
 	if (lives == 0):
-		score += points
 		if level != 0: score -= NO_LIVES #### Death Point Penalty
-		level -= 3 ### Death Level Penalty
+		level -= NO_LEVEL ### Death Level Penalty
 		if level < 1: level = 1
 		lives = 5
-		points = 0
 
 		for i in range(1, len(player)): del player[1]
 		for i in range(1, len(beasts)): del beasts[1]
@@ -698,8 +697,6 @@ def build_level():
 		for i in range(1, len(eggs)): del eggs[1]
 	else:
 		level += 1
-		score += points
-		points = 0
 		for i in range(1, len(player)): del player[1]
 #################################################################-- Primary Level Setup
 	if level > 0:
@@ -921,9 +918,6 @@ def build_level():
 	mi2_controls(mi2_opt)
 	mi8_controls(mi8_opt)
 	if keypress == 9:
-		system('clear')
-		print_board(blank_board)
-		sleep(1.5)
 		print_board(blank_board)
 		print(menu_ref)
 		while (True):############################################################
@@ -1268,16 +1262,17 @@ def build_level():
 ################################################################################################
 ###########################################################-- Input Function --#################
 ################################################################################################
-def take_input():
-	global pulling, stdscr, debug, keypress, player, top_margin, left_margin, save_top, save_left, key_move, timeout, game_play_mode
 
-	stdscr = initscr()
-	noecho()
-	stdscr.keypad(1)
+gameterm = initscr()
+noecho()
+gameterm.keypad(1)
+
+def take_input():
+	global pulling, gameterm, debug, keypress, player, top_margin, left_margin, save_top, save_left, key_move, timeout, game_play_mode
 
 	while(True):
 		sleep(LCD_TIME - .002)
-		keypress = stdscr.getch()
+		keypress = gameterm.getch()
 		timeout = 0
 		if (game_play_mode):
 			if keypress == ord('r'):
@@ -1296,19 +1291,19 @@ def take_input():
 					left_margin = 0
 					system('clear')
 			elif keypress == ord('p'):
-				keypress = stdscr.getch()
+				keypress = gameterm.getch()
 				keypress = 999
 			if pulling == 'auto':
 				if keypress == ord(' '):
 					while (keypress == ord(' ')):
-						keypress = stdscr.getch()
+						keypress = gameterm.getch()
 						player[1]['tug'] = not player[1]['tug']
 						if (keypress != ord(' ')):
 							tugspan = keypress # logs the present direction to compare for direction change
 							while (tugspan == keypress): # this ensures the player has pull function until direction key changes.
 								direct_keypress(keypress)
 								player[1]['tug'] = True
-								keypress = stdscr.getch()
+								keypress = gameterm.getch()
 				if keypress != ord(' '):
 					player[1]['tug'] = False
 					direct_keypress(keypress)
@@ -1321,7 +1316,7 @@ def take_input():
 			elif pulling == 'single':
 				if keypress == ord(' '):
 					while (keypress == ord(' ')):
-						keypress = stdscr.getch()
+						keypress = gameterm.getch()
 						player[1]['tug'] = True
 					direct_keypress(keypress)
 				else:
@@ -1331,20 +1326,18 @@ def take_input():
 ################################################################################################
 ##################-- This is the beginning of the program's main execution --###################
 ################################################################################################
-plan_the_board()
-board = build_the_board()
-blank_board = build_the_board()
-print('\033[2J')
-game_play_mode = True
-exec_start = 0
-exec_end = 0
-exec_time = 0
-
 
 try:
 	main_input = Thread(target=take_input)
 	main_input.daemon = True
 	main_input.start()
+	plan_the_board()
+	board = build_the_board()
+	blank_board = build_the_board()
+	game_play_mode = True
+	exec_start = 0
+	exec_end = 0
+	exec_time = 0
 
 	while(True):
 		exec_start = time()
