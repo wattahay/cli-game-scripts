@@ -11,7 +11,7 @@ def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename
 ######################################-- play audio tick
 play_audio('menu_item_tick')
 ##################################-- formatted character constants --########################
-# 			Foreground	+	Background	+	Style			+	Unicode Chars 			+ Reset
+# 			Foreground	+	Background	+	Style			+	Unicode Chars 			+ 	Reset
 BAKGRD =					'\033[40m'	+						'  '
 BLOCK =						'\033[43m'	+						'  '					+	'\033[0m'
 KILLBLOCK =	'\033[31m'	+	'\033[43m'	+	'\033[7m\033[2m'+	chr(9618) + chr(9618)	+	'\033[0m'
@@ -42,11 +42,11 @@ MONSTER_SCR = 6		# points for killing monsters
 NO_LIVES = 50		# point penalty for losing all lives
 NO_LEVEL = 3		# level penalty for losing all lives
 #########################################################-- game frame time
-LCD_TIME = .02		# game frame time between .015 and .05
+LCD_TIME = .025		# game frame time between .015 and .05
 #########################################################-- size of the board
 # The game and levels were created around 20 rows and 40 columns
 play_rows = 20		# lowest = 20, odd numbers are not accepted
-play_cols = 40 		# lowest = 40, odd numbers are not accepted
+play_cols = 40		# lowest = 40, odd numbers are not accepted
 #########################################################-- game levels
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the enclosing brackets are square
@@ -68,13 +68,19 @@ GAME_LEVELS = [
 		{'beasts':0,	'monsters':12,	'eggs':0,	'block': KILLBLOCK},	# Level 14
 		{'beasts':15,	'monsters':0,	'eggs':0,	'block': KILLBLOCK} 	# Level 15
 	]
-########################################################-- enemy movement odds
-# These values are the odds of moves for an enemy if 		|---------|
-# those moves are available to it. If a move is not 		| 5  4  3 |
-# available, then its odds are absorbed: 1st by its equal	| 4  H  2 |
-# counterpart, and then by the next lower priority, etc. 	| 3  2  1 |
-# Each of the 5 priorities will typically be at least 		|---------|
-# greater than the sum of all of its lower priorities. 	 5 Move Priorities
+########################################################-- Pawn Movement Priority Odds
+# These values are the odds of moves for an enemy if those		|---------|
+# moves are available to it. If a move is not available,		| 5  4  3 |
+# then its odds are absorbed: 1st by its equal counterpart,		| 4  H  2 |
+# and then by the next lower priority, etc. Each of the 5 		| 3  2  1 |
+# priorities is greater or equal to the sum all lower 			|---------|
+# priority moves.											5 Move Priorities
+########################-- Examples
+# Max Randomness	1, 1, 1, 3, 3, 9, 9, 27
+# High				1, 1, 1, 4, 4, 16, 16, 50		1, 2, 2, 6, 6, 18, 18, 55
+# Medium			1, 1, 1, 4, 4, 20, 20, 90		1, 2, 2, 8, 8, 26, 26, 98
+# Low Randomness	1, 3, 3, 12, 12, 40, 40, 200
+
 PRIORITY_ODDS = [
 		[99, False],	# Forward (1st priority)
 		[22, False],	# Front-Side (2nd priority)
@@ -85,13 +91,9 @@ PRIORITY_ODDS = [
 		[1, False],		# Rear-Side (4th priority)
 		[1, False] 		# Backwards (5th priority)
 	]
-###############-- Randomness Examples
-# Max Randomness	1, 1, 1, 4, 4, 12, 12, 36
-# High				1, 1, 1, 4, 4, 16, 16, 50		1, 2, 2, 6, 6, 18, 18, 55
-# Medium			1, 1, 1, 4, 4, 20, 20, 90		1, 2, 2, 8, 8, 26, 26, 98
-# Low Randomness	1, 3, 3, 12, 12, 40, 40, 200
+
 #####################################################-- player direction controls
-dir_keys = 0 #   0=wasd     1=arrows     2=hjkl
+dir_keys = 2 #   0=wasd     1=arrows     2=hjkl
 
 KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in the git repo)
 		{"title":"w,a,s,d", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
@@ -119,14 +121,14 @@ pulling = 'hold' # 'hold / 'tog' /  'swi' / 'sin'
 game_play_mode = False
 ################################################-- move constants
 MOVES = {
- 'U': {	'ra':-1,	'ca':0	},	# ra - "row adjustment"
- 'D': {	'ra':1, 	'ca':0	},	# ca - "column adjustment"
- 'L': {	'ra':0, 	'ca':-1	},
- 'R': {	'ra':0, 	'ca':1	},
-'UL': {	'ra':-1, 	'ca':-1	},
-'UR': {	'ra':-1, 	'ca':1	},
-'DL': {	'ra':1, 	'ca':-1	},
-'DR': {	'ra':1, 	'ca':1	}
+	 'U': {	'ra':-1,	'ca':0	},	# ra - "row adjustment"
+	 'D': {	'ra':1, 	'ca':0	},	# ca - "column adjustment"
+	 'L': {	'ra':0, 	'ca':-1	},
+	 'R': {	'ra':0, 	'ca':1	},
+	'UL': {	'ra':-1, 	'ca':-1	},
+	'UR': {	'ra':-1, 	'ca':1	},
+	'DL': {	'ra':1, 	'ca':-1	},
+	'DR': {	'ra':1, 	'ca':1	}
 }
 ################################################-- Pawn Classes (Dictionaries)
 beasts = [{ 'frames': (int(beast_speed / LCD_TIME)), 'frame':0, 'chr': BEAST, 'pnts': BEAST_SCR }]
@@ -157,28 +159,31 @@ left_margin = 0
 top_margin = 0
 stat_rows = 2
 stat_pad = 0
-stat_space = 0
 ################################################################################################
 ###########################################################-- Functions --######################
 ################################################################################################
-
-def plan_the_board(): #{
-	global save_top, save_left, top_margin, left_margin, board_rows, board_cols, play_rows, play_cols, stat_rows, stat_space, stat_pad
+def set_board_spacing(): #{
+	global top_margin, left_margin, board_rows, board_cols, stat_rows, stat_pad, debug
 
 	screen_rows, ttyCols = [int(x) for x in popen('stty size', 'r').read().split()]
 	screen_cols = int(ttyCols / 2)
 
-	top_margin = int((screen_rows - board_rows - stat_rows) / 2)
-	left_margin = int((screen_cols - board_cols))
-	save_top = top_margin # assigned for the debug feature
-	save_left = left_margin # assigned for the debug feature
-	             # #######################################################################
-	stat_pad = 6 # |stat_pad->|LEVEL|<-stat_space->|SCORE|<-stat_space->|LIVES|<-stat_pad|
-	stat_space = int(((board_cols * 2) - (stat_pad * 2) - (3 * 13 )) / 2)
-	if stat_space < 0: stat_space = 0
-	#}
-# BUILDS a blank board
-def build_the_board(): #{
+	stat_grow_limit = 60 # size according to board columns
+
+	if (debug):
+		top_margin = 0
+		left_margin = 0
+	else:
+		top_margin = int((screen_rows - board_rows - stat_rows) / 2)
+		left_margin = int((screen_cols - board_cols))
+
+	if board_cols <= stat_grow_limit:
+		stat_pad = 6
+	else:
+		stat_pad = board_cols - stat_grow_limit + 6
+
+
+def build_the_board(): #{ BUILDS a blank board
 	global board_cols, board_rows
 
 	screen_board = []
@@ -211,7 +216,7 @@ def set_cursor_avoid():
 	print('\033[' + str(top_margin + board_rows) + ';0H\033[0m\033[30m')
 ########################################################-- print board function
 def print_board(board_array): #{
-	global top_margin, left_margin, score, lives, level, board_rows, board_cols, save_top, save_left, stat_space, stat_rows
+	global top_margin, left_margin, score, lives, level, board_rows, board_cols, stat_rows, stat_pad
 
 	set_topleft_ref(0,0)
 
@@ -230,17 +235,16 @@ def print_board(board_array): #{
 			if i == 0: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37mMonsters: ' + str(monsters[i]))
 			else: print('\033[u' + '\033[' + str(len(board) + len(eggs) + len(beasts) + 8 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37mMonster ' + str(i) + ': ' + str(monsters[i]))
 
-	level_stat = chr(9477) + ' LEVEL: ' + str(level) + ' ' + chr(9477)
-	score_stat = chr(9477) + ' SCORE: ' + str(score) + ' ' + chr(9477)
-	lives_stat = chr(9477) + ' LIVES: ' + str(lives) + ' ' + chr(9477)
+	if (level > 0):
+		level_stat = chr(9477) + ' LEVEL: ' + str(level) + ' ' + chr(9477)
+		score_stat = chr(9477) + ' SCORE: ' + str(score) + ' ' + chr(9477)
+		lives_stat = chr(9477) + ' LIVES: ' + str(lives) + ' ' + chr(9477)
 
-	# See the definition of stat_pad and stat_space in the function: plan_the_board
-	print('\033[u\033[0m\033[37m\033[' + str(len(board) + 1) + 'B' +
-		'\033[' + str(stat_pad) + 'C\033[s' + 											level_stat + '   ' +
-		'\033[u\033[' + str(board_cols - stat_pad - int(len(score_stat)/2)) + 	'C' + 	score_stat + '   ' +
-		'\033[u\033[' + str(board_cols*2 - stat_pad*2 - len(lives_stat)) + 		'C' + 	lives_stat + '   ')
+		print('\033[u\033[0m\033[37m\033[' + str(len(board) + 1) + 'B' +
+			'\033[' + str(stat_pad) + 'C\033[s' + 											level_stat + '   ' +
+			'\033[u\033[' + str(board_cols - stat_pad - int(len(score_stat)/2)) + 	'C' + 	score_stat + '   ' +
+			'\033[u\033[' + str(board_cols*2 - stat_pad*2 - len(lives_stat)) + 		'C' + 	lives_stat + '   ')
 
-	print('\033[H\033[8m')
 ##########################################-- place the pieces
 def place_beasts(count):
 	global beasts, board, BAKGRD, beast_speed, LCD_TIME
@@ -1268,7 +1272,7 @@ noecho()
 gameterm.keypad(1)
 
 def take_input():
-	global pulling, gameterm, debug, keypress, player, top_margin, left_margin, save_top, save_left, key_move, timeout, game_play_mode
+	global pulling, gameterm, debug, keypress, player, top_margin, left_margin, key_move, timeout, game_play_mode
 
 	while(True):
 		sleep(LCD_TIME - .002)
@@ -1277,13 +1281,12 @@ def take_input():
 		if (game_play_mode):
 			if keypress == ord('r'):
 				keypress = 999
-				plan_the_board()
+				set_board_spacing()
 				system('clear')
 			elif keypress == ord('b'):
 				if debug == True:
 					debug = False
-					top_margin = save_top
-					left_margin = save_left
+					set_board_spacing()
 					system('clear')
 				else:
 					debug = True
@@ -1331,9 +1334,10 @@ try:
 	main_input = Thread(target=take_input)
 	main_input.daemon = True
 	main_input.start()
-	plan_the_board()
+	set_board_spacing()
 	board = build_the_board()
 	blank_board = build_the_board()
+	print_board(blank_board)
 	game_play_mode = True
 	exec_start = 0
 	exec_end = 0
