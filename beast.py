@@ -1,15 +1,19 @@
-from curses import initscr, noecho
+from curses import initscr, noecho, echo
 from random import randint, choices
 from os import system, popen, path
 from time import sleep, time
 from threading import Thread
 
+def close_game(): # close game function
+	try:
+		raise KeyboardInterrupt
+	except KeyboardInterrupt:
+		system('reset')
+		exit()
 ######################################-- script's directory path
 script_dir = path.abspath( path.dirname( __file__ ) )
 ######################################-- Linux aplay audio function
 def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
-######################################-- play audio tick
-play_audio('menu_item_tick')
 ##################################-- formatted character constants --########################
 # 			Foreground	+	Background	+	Style			+	Unicode Chars 			+ 	Reset
 BAKGRD =					'\033[40m'	+						'  '
@@ -42,11 +46,11 @@ MONSTER_SCR = 6		# points for killing monsters
 NO_LIVES = 50		# point penalty for losing all lives
 NO_LEVEL = 3		# level penalty for losing all lives
 #########################################################-- game frame time
-LCD_TIME = .025		# game frame time between .015 and .05
+LCD_TIME = .02		# example: .03 = 1 frame every .03 seconds (3 hundredths of a second)
 #########################################################-- size of the board
 # The game and levels were created around 20 rows and 40 columns
-play_rows = 20		# lowest = 20, odd numbers are not accepted
-play_cols = 40		# lowest = 40, odd numbers are not accepted
+play_rows = 20		# lowest = 20
+play_cols = 40		# lowest = 40
 #########################################################-- game levels
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the enclosing brackets are square
@@ -114,7 +118,7 @@ KEY_P_RIGHT = KYBD[dir_keys]["PK_RIGHT"]
 KEY_P_LEFT = KYBD[dir_keys]["PK_LEFT"]
 
 mi1_opt = dir_keys + 1 # initial keyboard setting
-keypress = ''
+keypress = 999
 debug = False
 timeout = 0 # variable for automatic game pause with no activity
 pulling = 'hold' # 'hold / 'tog' /  'swi' / 'sin'
@@ -207,7 +211,7 @@ def set_topleft_ref(top, left):
 	global top_margin, left_margin
 	print('\033[?25l\033[' + str(top_margin + top)  + ';' + str(left_margin + left) + 'H\033[s\033[0m')
 
-def set_topmid_ref(top, leftkeel):
+def set_topcenter_ref(top, leftkeel):
 	global top_margin, left_margin, board_cols
 	print('\033[' + str(top_margin + 1 + top) + ';' + str(left_margin + int(board_cols) - leftkeel) + 'H\033[s\033[0m')
 
@@ -240,10 +244,10 @@ def print_board(board_array): #{
 		score_stat = chr(9477) + ' SCORE: ' + str(score) + ' ' + chr(9477)
 		lives_stat = chr(9477) + ' LIVES: ' + str(lives) + ' ' + chr(9477)
 
-		print('\033[u\033[0m\033[37m\033[' + str(len(board) + 1) + 'B' +
-			'\033[' + str(stat_pad) + 'C\033[s' + 											level_stat + '   ' +
-			'\033[u\033[' + str(board_cols - stat_pad - int(len(score_stat)/2)) + 	'C' + 	score_stat + '   ' +
-			'\033[u\033[' + str(board_cols*2 - stat_pad*2 - len(lives_stat)) + 		'C' + 	lives_stat + '   ')
+		print( '\033[u\033[0m\033[37m\033[' + str(len(board) + 1) + 'B' +
+			'\033[s\033[' + str(stat_pad) 									+ 'C'	+ level_stat + '   ' +
+			'\033[u\033[' + str(board_cols - int(len(score_stat)/2))		+ 'C' 	+ score_stat + '   ' +
+			'\033[u\033[' + str(board_cols*2 - stat_pad - len(lives_stat))	+ 'C' 	+ lives_stat + '   ' )
 
 ##########################################-- place the pieces
 def place_beasts(count):
@@ -644,9 +648,15 @@ def pause():
 
 	print('\033[H\033[0m')
 
-	while(keypress == ord('p')):
-		sleep(.03)
+	keypress = 999
 
+	while(True):
+		sleep(LCD_TIME)
+		if (keypress == ord('p')): break
+		if (keypress == 27):
+			close_game()
+
+	keypress = 999
 
 	play_audio('pause')
 ################################################################################################
@@ -660,15 +670,15 @@ def build_level():
 	global BAKGRD, BLOCK, KILLBLOCK, game_play_mode, top_margin, left_margin, LCD_TIME
 	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT, pulling
 
-	print_board(board)
-	sleep(.5)
 	board = []
 	board = build_the_board()
-	print_board(board)
 ########################################################-- Level 0 Intro Screen
 	if (level == 0):
-		sleep(1)
-		set_topmid_ref(3, 29)
+
+		sleep(1) # Intro delay for effect
+		print_board(board)
+		set_topcenter_ref(3, 29)
+		sleep(.03) # Program waits for terminal to catch up printing
 		play_audio('begin')
 		print('\033[u\033[2B\033[0m' + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*3 + BEAST*1 + BAKGRD*4 + BEAST*3 + BAKGRD*2 + BEAST*5)
 		print('\033[u\033[3B\033[0m' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*6 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*2 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1)
@@ -679,13 +689,13 @@ def build_level():
 		print('\033[u\033[8B\033[0m' + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*1 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*2 + BEAST*3 + BAKGRD*4 + BEAST*1)
 		set_cursor_avoid()
 		sleep(.4)
-		set_topmid_ref(17, 35)
+		set_topcenter_ref(17, 35)
 		print('\033[37m\033[2m\033[40mPress the Spacebar to Play . . .\033[0m')
 		set_cursor_avoid()
 		while (keypress != ord(' ')):
 			sleep(.2)
 
-	set_topmid_ref(17, 35)
+	set_topcenter_ref(17, 35)
 	print('\033[37m\033[2m\033[40mPress \033[36mtab \033[37mfor \033[35mSettings\033[30m . . .       \033[0m')
 	sleep(1.2)
 
@@ -1293,9 +1303,6 @@ def take_input():
 					top_margin = 0
 					left_margin = 0
 					system('clear')
-			elif keypress == ord('p'):
-				keypress = gameterm.getch()
-				keypress = 999
 			if pulling == 'auto':
 				if keypress == ord(' '):
 					while (keypress == ord(' ')):
@@ -1337,7 +1344,6 @@ try:
 	set_board_spacing()
 	board = build_the_board()
 	blank_board = build_the_board()
-	print_board(blank_board)
 	game_play_mode = True
 	exec_start = 0
 	exec_end = 0
@@ -1349,8 +1355,7 @@ try:
 			keypress = ord('p')
 			timeout = 0
 		if keypress == 27:
-			system('reset')
-			exit()
+			close_game()
 		elif keypress == ord('p'):
 			pause()
 		else:
@@ -1372,4 +1377,4 @@ try:
 	################################################
 
 except KeyboardInterrupt:
-	system('reset')
+	close_game()
