@@ -49,8 +49,8 @@ NO_LEVEL = 3		# level penalty for losing all lives
 LCD_TIME = .02		# example: .03 = 1 frame every .03 seconds (3 hundredths of a second)
 #########################################################-- size of the board
 # Possible values depend on screen resolution and terminal text size
-play_rows = 20		# 20 - 60
-play_cols = 40		# 40 - 120
+play_rows = 40		# 20 - 60
+play_cols = 60		# 40 - 120
 #########################################################-- game levels
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the outer brackets are square
@@ -160,7 +160,7 @@ board_rows = play_rows + 2
 board_cols = play_cols + 2
 ################################################-- spacing variables
 left_margin = 0
-top_margin = 0
+top_margin = 1 # 1 is the lowest that the top margin can be, because of a specific issue with the print function
 stat_rows = 2
 stat_pad = 0
 ################################################################################################
@@ -175,10 +175,10 @@ def set_board_spacing(): #{
 	stat_grow_limit = 60 # size according to board columns
 
 	if (debug):
-		top_margin = 0
+		top_margin = 1
 		left_margin = 0
 	else:
-		top_margin = int((screen_rows - board_rows - stat_rows) / 2)
+		top_margin = 1 + int((screen_rows - board_rows - stat_rows) / 2)
 		left_margin = int((screen_cols - board_cols))
 
 	if board_cols <= stat_grow_limit:
@@ -213,7 +213,7 @@ def set_topleft_ref(top, left):
 
 def set_topcenter_ref(top, leftkeel):
 	global top_margin, left_margin, board_cols
-	print('\033[' + str(top_margin + 1 + top) + ';' + str(left_margin + int(board_cols) - leftkeel) + 'H\033[s\033[0m')
+	print('\033[' + str(top_margin + top) + ';' + str(left_margin + int(board_cols) - leftkeel) + 'H\033[s\033[0m')
 
 def set_cursor_avoid():
 	global top_margin, left_margin, board_rows
@@ -225,7 +225,10 @@ def print_board(board_array): #{
 	set_topleft_ref(0,0)
 
 	for rowi in range(board_rows + 1):
-		print('\033[u' + '\033[' + str(rowi) +  'B' + ''.join(board_array[rowi - 1]))
+		print('\033[u\033[' + str(rowi) +  'B' + ''.join(board_array[rowi - 1]))
+		#print('\033[u\033[' + str(rowi - 1) +  'B' + ''.join(board_array[rowi - 1]))
+		# The above line was changed, because it causes flickering
+		# The adapted version prints the board 1 line lower in the terminal
 
 	if (debug):
 		print('\033[u' + '\033[' + str(len(board) + 4) + 'B' + '\r\033[0m\033[37mPlayer: ' + str(player) )
@@ -664,21 +667,19 @@ def pause():
 ################################################################################################
 def build_level():
 	global GAME_LEVELS, NO_LIVES, NO_LEVEL, incubate, egg_speed, beast_speed, monster_speed, keypress
-	global play_rows, play_cols, board_rows, board_cols, reset_board, blank_board
+	global play_rows, play_cols, board_rows, board_cols, blank_board
 	global board, level, lives, score, mi1_opt
 	global lvl_block_cnt, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt, lvl_box_cnt, block_type
 	global BAKGRD, BLOCK, KILLBLOCK, game_play_mode, top_margin, left_margin, LCD_TIME
 	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT, pulling
 
-	print_board(board)
-	if (level == 0):sleep(.2)
-	if (level >= 1):sleep(1)
-	board = []
-	board = build_the_board()
-	print_board(board)
+	if (level >= 1):
+		print_board(board)		# re-prints board to show post-level board
+		sleep(1.4)				# seconds to show the final level board
+	board = build_the_board()	# clears the board after end of level
+	print_board(board)			# prints cleared board after end of level
 ########################################################-- Level 0 Intro Screen
 	if (level == 0):
-
 		sleep(1) # Intro delay for effect
 		print_board(board)
 		set_topcenter_ref(3, 29)
@@ -1304,8 +1305,7 @@ def take_input():
 					system('clear')
 				else:
 					debug = True
-					top_margin = 0
-					left_margin = 0
+					set_board_spacing()
 					system('clear')
 			if pulling == 'auto':
 				if keypress == ord(' '):
