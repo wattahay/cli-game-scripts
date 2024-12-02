@@ -45,8 +45,8 @@ NO_LEVEL = 3		# level penalty for losing all lives
 LCD_TIME = .02		# example: .03 = 1 frame every .03 seconds (3 hundredths of a second)
 #########################################################-- size of the board
 # Possible values depend on screen resolution and terminal text size
-play_rows = 40		# 20 - 60
-play_cols = 60		# 40 - 120
+play_rows = 20		# 20 - 60
+play_cols = 40		# 40 - 120
 #########################################################-- game levels
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the outer brackets are square
