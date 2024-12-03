@@ -864,9 +864,9 @@ def build_level():
 	def main_menu_2():
 		global mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, BLOCK, block_type, KILLBLOCK, normalyellow, dangerousorange,  play_rows, play_cols
 		global lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt
-		print('\033[u\033[4B\033[34C' + 'Total Spaces: \033[36m' + str(play_rows * play_cols) + ' \033[37m')
-		print('\033[u\033[5B\033[35C' + 'Used Spaces: \033[36m' + str(lvl_box_cnt + lvl_block_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt) + ' \033[37m')
-		print('\033[u\033[6B\033[35C' + 'Free Spaces: \033[36m' + str((play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)) + ' \033[37m')
+		print('\033[u\033[4B\033[34C\033[40m' + 'Total Spaces: \033[36m' + str(play_rows * play_cols) + ' \033[37m')
+		print('\033[u\033[5B\033[35C\033[40m' + 'Used Spaces: \033[36m' + str(lvl_box_cnt + lvl_block_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt) + ' \033[37m')
+		print('\033[u\033[6B\033[35C\033[40m' + 'Free Spaces: \033[36m' + str((play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)) + ' \033[37m')
 
 		print('\033[u\033[3B' + mi3_shade + BEAST + mi3_shade + '\033[40m - Beast Count: \033[35m' + str(lvl_beast_cnt) + ' \033[37m')
 		print('\033[u\033[5B' + mi4_shade + MONSTER + mi4_shade + '\033[40m - Monster Count: \033[35m' + str(lvl_monster_cnt) + ' \033[37m')
