@@ -10,39 +10,6 @@ Probably the best appeal for a wide use-case for this would be a quick way to pr
 
 **Visual elements** are Unicode characters drawn using **[terminal escape sequences](https://github.com/wattahay/cli-game-scripts/wiki/Inline-Cursor-Movement)**.
 
-### Setup
-
-Set up a terminal with an increased ~26 font size, and a Dark Tango color palette.
-1. On the git page, click the green Clone/Download button to get the .zip file
-2. Extract the zipped files, maintaining the same directory structure
-3. Give the beast.py file executable permissions: chmod +x beast.py
-4. Run the game: ./beast.py
-	* Alternatively run: **python3 beast.py**
-
-### Initial Game Start
-
-1. As stated above: run the game with ./beast.py (or python3 beast.py)
-2. Wait for the start screen to load.
-3. Press 'tab' to enter the settings
-4. Choose your control keys. (the change takes place immediately)
-5. Press 'tab' to see and change upcoming level setup or pawn speeds
-6. Press 'esc' to escape the settings, and enter the next level
-
-### Controls
-
-* 'esc'...........quit game / exit the options menu
-* 'tab'...........enter options menu / switch tabs in options menu
-* 'p'.............pause
-* 'b'.............debug stats
-* ctrl/shift......pull blocks
-* 'r'.............restore screen for a resized terminal
-
-Player movement control has 3 options in the settings menu:
-
-* w,a,s,d
-* arrow keys
-* h,j,k,l
-
 ### Gameplay
 
 Pawns kill you when they reach you.
@@ -50,8 +17,6 @@ Pawns kill you when they reach you.
 Move blocks around to squash the enemy pawns. Get points. Clear the level to progress.
 
 There is a large point penalty, and a level panalty, for losing 5 lives.
-
-The game has no breaks or saves (yet). You can press pause wit 'p'. You have a brief, passing chance to press 'tab' for settings changes before/after each level.
 
 * **Beasts** are red 'H's
 	* Beasts can be crushed using regular green blocks
@@ -65,15 +30,51 @@ The game has no breaks or saves (yet). You can press pause wit 'p'. You have a b
 	* Orange blocks destroy/explode green blocks that are pushed into them.
 	* **Orange blocks kill you** if you walk into them
 
+### Runs in Linux Terminal
+
+Set up a terminal with an increased ~26 font size, and a Dark Tango color palette.
+1. On the git page, click the green Clone/Download button to get the .zip file
+2. Extract the zipped files, maintaining the same directory structure
+4. Run the game: **python3 beast.py**
+
+### Script Options
+
+* **-t** transparent background
+* **-k:hjkl** key controls
+	* **options** "wasd", "arrows", "hjkl"
+* **-w:50** custom game width:2-digit number
+* **-h:30** custom game height:2-digit number
+
+**Example:** python3 beast.py -w:54 -h:30 -t -k:hjkl
+
+### Controls
+
+* 'spacebar'......enter level / exit settings
+* 'esc'...........quit the game
+* 'tab'...........enter options menu / switch tabs in options menu
+* 'p'.............pause
+* 'b'.............debug stats
+* shift...........pull blocks
+* 'r'.............restore screen for a resized terminal
+
+Player movement control has 3 options in the settings menu:
+
+* w,a,s,d
+* arrow keys
+* h,j,k,l
+
+
 ### Change Many Default Settings in the beast.py Script
 
 **Useful Variables**
 
 If you open the script in a text editor, you will see the commented section: **Useful Variables**
 
+* Change level presets
 * Enemy kill points
 * Enemy speeds
-* Loss point penalty
+* Point loss penalty
+* Level penalty
 * Game clock speed
 * Default player controls setting
 * Enemies per level
@@ -90,7 +91,7 @@ If you open the script in a text editor, you will see the commented section: **U
 6. "uxterm" (lxterm)
 7. "Terminator" (x-terminal-emulator)
 
-Most terminals have profiles you can create for individual applications.
+Most terminals have profiles you can create for unique purposes.
 
 * Use a **dark tango** color palette, and make the background darker if needed.
 * Font Ranking
@@ -106,12 +107,10 @@ Most terminals have profiles you can create for individual applications.
 
 ### Most Lacking Features
 
-* keyboard code calibrator (unless the keyboard function changes)
 * persistent settings storage
 * custom level files
 * start script with custom level settings profile
-* better navigation controls between menu/gameplay/program
-
+* 
 ### Next Gameplay Features
 
 * Better egg hatching
