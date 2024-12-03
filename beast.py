@@ -9,10 +9,6 @@ from sys import argv
 script_dir = path.abspath( path.dirname( __file__ ) )
 ######################################-- Linux aplay audio function
 def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
-######################################-- use test stepper function
-STPR = False # stepper(run, tick, txt) True/False
-######################################-- background color code
-xbgx = '\033[40m'
 ################################################################################################
 ###########################################################-- Useful Variables --###############
 ################################################################################################
@@ -26,6 +22,8 @@ EGG_SCR = 8			# points for killing eggs
 MONSTER_SCR = 10	# points for killing monsters
 NO_LIVES = 50		# point penalty for losing all lives
 NO_LEVEL = 3		# level penalty for losing all lives
+#########################################################-- background color ansi
+xbgx = '\033[40m'
 #########################################################-- game frame time
 LCD_TIME = .02		# example: .03 = 1 frame every .03 seconds (3 hundredths of a second)
 #########################################################-- size of the board
@@ -40,7 +38,7 @@ GAME_LEVELS = [
 		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'yellow'}, # Level 1
 		{'beasts':5,	'monsters':0,	'eggs':0,	'block': 'orange'},	# Level 2
 		{'beasts':5,	'monsters':0,	'eggs':2,	'block': 'yellow'}, # Level 3
-		{'beasts':4,	'monsters':1,	'eggs':1,	'block': 'orange'},	# Level 4
+		{'beasts':0,	'monsters':0,	'eggs':1,	'block': 'orange'},	# Level 4
 		{'beasts':4,	'monsters':2,	'eggs':2,	'block': 'yellow'}, # Level 5
 		{'beasts':8,	'monsters':0,	'eggs':0,	'block': 'orange'}, # Level 6
 		{'beasts':0,	'monsters':0,	'eggs':8,	'block': 'orange'}, # Level 7
@@ -58,7 +56,7 @@ GAME_LEVELS = [
 # moves are available to it. If a move is not available,		| 5  4  3 |
 # then its odds are absorbed: 1st by its equal counterpart,		| 4  H  2 |
 # and then by the next lower priority, etc. Each of the 5 		| 3  2  1 |
-# priorities is greater or equal to the sum all lower 			|---------|
+# priorities is greater or equal to the sum of all lower 		|---------|
 # priority moves.											5 Move Priorities
 ########################-- Examples
 # Max Randomness	1, 1, 1, 3, 3, 9, 9, 27
@@ -142,10 +140,10 @@ eggsub = 8329   # unicode key for subscript 9 (8328 = 8, and so on)
 egg2nd = 32     # unicode key for a space character
 # The below function returns and egg character with the appropriate subscript
 def EGG(sub):
-		return '\033[37m' + xbgx + '\033[2m' + chr(11052) + '\033[1m' + chr(sub) + '\033[0m'
-	# The below function is used to detect an egg independent of its changing subscript
+		return '\033[0m\033[0m\033[0m\033[37m' + xbgx + '\033[2m' + chr(11052) + '\033[1m' + chr(sub) + '\033[0m'
+# The below function is used to detect an egg independent of its changing subscript
 def deteggt(chegg):
-		if (chegg[0:15] == '\033[37m' + xbgx + '\033[2m' + chr(11052)): return True
+		if (chegg[0:12] == '\033[0m\033[0m\033[0m'): return True
 ################################################-- Pawn Classes (Dictionaries)
 beasts = [{ 'frames': (int(beast_speed / LCD_TIME)), 'frame':0, 'chr': BEAST, 'pnts': BEAST_SCR }]
 monsters = [{ 'frames': (int(monster_speed / LCD_TIME)), 'frame':0, 'chr': MONSTER, 'pnts': MONSTER_SCR }]
@@ -726,9 +724,9 @@ def build_level():
 #################################################################-- Show Options
 
 	set_botleft(1,0)
-	print('\033[u\033[37m' + xbgx + 'Press \033[36mspacebar\033[37m to play \033[35mlevel ' + str(newlevel) + '\033[0m')
+	print('\033[u\033[37m' + xbgx + 'Press \033[36mspacebar\033[37m to play \033[1;35mlevel ' + str(newlevel) + '\033[0m')
 	set_botleft(0,0)
-	print('\033[u\033[37m' + xbgx + 'Press \033[36mtab\033[37m for \033[35msettings\033[37m\033[0m')
+	print('\033[u\033[37m' + xbgx + 'Press \033[36mtab\033[37m for \033[1;35msettings\033[37m\033[0m')
 	while (True):
 		if (keypress == ord(' ')):
 			sleep(1) # delay for effect before entering settings
@@ -778,7 +776,7 @@ def build_level():
 	ltab = '\033[0m\033[7m' + xbgx
 	dtab = '\033[0m\033[7m' + xbgx + '\033[2m'
 	speedbg = xbgx + '\033[34m|||\033[32m|||||\033[33m\033[31m||\033[37m' + xbgx
-	speed_arrow = xbgx + '\033[35m' + chr(9632) + xbgx	 # 10219 (thin double) 9193 (skip) 9670 (diamon)
+	speed_arrow = xbgx + '\033[1;35m' + chr(9632) + xbgx	 # 10219 (thin double) 9193 (skip) 9670 (diamon)
 	chr_cnt = 0
 	mi1_shade = '' ########### 1 -- direction keys group
 	#mi1_opt = #  (set globally at the beginning of the script)
@@ -877,11 +875,11 @@ def build_level():
 		print('\033[u\033[5B\033[35C' + xbgx + 'Used Spaces: \033[36m' + str(lvl_box_cnt + lvl_block_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt) + ' \033[37m')
 		print('\033[u\033[6B\033[35C' + xbgx + 'Free Spaces: \033[36m' + str((play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)) + ' \033[37m')
 
-		print('\033[u\033[3B' + mi3_shade + BEAST + mi3_shade + xbgx + ' - Beast Count: \033[35m' + str(lvl_beast_cnt) + ' \033[37m')
-		print('\033[u\033[5B' + mi4_shade + MONSTER + mi4_shade + xbgx + ' - Monster Count: \033[35m' + str(lvl_monster_cnt) + ' \033[37m')
-		print('\033[u\033[7B' + mi5_shade + EGG(32) + mi5_shade + xbgx + ' - Egg Count: \033[35m' + str(lvl_egg_cnt) + ' \033[37m')
-		print('\033[u\033[9B' + mi6_shade + BOX + mi6_shade + xbgx + ' - Box Count: \033[35m' + str(lvl_box_cnt) + ' \033[37m')
-		print('\033[u\033[11B' + mi7_shade + block_type + mi7_shade + xbgx + ' - Block Count: \033[35m' + str(lvl_block_cnt) + ' \033[37m')
+		print('\033[u\033[3B' + mi3_shade + BEAST + mi3_shade + xbgx + ' - Beast Count: \033[1;35m' + str(lvl_beast_cnt) + ' \033[37m')
+		print('\033[u\033[5B' + mi4_shade + MONSTER + mi4_shade + xbgx + ' - Monster Count: \033[1;35m' + str(lvl_monster_cnt) + ' \033[37m')
+		print('\033[u\033[7B' + mi5_shade + EGG(32) + mi5_shade + xbgx + ' - Egg Count: \033[1;35m' + str(lvl_egg_cnt) + ' \033[37m')
+		print('\033[u\033[9B' + mi6_shade + BOX + mi6_shade + xbgx + ' - Box Count: \033[1;35m' + str(lvl_box_cnt) + ' \033[37m')
+		print('\033[u\033[11B' + mi7_shade + block_type + mi7_shade + xbgx + ' - Block Count: \033[1;35m' + str(lvl_block_cnt) + ' \033[37m')
 		print('\033[u\033[13B' + mi8_shade + block_type + mi8_shade + xbgx + ' - Block Type: ' + normalyellow + mi8_shade + dangerousorange + mi8_shade + ' \033[37m')
 
 	def main_menu_3():
@@ -895,21 +893,21 @@ def build_level():
 		global dir_keys, wasd, arrows, vi, pulling, KYBD, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_RIGHT, KEY_P_LEFT
 		if opt == 1:
 			dir_keys = 0
-			wasd = '[\033[35m w,a,s,d \033[37m]'
+			wasd = '[\033[1;35m w,a,s,d \033[37m]'
 			arrows = '  arrows  '
 			vi = '  h,j,k,l  '
 
 		elif opt == 2:
 			dir_keys = 1
 			wasd = '  w,a,s,d  '
-			arrows = '[\033[35m arrows \33[37m]'
+			arrows = '[\033[1;35m arrows \33[37m]'
 			vi = '  h,j,k,l  '
 
 		elif opt == 3:
 			dir_keys = 2
 			wasd = '  w,a,s,d  '
 			arrows = '  arrows  '
-			vi = '[\033[35m h,j,k,l \033[37m]'
+			vi = '[\033[1;35m h,j,k,l \033[37m]'
 
 		KEY_UP = KYBD[dir_keys]["K_UP"]
 		KEY_DOWN = KYBD[dir_keys]["K_DOWN"]
@@ -925,44 +923,44 @@ def build_level():
 
 		if opt == 1:
 			pulling = 'hold'
-			hold = '[\033[35m hold \033[37m]'
+			hold = '[\033[1;35m hold \033[37m]'
 			toggle = '  toggle  '
 			single = '  single  '
 			auto = '  auto  '
 		if opt == 2:
 			pulling = 'toggle'
 			hold = '  hold  '
-			toggle = '[\033[35m toggle \033[37m]'
+			toggle = '[\033[1;35m toggle \033[37m]'
 			single = '  single  '
 			auto = '  auto  '
 		elif opt == 3:
 			pulling = 'single'
 			hold = '  hold  '
 			toggle = '  toggle  '
-			single = '[\033[35m single \033[37m]'
+			single = '[\033[1;35m single \033[37m]'
 			auto = '  auto  '
 		elif opt == 4:
 			pulling = 'auto'
 			hold = '  hold  '
 			toggle = '  toggle  '
 			single = '  single  '
-			auto = '[\033[35m auto \033[37m]'
+			auto = '[\033[1;35m auto \033[37m]'
 
 	def mi8_controls(opt):
 		global block_type, BLOCK, KILLBLOCK, normalyellow, dangerousorange
 
 		if opt == 1:
 			block_type = BLOCK
-			normalyellow = '[\033[35m Normal Yellow \033[37m]'
+			normalyellow = '[\033[1;35m Normal Yellow \033[37m]'
 			dangerousorange = '  Dangerous Orange  '
 		elif opt == 2:
 			block_type = KILLBLOCK
 			normalyellow = '  Normal Yellow  '
-			dangerousorange = '[\033[35m Dangerous Orange \033[37m]'
+			dangerousorange = '[\033[1;35m Dangerous Orange \033[37m]'
 
 	def tabkey_note():
 		set_botleft(1,0)
-		print('\033[u\033[0m' + xbgx + '\033[37mPress \033[36mspacebar\033[37m to play \033[35mlevel ' + str(newlevel) + '\033[0m')
+		print('\033[u\033[0m' + xbgx + '\033[37mPress \033[36mspacebar\033[37m to play \033[1;35mlevel ' + str(newlevel) + '\033[0m')
 		set_botleft(0,0)
 		print('\033[u\033[0m' + xbgx + '\033[37mPress \033[36mtab \033[37mto switch settings tabs\033[0m')
 
