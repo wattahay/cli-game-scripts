@@ -199,6 +199,9 @@ def set_board_spacing(): #{
 	else:
 		stat_pad = board_cols - stat_grow_limit + 6
 
+	if top_margin == 0: top_margin = 1
+	if left_margin == 0: left_margin = 1
+
 
 def build_the_board(): #{ BUILDS a blank board
 	global board_cols, board_rows
