@@ -9,6 +9,11 @@ from sys import argv
 script_dir = path.abspath( path.dirname( __file__ ) )
 ######################################-- Linux aplay audio function
 def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
+######################################-- get terminal size
+def get_tty():
+	rows, ttycols = [int(x) for x in popen('stty size', 'r').read().split()]
+	cols = int(ttycols / 2)
+	return rows, cols
 ################################################################################################
 ###########################################################-- Useful Variables --###############
 ################################################################################################
@@ -74,7 +79,6 @@ PRIORITY_ODDS = [
 		[1, False],		# Rear-Side (4th priority)
 		[1, False] 		# Backwards (5th priority)
 	]
-
 #####################################################-- player direction controls
 dir_keys = 0 #   0=wasd     1=arrows     2=hjkl
 
@@ -86,7 +90,24 @@ KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in t
 ################################################################################################
 ###########################################################-- More Variables --#################
 ################################################################################################
+calibrate = False	# calibrate terminal spacing
+tcomp = 0			# compensation for ansi-based terminal spacing
+termpad = 0			# padding for terminal fit screen
+fitted = False		# whether or not the -f option is chosen
 ################################################-- argv assignments
+for i in argv:
+	if i[0:3] == '-f:':
+		if(i[3:].isdigit() & len(i[3:]) < 3):
+			termpad = int(i[3:])
+		else:
+			termpad = 0
+	else: termpad = 0
+	if i[0:2] == '-f':
+		fitted = True
+		term_rows, term_cols = get_tty()
+		play_rows = term_rows - 4 - termpad*2
+		play_cols = term_cols - 2 - termpad*2
+
 for i in argv:
 	if i[0:2] == '-t':
 		xbgx = ''
@@ -95,11 +116,11 @@ for i in argv:
 		if i[3:] == 'arrows': dir_keys = 1
 		if i[3:] == 'hjkl': dir_keys = 2
 	if i[0:3] == '-h:':
-		if(i[3:].isdigit() & len(i[3:]) < 3):
-			play_rows = int(i[3:])
+		if(i[3:].isdigit() & len(i[3:]) < 2):
+			play_rows = int(i[3:]) + termpad
 	if i[0:3] == '-w:':
 		if(i[3:].isdigit() & len(i[3:]) < 3):
-			play_cols = int(i[3:])
+			play_cols = int(i[3:]) + termpad
 ################################################-- keyboard constants
 KEY_UP = KYBD[dir_keys]["K_UP"]
 KEY_DOWN = KYBD[dir_keys]["K_DOWN"]
@@ -163,8 +184,6 @@ if (play_cols < 40): play_rows = int(40)
 else: play_cols = int(play_cols)
 if (play_rows % 2 != 0): play_rows -= 1
 if (play_cols % 2 != 0): play_cols -= 1
-board_rows = play_rows + 2
-board_cols = play_cols + 2
 ################################################-- spacing variables
 left_margin = 0
 top_margin = 0 # 1 is the lowest that the top margin can be, because of a specific issue with the print function
@@ -173,26 +192,36 @@ stat_pad = 0
 ###########################################################-- Functions --######################
 ################################################################################################
 def close_game(): # close game function
+	system('clear')
+	sleep(.2)
+	system('clear')
 	try:
 		raise KeyboardInterrupt
 	except KeyboardInterrupt:
 		system('reset')
 		exit()
-
+######################################-- Linux aplay audio function
+def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
+######################################-- get/set game dimensions
 def set_board_spacing(): #{
-	global top_margin, left_margin, board_rows, board_cols, stat_pad, debug
+	global top_margin, left_margin, board_rows, board_cols, stat_pad, debug, termpad, play_rows, play_cols
 
-	screen_rows, ttyCols = [int(x) for x in popen('stty size', 'r').read().split()]
-	screen_cols = int(ttyCols / 2)
+	screen_rows, screen_cols = get_tty()
+
+	board_rows = play_rows + 2
+	board_cols = play_cols + 2
 
 	stat_grow_limit = 60 # size according to board columns
+
+	if (board_rows > screen_rows - 6):
+		debug = False
 
 	if (debug):
 		top_margin = 0
 		left_margin = 0
 	else:
-		top_margin = int((screen_rows - board_rows) / 2)
-		left_margin = int((screen_cols - board_cols))
+		top_margin = int((screen_rows - board_rows) / 2 + 1)
+		left_margin = int(screen_cols - board_cols + 1)
 
 	if board_cols <= stat_grow_limit:
 		stat_pad = 6
@@ -201,8 +230,7 @@ def set_board_spacing(): #{
 
 	if top_margin == 0: top_margin = 1
 	if left_margin == 0: left_margin = 1
-
-
+######################################-- Create new board array with background and border
 def build_the_board(): #{ BUILDS a blank board
 	global board_cols, board_rows
 
@@ -241,7 +269,7 @@ def set_midcent(topcomp, leftcomp):
 
 ########################################################-- print board function
 def print_board(board_array): #{
-	global top_margin, left_margin, score, lives, level, board_rows, board_cols, stat_pad
+	global top_margin, left_margin, score, lives, level, board_rows, board_cols, stat_pad, play_rows, play_cols, termpad, term_cols, term_rows
 
 	print('\033[?25l\033[' + str(top_margin) + ';' + str(left_margin) + 'H\033[s\033[0m')
 
@@ -683,10 +711,10 @@ def pause():
 ################################################################################################
 def build_level():
 	global GAME_LEVELS, NO_LIVES, NO_LEVEL, incubate, egg_speed, beast_speed, monster_speed, keypress
-	global play_rows, play_cols, board_rows, board_cols, blank_board
-	global board, newlevel, level, lives, score, mi1_opt
+	global play_rows, play_cols, board_rows, board_cols, blank_board, board, fitted
+	global newlevel, level, lives, score, mi1_opt, xbgx
 	global lvl_block_cnt, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt, lvl_box_cnt, block_type
-	global BAKGRD, BLOCK, KILLBLOCK, game_play_mode, top_margin, left_margin, LCD_TIME
+	global BEAST, BAKGRD, BLOCK, KILLBLOCK, game_play_mode, top_margin, left_margin, LCD_TIME
 	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT, pulling
 
 	newlevel = 1
@@ -696,8 +724,12 @@ def build_level():
 ########################################################-- Intro Screen (level 0)
 	if (level == 0):
 		sleep(.01) # seems necessary
-		print_board(board)
+		if(fitted == False): # temporary solution until intro prints a fitted board
+			print_board(blank_board)
 		sleep(1) # delay for effect
+		if (fitted): # temporary solution until intro prints a fitted board
+			BAKGRD = '\033[0m' + '  ' + '\033[0m'
+			BEAST =	'\033[0m\033[31m' + chr(9500) + chr(9508) + '\033[0m'
 		set_midcent(7,29)
 		print('\033[u\033[0m' + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*3 + BEAST*1 + BAKGRD*4 + BEAST*3 + BAKGRD*2 + BEAST*5)
 		print('\033[u\033[1B\033[0m' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*6 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*2 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1)
@@ -708,6 +740,9 @@ def build_level():
 		print('\033[u\033[6B\033[0m' + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*1 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*2 + BEAST*3 + BAKGRD*4 + BEAST*1)
 		play_audio('begin')
 		sleep(.5) # delay to show options
+		if (fitted): # temporary solution until intro prints a fitted board
+			BAKGRD = xbgx + '  '
+			BEAST =	'\033[31m' + xbgx + chr(9500) + chr(9508)	+ '\033[0m'
 
 #################################################################-- Clear Last Level
 	if (lives == 0): ############### If the player lost the last level
@@ -720,16 +755,17 @@ def build_level():
 		if level == 1: wordvar = ' level'
 		else: wordvar = ' levels'
 		set_topleft(3,3)
-		print('\033[u\033[37m' + xbgx + 'You died. You lost \033[36m' + str(NO_LIVES) + ' points\033[37m and got held back \033[36m' + str(lostlevels) + wordvar + '.\033[37m\033[0m')
+		print('\033[u\033[37m' + xbgx + 'Player defeated. You lost \033[36m' + str(NO_LIVES) + ' points\033[37m and got held back \033[36m' + str(lostlevels) + wordvar + '.\033[37m\033[0m')
 	else:
 		newlevel = level + 1
 
 #################################################################-- Show Options
-
+	if (fitted): xbgx = '' # temporary solution until intro prints a fitted board
 	set_botleft(1,0)
 	print('\033[u\033[37m' + xbgx + 'Press \033[36mspacebar\033[37m to play \033[1;35mlevel ' + str(newlevel) + '\033[0m')
 	set_botleft(0,0)
 	print('\033[u\033[37m' + xbgx + 'Press \033[36mtab\033[37m for \033[1;35msettings\033[37m\033[0m')
+	if (fitted): xbgx = '\033[40m'# temporary solution until intro prints a fitted board
 	while (True):
 		if (keypress == ord(' ')):
 			sleep(1) # delay for effect before entering settings
