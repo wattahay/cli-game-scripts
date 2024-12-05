@@ -41,7 +41,7 @@ Set up a terminal with an increased ~26 font size, and a Dark Tango color palett
 
 * **-t** transparent background
 * **-f** fitted to terminal
-	* **-f:x** x = padding size
+	* **-f:x** (x = additional padding, usually between 1 and 5)
 * **-k:hjkl** key controls
 	* **options** "wasd", "arrows", "hjkl"
 * **-w:50** custom game width:2-digit number (option trumps fitted width)
