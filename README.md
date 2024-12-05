@@ -41,6 +41,8 @@ Yellow/Orange Blocks.....immovable
 
 ### Script Options
 
+`python3 beast.py -w:54 -h:30 -t -k:hjkl`
+
 ```
 -t.........transparent background
 -f.........fitted to terminal
@@ -54,9 +56,7 @@ Yellow/Orange Blocks.....immovable
 	2-digit number (option trumps fitted height)
 ```
 
-**Example:** `python3 beast.py -w:54 -h:30 -t -k:hjkl`
-
-[Terminal Fitting Options](https://github.com/wattahay/cli-game-scripts/wiki/Terminal-Fitting-Options)
+See: [Terminal Fitting Options](https://github.com/wattahay/cli-game-scripts/wiki/Terminal-Fitting-Options)
 
 ### Controls
 
