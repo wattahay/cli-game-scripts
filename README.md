@@ -42,6 +42,7 @@ Yellow/Orange Blocks.....immovable
 ### Script Options
 
 Example:
+
 `python3 beast.py -w:54 -h:30 -t -k:hjkl`
 
 ```
