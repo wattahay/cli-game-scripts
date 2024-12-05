@@ -40,10 +40,12 @@ Set up a terminal with an increased ~26 font size, and a Dark Tango color palett
 ### Script Options
 
 * **-t** transparent background
+* **-f** fitted to terminal
+	* **-f:x** x = padding size
 * **-k:hjkl** key controls
 	* **options** "wasd", "arrows", "hjkl"
-* **-w:50** custom game width:2-digit number
-* **-h:30** custom game height:2-digit number
+* **-w:50** custom game width:2-digit number (option trumps fitted width)
+* **-h:30** custom game height:2-digit number (option trumps fitted height)
 
 **Example:** python3 beast.py -w:54 -h:30 -t -k:hjkl
 
