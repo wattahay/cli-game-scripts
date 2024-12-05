@@ -39,13 +39,18 @@ There is a large point penalty, and a level panalty, for losing 5 lives.
 
 ### Script Options
 
-* **-t** transparent background
-* **-f** fitted to terminal
-	* **-f:x** (x = additional padding, usually between 1 and 5)
-* **-k:hjkl** key controls
-	* **options** "wasd", "arrows", "hjkl"
-* **-w:50** custom game width:2-digit number (option trumps fitted width)
-* **-h:30** custom game height:2-digit number (option trumps fitted height)
+```
+'-t'.........transparent background
+'-f'.........fitted to terminal
+'-f:2'...additional padding
+	x = 1-to-5 accommodates varied terminal spacing differences
+'-k:hjkl'....key controls
+	options: "wasd", "arrows", "hjkl"
+-w:50........custom game width
+	2-digit number (option trumps fitted width)
+'-h:30'......custom game height
+	2-digit number (option trumps fitted height)
+```
 
 **Example:** python3 beast.py -w:54 -h:30 -t -k:hjkl
 
@@ -53,13 +58,15 @@ There is a large point penalty, and a level panalty, for losing 5 lives.
 
 ### Controls
 
+```
 * 'spacebar'......enter level / exit settings
 * 'esc'...........quit the game
 * 'tab'...........enter options menu / switch tabs in options menu
 * 'p'.............pause
 * 'b'.............debug stats
-* shift...........pull blocks
+* 'shift'.........pull blocks
 * 'r'.............restore screen for a resized terminal
+```
 
 Player movement control has 3 options in the settings menu:
 
