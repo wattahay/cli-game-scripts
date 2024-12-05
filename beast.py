@@ -998,6 +998,7 @@ def build_level():
 			dangerousorange = '[\033[1;35m Dangerous Orange \033[37m]'
 
 	def tabkey_note():
+		global xbgx
 		set_botleft(1,0)
 		print('\033[u\033[0m' + xbgx + '\033[37mPress \033[36mspacebar\033[37m to play \033[1;35mlevel ' + str(newlevel) + '\033[0m')
 		set_botleft(0,0)
