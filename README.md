@@ -48,11 +48,11 @@ Example:
 ```
 -t.........transparent background
 -f.........fitted to terminal
--f:2...additional padding
+-f:2.......additional padding
 	1-to-5 accommodates terminal spacing differences
 -k:hjkl....key controls
 	options: "wasd", "arrows", "hjkl"
--w:50........custom game width
+-w:50......custom game width
 	2-digit number (option trumps fitted width)
 -h:30......custom game height
 	2-digit number (option trumps fitted height)
