@@ -18,17 +18,19 @@ Move blocks around to squash the enemy pawns. Get points. Clear the level to pro
 
 There is a large point penalty, and a level panalty, for losing 5 lives.
 
-* **Beasts** are red 'H's
-	* Beasts can be crushed using regular green blocks
-* **Monsters** are double-lined red 'H's
-	* Monsters must be crushed right against yellow or orange blocks
-* **Eggs** hatch into monsters
-	* **To kill eggs**, they must be pushed into yellow/orange blocks, using green blocks
-	* New eggs might appear in the distance when Monsters swarm around you
-* **Green blocks** can be **pushed and pulled**
-* **Yellow/orange** blocks are immovable
-	* Orange blocks destroy/explode green blocks that are pushed into them.
-	* **Orange blocks kill you** if you walk into them
+```
+Beasts...................red 'H's
+	Beasts can be crushed using regular green blocks
+Monsters.................double-lined red 'H's
+	Monsters must be crushed right against yellow/orange blocks
+Eggs.....................hatch into monsters
+	To kill eggs, they must be pushed into yellow/orange blocks, using green blocks
+	New eggs might appear in the distance when Monsters swarm around you
+Green Blocks.............can be pushed and pulled
+Yellow/Orange Blocks.....immovable
+	Orange blocks destroy/explode green blocks that are pushed into them.
+	Orange blocks kill you if you walk into them
+```
 
 ### Runs in Linux Terminal
 
@@ -40,15 +42,15 @@ There is a large point penalty, and a level panalty, for losing 5 lives.
 ### Script Options
 
 ```
-'-t'.........transparent background
-'-f'.........fitted to terminal
-'-f:2'...additional padding
+-t.........transparent background
+-f.........fitted to terminal
+-f:2...additional padding
 	x = 1-to-5 accommodates varied terminal spacing differences
-'-k:hjkl'....key controls
+-k:hjkl....key controls
 	options: "wasd", "arrows", "hjkl"
 -w:50........custom game width
 	2-digit number (option trumps fitted width)
-'-h:30'......custom game height
+-h:30......custom game height
 	2-digit number (option trumps fitted height)
 ```
 
@@ -59,20 +61,22 @@ There is a large point penalty, and a level panalty, for losing 5 lives.
 ### Controls
 
 ```
-* 'spacebar'......enter level / exit settings
-* 'esc'...........quit the game
-* 'tab'...........enter options menu / switch tabs in options menu
-* 'p'.............pause
-* 'b'.............debug stats
-* 'shift'.........pull blocks
-* 'r'.............restore screen for a resized terminal
+spacebar......enter level / exit settings
+esc...........quit the game
+tab...........enter options menu / switch tabs in options menu
+p.............pause
+b.............debug stats
+shift.........pull blocks
+r.............restore screen for a resized terminal
 ```
 
 Player movement control has 3 options in the settings menu:
 
-* w,a,s,d
-* arrow keys
-* h,j,k,l
+```
+w,a,s,d
+arrow keys
+h,j,k,l
+```
 
 
 ### Change Many Default Settings in the beast.py Script
@@ -81,16 +85,18 @@ Player movement control has 3 options in the settings menu:
 
 If you open the script in a text editor, you will see the commented section: **Useful Variables**
 
-* Change level presets
-* Enemy kill points
-* Enemy speeds
-* Point loss penalty
-* Level penalty
-* Game clock speed
-* Default player controls setting
-* Enemies per level
-* Randomness of enemy movement
-* OS keyboard codes
+```
+Change level presets
+Enemy kill points
+Enemy speeds
+Point loss penalty
+Level penalty
+Game clock speed
+Default player controls setting
+Enemies per level
+Randomness of enemy movement
+OS keyboard codes
+```
 
 ### Best Terminals
 
@@ -121,7 +127,7 @@ Most terminals have profiles you can create for unique purposes.
 * persistent settings storage
 * custom level files
 * start script with custom level settings profile
-* 
+
 ### Next Gameplay Features
 
 * Better egg hatching
