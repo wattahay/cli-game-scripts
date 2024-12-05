@@ -49,6 +49,8 @@ Set up a terminal with an increased ~26 font size, and a Dark Tango color palett
 
 **Example:** python3 beast.py -w:54 -h:30 -t -k:hjkl
 
+[Terminal Fitting Options](https://github.com/wattahay/cli-game-scripts/wiki/Terminal-Fitting-Options)
+
 ### Controls
 
 * 'spacebar'......enter level / exit settings
