@@ -41,13 +41,14 @@ Yellow/Orange Blocks.....immovable
 
 ### Script Options
 
+Example:
 `python3 beast.py -w:54 -h:30 -t -k:hjkl`
 
 ```
 -t.........transparent background
 -f.........fitted to terminal
 -f:2...additional padding
-	x = 1-to-5 accommodates varied terminal spacing differences
+	1-to-5 accommodates terminal spacing differences
 -k:hjkl....key controls
 	options: "wasd", "arrows", "hjkl"
 -w:50........custom game width
