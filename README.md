@@ -46,7 +46,7 @@ Example:
 `python3 beast.py -w:54 -h:30 -t -k:hjkl`
 
 ```
--t.........transparent background
+-t.........transparent background (settings tabs need work)
 -f.........fitted to terminal
 -f:2.......additional padding
 	1-to-5 accommodates terminal spacing differences
