@@ -96,21 +96,29 @@ KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in t
 ################################################################################################
 trnsprnt = False	# calibrate terminal spacing
 tcomp = 0			# compensation for ansi-based terminal spacing
-termpad = 0			# padding for terminal fit screen
+left_pad = 0			# padding for terminal fitted screen
+top_pad = 0			# padding for terminal fitted screen
 fitted = False		# whether or not the -f option is chosen
+stat_rows = 1		# rows for game stats
 ################################################-- argv assignments
 for i in argv:
 	if i[0:3] == '-f:':
 		if(i[3:].isdigit() & len(i[3:]) < 3):
-			termpad = int(i[3:])
+			left_pad = int(i[3:]) * 2
+			top_pad = int(i[3:])
 		else:
-			termpad = 0
-	else: termpad = 0
+			left_pad = 0
+			top_pad = 0
+	else:
+		left_pad = 0
+		top_pad = 0
 	if i[0:2] == '-f':
 		fitted = True
-		term_rows, term_cols, tty_cols = get_rw_cl_tcl(1,1,1)
-		play_rows = term_rows - 5 - termpad*2
-		play_cols = term_cols - 2 - termpad*2
+		term_rows, tot_cols = get_rw_cl_tcl(1,0,1)
+		if term_rows % 2 == 0: alt = 0
+		else: alt = 1
+		play_rows = term_rows - 2 - top_pad*2 - stat_rows
+		play_cols = (tot_cols - 4 - left_pad * 2) / 2
 
 for i in argv:
 	if i[0:2] == '-t':
@@ -122,10 +130,10 @@ for i in argv:
 		if i[3:] == 'hjkl': dir_keys = 2
 	if i[0:3] == '-h:':
 		if(i[3:].isdigit() & len(i[3:]) < 2):
-			play_rows = int(i[3:]) + termpad*2
+			play_rows = int(i[3:]) + top_pad*2
 	if i[0:3] == '-w:':
 		if(i[3:].isdigit() & len(i[3:]) < 3):
-			play_cols = int(i[3:]) + termpad*2
+			play_cols = int(i[3:]) + left_pad
 ################################################-- keyboard constants
 KEY_UP = KYBD[dir_keys]["K_UP"]
 KEY_DOWN = KYBD[dir_keys]["K_DOWN"]
@@ -181,42 +189,44 @@ plr_flash = 0
 plr_frames = (int(.05 / LCD_TIME) * 2)
 plr_frame = 0
 ################################################-- board variables
+level = 0
 board = []
 blank_board = []
-if (play_rows < 20): play_rows = int(20)
-else: play_rows = int(play_rows)
-if (play_cols < 40): play_rows = int(40)
-else: play_cols = int(play_cols)
-if (play_rows % 2 != 0): play_rows -= 1
-if (play_cols % 2 != 0): play_cols -= 1
+if (play_rows < 20): play_rows = 20
+if (play_cols < 40): play_rows = 40
+play_rows = int(play_rows)
+play_cols = int(play_cols)
+board_rows = play_rows + 2
+board_cols = play_cols + 2
 ################################################-- spacing variables
 left_margin = 0
 top_margin = 0 # 1 is the lowest that the top margin can be, because of a specific issue with the print function
-stat_pad = 0
+stat_grow_limit = 52 # greatest board width of centered stats
+left_stat = 6
+min_rows = board_rows + stat_rows
 ################################################################################################
 ###########################################################-- Functions --######################
 ################################################################################################
 def close_game(): # close game function
 	system('clear')
-	sleep(.2)
+	sleep(.1)
 	system('clear')
 	try:
 		raise KeyboardInterrupt
 	except KeyboardInterrupt:
+		system('clear')
+		sleep(.1)
+		system('clear')
 		system('reset')
 		exit()
 ######################################-- Linux aplay audio function
 def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
 ######################################-- get/set game dimensions
 def set_board_spacing(): #{
-	global top_margin, left_margin, board_rows, board_cols, stat_pad, debug, termpad, play_rows, play_cols
+	global top_margin, left_margin, board_rows, board_cols, play_rows, play_cols
+	global left_stat, statpad, stat_rows, min_rows, stat_grow_limit, level, debug
 
 	screen_rows, screen_cols = get_rw_cl_tcl(1,0,1)
-
-	board_rows = play_rows + 2
-	board_cols = play_cols + 2
-
-	stat_grow_limit = 52 # size according to board columns
 
 	if (board_rows > screen_rows - 6):
 		debug = False
@@ -225,13 +235,16 @@ def set_board_spacing(): #{
 		top_margin = 0
 		left_margin = 0
 	else:
-		top_margin = int((screen_rows - board_rows) / 2)
-		left_margin = int(screen_cols / 2) - board_cols
+		left_margin = int((screen_cols - (board_cols*2)) / 2)
+		top_margin = int((screen_rows - min_rows) / 2)
+
+	left_margin += 1
+	top_margin += 1
 
 	if board_cols <= stat_grow_limit:
-		stat_pad = 6
+		statpad = left_stat
 	else:
-		stat_pad = board_cols - stat_grow_limit + 6
+		statpad = board_cols - stat_grow_limit + left_stat
 
 ######################################-- Create new board array with background and border
 def build_the_board(): #{ BUILDS a blank board
@@ -272,13 +285,10 @@ def set_midcent(topcomp, leftcomp):
 
 ########################################################-- print board function
 def print_board(board_array): #{
-	global top_margin, left_margin, score, lives, level, board_rows, board_cols, stat_pad, play_rows, play_cols, termpad, term_cols, term_rows
-	left = '1'
-	top = '1'
-	if top_margin > 0: top = str(top_margin)
-	if left_margin > 0: left = str(left_margin)
+	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, play_rows, play_cols, term_cols, term_rows
 
-	print('\033[?25l\033[' + top + ';' + left + 'H\033[s\033[0m')
+
+	print('\033[?25l\033[' + str(top_margin) + ';' + str(left_margin) + 'H\033[s\033[0m')
 
 	for rowi in range(board_rows):
 		if (rowi == 0): print('\033[u' + ''.join(board_array[rowi]))
@@ -302,9 +312,10 @@ def print_board(board_array): #{
 		lives_stat = chr(9477) + ' LIVES: ' + str(lives) + ' ' + chr(9477)
 
 		print( '\033[u\033[0m\033[37m\033[' + str(len(board)) + 'B' +
-			'\033[s\033[' + str(stat_pad) 									+ 'C'	+ level_stat + '   ' +
+			'\033[s\033[' + str(statpad) 									+ 'C'	+ level_stat + '   ' +
 			'\033[u\033[' + str(board_cols - int(len(score_stat)/2))		+ 'C' 	+ score_stat + '   ' +
-			'\033[u\033[' + str(board_cols*2 - stat_pad - len(lives_stat))	+ 'C' 	+ lives_stat + '   ' )
+			'\033[u\033[' + str(board_cols*2 - statpad - len(lives_stat))	+ 'C' 	+ lives_stat + '   ' +
+			'\033[0m\033[?25\033[1A')
 
 ##########################################-- place the pieces
 def place_beasts(count):
@@ -1373,6 +1384,7 @@ def take_input():
 		if (game_play_mode):
 			if keypress == ord('r'):
 				keypress = 999
+				system('clear')
 				set_board_spacing()
 				system('clear')
 			elif keypress == ord('b'):
@@ -1459,6 +1471,7 @@ try:
 			hatch_eggs()
 			flash_player()
 			print_board(board)
+			print('\033[0;0H\033[30m\033[43m' + str(get_rw_cl_tcl(1,0,1)) + '\033[0m')
 		exec_end = time()
 		exec_time = exec_end - exec_start
 		if (LCD_TIME > exec_time):
