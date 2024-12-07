@@ -5,19 +5,6 @@ from time import sleep, time
 from threading import Thread
 from sys import argv
 
-######################################-- script's directory path
-script_dir = path.abspath( path.dirname( __file__ ) )
-######################################-- Linux aplay audio function
-def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
-######################################-- get terminal size
-def get_rw_cl_tcl(rw, cl, tcl): # example call: tty_cols = get_rw_cl_tcl(0,0,1)
-	rows, ttycols = [int(x) for x in popen('stty size', 'r').read().split()]
-	size = []
-	if int(rw): size.append(rows)
-	if int(cl): size.append(int(ttycols / 2))
-	if int(tcl): size.append(ttycols)
-	if len(size) == 1: return size[0]
-	else: return size
 ################################################################################################
 ###########################################################-- Useful Variables --###############
 ################################################################################################
@@ -31,8 +18,6 @@ EGG_SCR = 8			# points for killing eggs
 MONSTER_SCR = 10	# points for killing monsters
 NO_LIVES = 50		# point penalty for losing all lives
 NO_LEVEL = 3		# level penalty for losing all lives
-#########################################################-- background color ansi
-xbgx = '\033[40m'
 #########################################################-- game frame time
 LCD_TIME = .02		# example: .03 = 1 frame every .03 seconds (3 hundredths of a second)
 #########################################################-- size of the board
@@ -44,7 +29,7 @@ play_cols = 40		# 40 - 120
 # Each level is surrounded by curly brackets, while the outer brackets are square
 # Make sure all bracketted levels are followed by a comma (except for the last level)
 GAME_LEVELS = [
-		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'yellow'}, # Level 1
+		{'beasts':3,	'monsters':0,	'eggs':5, 	'block': 'yellow'}, # Level 1
 		{'beasts':5,	'monsters':0,	'eggs':0,	'block': 'orange'},	# Level 2
 		{'beasts':5,	'monsters':0,	'eggs':2,	'block': 'yellow'}, # Level 3
 		{'beasts':0,	'monsters':0,	'eggs':1,	'block': 'orange'},	# Level 4
@@ -92,11 +77,34 @@ KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in t
 		{"title":"h,j,k,l", "K_UP":107, "K_DOWN":106, "K_RIGHT":108, "K_LEFT":104, "PK_UP":75,  "PK_DOWN":74,  "PK_RIGHT":76,  "PK_LEFT":72}
 	]
 ################################################################################################
-###########################################################-- More Variables --#################
+###########################################################-- Utility Functions --##############
 ################################################################################################
+######################################-- Linux aplay audio function
+script_dir = path.abspath( path.dirname( __file__ ) )
+def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
+######################################-- get terminal size
+def get_rw_cl_tcl(rw, cl, tcl): # get rows, columns, and terminal columns
+	rows, ttycols = [int(x) for x in popen('stty size', 'r').read().split()]
+	size = []
+	if int(rw): size.append(rows)
+	if int(cl): size.append(int(ttycols / 2))
+	if int(tcl): size.append(ttycols)
+	if len(size) == 1: return size[0]
+	else: return size
+#########################################################-- background color ansi
+def tbg(ret): # tbg(1)
+	global xbgx, trnsprnt
+	if trnsprnt: xbgx = '\033[49m'
+	else: xbgx = '\033[40m'
+	if ret == 1: return xbgx
+################################################################################################
+######################################################-- More Global Variables --###############
+################################################################################################
+######################################-- script's directory path
+xbgx: '\033[40m'
 trnsprnt = False	# calibrate terminal spacing
 tcomp = 0			# compensation for ansi-based terminal spacing
-left_pad = 0			# padding for terminal fitted screen
+left_pad = 0		# padding for terminal fitted screen
 top_pad = 0			# padding for terminal fitted screen
 fitted = False		# whether or not the -f option is chosen
 stat_rows = 1		# rows for game stats
@@ -118,7 +126,11 @@ for i in argv:
 		if term_rows % 2 == 0: alt = 0
 		else: alt = 1
 		play_rows = term_rows - 2 - top_pad*2 - stat_rows
+		if (play_rows % 2 == 1):
+			play_rows -= 1 # board size must be even until multi-egg pushing allows odd
 		play_cols = (tot_cols - 4 - left_pad * 2) / 2
+		if (play_cols % 2 == 1): # board size must be even until multi-egg pushing allows odd
+			play_cols -= 1
 
 for i in argv:
 	if i[0:2] == '-t':
@@ -174,10 +186,10 @@ eggsub = 8329   # unicode key for subscript 9 (8328 = 8, and so on)
 egg2nd = 32     # unicode key for a space character
 # The below function returns and egg character with the appropriate subscript
 def EGG(sub):
-		return '\033[0m\033[0m\033[0m\033[37m' + xbgx + '\033[2m' + chr(11052) + '\033[1m' + chr(sub) + '\033[0m'
+	return '\033[0m\033[0m\033[0m\033[37m' + xbgx + '\033[2m' + chr(11052) + '\033[1m' + chr(sub) + '\033[0m'
 # The below function is used to detect an egg independent of its changing subscript
 def deteggt(chegg):
-		if (chegg[0:12] == '\033[0m\033[0m\033[0m'): return True
+	if (chegg[0:12] == '\033[0m\033[0m\033[0m'): return True
 ################################################-- Pawn Classes (Dictionaries)
 beasts = [{ 'frames': (int(beast_speed / LCD_TIME)), 'frame':0, 'chr': BEAST, 'pnts': BEAST_SCR }]
 monsters = [{ 'frames': (int(monster_speed / LCD_TIME)), 'frame':0, 'chr': MONSTER, 'pnts': MONSTER_SCR }]
@@ -205,7 +217,7 @@ stat_grow_limit = 52 # greatest board width of centered stats
 left_stat = 6
 min_rows = board_rows + stat_rows
 ################################################################################################
-###########################################################-- Functions --######################
+###########################################################-- Utility Functions --##############
 ################################################################################################
 def close_game(): # close game function
 	system('clear')
@@ -219,8 +231,26 @@ def close_game(): # close game function
 		system('clear')
 		system('reset')
 		exit()
-######################################-- Linux aplay audio function
-def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
+########################################################-- cursor preset functions
+def set_topleft(top, left):
+	global top_margin, left_margin, xbgx
+	tbg(0)
+	print('\033[?25l\033[' + str(2 + top_margin + top)  + ';' + str(4 + left_margin + left) + 'H\033[s\033[0m' + xbgx)
+
+def set_botleft(bottom, left):
+	global top_margin, left_margin, board_cols, board_rows, xbgx
+	print('\033[?25l\033[' + str(top_margin + int(board_rows - bottom - 3)) + ';' + str(4 + left_margin + left) + 'H\033[s\033[0m' + xbgx)
+
+#def set_topcent(top, leftcomp):
+#	global top_margin, left_margin, board_cols
+#	print('\033[?25l\033[' + str(2 + top_margin + top) + ';' + str(left_margin + int(board_cols) - leftcomp) + 'H\033[s\033[0m')
+
+def set_midcent(topcomp, leftcomp):
+	global top_margin, left_margin, board_cols, board_rows, xbgx
+	print('\033[?25l\033[' + str(top_margin + int(board_rows / 2) - topcomp) + ';' + str(left_margin + board_cols - leftcomp) + 'H\033[s\033[0m' + xbgx)
+################################################################################################
+###########################################################-- Board Functions --################
+################################################################################################
 ######################################-- get/set game dimensions
 def set_board_spacing(): #{
 	global top_margin, left_margin, board_rows, board_cols, play_rows, play_cols
@@ -265,23 +295,6 @@ def build_the_board(): #{ BUILDS a blank board
 
 	return screen_board
 #}
-
-########################################################-- cursor preset functions
-def set_topleft(top, left):
-	global top_margin, left_margin
-	print('\033[?25l\033[' + str(2 + top_margin + top)  + ';' + str(4 + left_margin + left) + 'H\033[s\033[0m')
-
-def set_botleft(bottom, left):
-	global top_margin, left_margin, board_cols, board_rows
-	print('\033[?25l\033[' + str(top_margin + int(board_rows - bottom - 3)) + ';' + str(4 + left_margin + left) + 'H\033[s\033[0m')
-
-#def set_topcent(top, leftcomp):
-#	global top_margin, left_margin, board_cols
-#	print('\033[?25l\033[' + str(2 + top_margin + top) + ';' + str(left_margin + int(board_cols) - leftcomp) + 'H\033[s\033[0m')
-
-def set_midcent(topcomp, leftcomp):
-	global top_margin, left_margin, board_cols, board_rows
-	print('\033[?25l\033[' + str(top_margin + int(board_rows / 2) - topcomp) + ';' + str(left_margin + board_cols - leftcomp) + 'H\033[s\033[0m')
 
 ########################################################-- print board function
 def print_board(board_array): #{
@@ -700,17 +713,14 @@ def pause():
 	global board_rows, board_cols, left_margin, top_margin, keypress
 
 	play_audio('pause')
+	tbg(0) # handles transparent background
+	set_midcent(6, 8)
+	print('\033[u\033[1B' + xbgx + chr(9556) + chr(9552)*12 + chr(9559))
+	print('\033[u\033[2B' + xbgx + chr(9553) + '            ' + chr(9553))
+	print('\033[u\033[3B' + xbgx + chr(9553) + '   PAUSED   ' + chr(9553))
+	print('\033[u\033[4B' + xbgx + chr(9553) + '            ' + chr(9553))
+	print('\033[u\033[5B' + xbgx + chr(9562) + chr(9552)*12 + chr(9565))
 
-	pauseleft = (left_margin + board_cols - 8)
-	pausetop = (top_margin + int(board_rows/4))
-	print('\033[0m' + xbgx )
-	print('\033[' + str(pausetop) + ';' + str(pauseleft) + 'H' + ' '*16)
-	print('\033[' + str(pausetop + 1) + ';' + str(pauseleft) + 'H' + ' ' + chr(9556) + chr(9552)*12 + chr(9559) + ' ')
-	print('\033[' + str(pausetop + 2) + ';' + str(pauseleft) + 'H' + ' ' + chr(9553) + '            ' + chr(9553) + ' ')
-	print('\033[' + str(pausetop + 3) + ';' + str(pauseleft) + 'H' + ' ' + chr(9553) + '   PAUSED   ' + chr(9553) + ' ')
-	print('\033[' + str(pausetop + 4) + ';' + str(pauseleft) + 'H' + ' ' + chr(9553) + '            ' + chr(9553) + ' ')
-	print('\033[' + str(pausetop + 5) + ';' + str(pauseleft) + 'H' + ' ' + chr(9562) + chr(9552)*12 + chr(9565) + ' ')
-	print('\033[' + str(pausetop + 6) + ';' + str(pauseleft) + 'H' + ' '*16)
 
 	print('\033[H\033[0m')
 
@@ -828,6 +838,7 @@ def build_level():
 	main_menu = 0
 	item_menu = 0
 	controls_menu = 9
+	tbg(0) # handles transparent background
 	dim = '\033[0m' + xbgx + '\033[2m'
 	norm = '\033[0m' + xbgx
 	ltab = '\033[0m\033[7m' + xbgx
@@ -889,6 +900,7 @@ def build_level():
 #################################################################-- Settings Functions
 	def dim_menus(mi):
 		global mi1_shade, mi2_shade, mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, mi9_shade, mi10_shade, mi11_shade, mi12_shade
+
 		if mi != 1: mi1_shade = dim ########### 1 -- direction keys group
 		else: mi1_shade = norm
 		if mi != 2: mi2_shade = dim ########### 2 -- block-pull method
@@ -928,6 +940,7 @@ def build_level():
 	def main_menu_2():
 		global mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, BLOCK, block_type, KILLBLOCK, normalyellow, dangerousorange,  play_rows, play_cols
 		global lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt
+
 		print('\033[u\033[4B\033[34C' + xbgx + 'Total Spaces: \033[36m' + str(play_rows * play_cols) + ' \033[37m')
 		print('\033[u\033[5B\033[35C' + xbgx + 'Used Spaces: \033[36m' + str(lvl_box_cnt + lvl_block_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt) + ' \033[37m')
 		print('\033[u\033[6B\033[35C' + xbgx + 'Free Spaces: \033[36m' + str((play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)) + ' \033[37m')
@@ -1017,6 +1030,7 @@ def build_level():
 
 	def tabkey_note():
 		global xbgx
+
 		set_botleft(1,0)
 		print('\033[u\033[0m' + xbgx + '\033[37mPress \033[36mspacebar\033[37m to play \033[1;35mlevel ' + str(newlevel) + '\033[0m')
 		set_botleft(0,0)
