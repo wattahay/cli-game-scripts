@@ -46,13 +46,13 @@ GAME_LEVELS = [
 		{'beasts':15,	'monsters':0,	'eggs':0,	'block': 'orange'} 	# Level 15
 	]
 ########################################################-- Pawn Movement Priority Odds
-# These values are the odds of moves for an enemy if those		|---------|
-# moves are available to it. If a move is not available,		| 5  4  3 |
-# then its odds are absorbed: 1st by its equal counterpart,		| 4  H  2 |
-# and then by the next lower priority, etc. Each of the 5 		| 3  2  1 |
-# priorities is greater or equal to the sum of all lower 		|---------|
-# priority moves.											5 Move Priorities
-########################-- Examples
+# These values are the odds of moves for an enemy if those		|---------------------
+# moves are available to it. If a move is not available,		| 5  4  3 	
+# then its odds are absorbed: 1st by its equal counterpart,		| 4  H  2 	
+# and then by the next lower priority, etc. Each of the 5 		| 3  2  1 	
+# priorities is greater or equal to the sum of all lower 		|		 \	
+# priority moves.												|		   \
+########################-- Examples								|			<>
 # Max Randomness	1, 1, 1, 3, 3, 9, 9, 27
 # High				1, 1, 1, 4, 4, 16, 16, 50		1, 2, 2, 6, 6, 18, 18, 55
 # Medium			1, 1, 1, 4, 4, 20, 20, 90		1, 2, 2, 8, 8, 26, 26, 98
