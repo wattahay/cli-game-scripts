@@ -94,7 +94,7 @@ KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in t
 ################################################################################################
 ###########################################################-- More Variables --#################
 ################################################################################################
-calibrate = False	# calibrate terminal spacing
+trnsprnt = False	# calibrate terminal spacing
 tcomp = 0			# compensation for ansi-based terminal spacing
 termpad = 0			# padding for terminal fit screen
 fitted = False		# whether or not the -f option is chosen
@@ -115,6 +115,7 @@ for i in argv:
 for i in argv:
 	if i[0:2] == '-t':
 		xbgx = '\033[49m'
+		trnsprnt = True
 	if i[0:3] == '-k:':	# "wasd", "arrows", "hjkl"
 		if i[3:] == 'wasd': dir_keys = 0
 		if i[3:] == 'arrows': dir_keys = 1
@@ -766,7 +767,7 @@ def build_level():
 		newlevel = level + 1
 
 #################################################################-- Show Options
-	if (fitted): xbgx = '' # temporary solution until intro prints a fitted board
+	if (fitted & trnsprnt): xbgx = '\033[49m' # temporary solution until intro prints a fitted board
 	set_botleft(1,0)
 	print('\033[u\033[37m' + xbgx + 'Press \033[36mspacebar\033[37m to play \033[1;35mlevel ' + str(newlevel) + '\033[0m')
 	set_botleft(0,0)
