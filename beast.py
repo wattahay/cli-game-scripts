@@ -10,10 +10,14 @@ script_dir = path.abspath( path.dirname( __file__ ) )
 ######################################-- Linux aplay audio function
 def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
 ######################################-- get terminal size
-def get_tty():
+def get_rw_cl_tcl(rw, cl, tcl): # example call: tty_cols = get_rw_cl_tcl(0,0,1)
 	rows, ttycols = [int(x) for x in popen('stty size', 'r').read().split()]
-	cols = int(ttycols / 2)
-	return rows, cols
+	size = []
+	if int(rw): size.append(rows)
+	if int(cl): size.append(int(ttycols / 2))
+	if int(tcl): size.append(ttycols)
+	if len(size) == 1: return size[0]
+	else: return size
 ################################################################################################
 ###########################################################-- Useful Variables --###############
 ################################################################################################
@@ -104,23 +108,23 @@ for i in argv:
 	else: termpad = 0
 	if i[0:2] == '-f':
 		fitted = True
-		term_rows, term_cols = get_tty()
-		play_rows = term_rows - 4 - termpad*2
+		term_rows, term_cols, tty_cols = get_rw_cl_tcl(1,1,1)
+		play_rows = term_rows - 5 - termpad*2
 		play_cols = term_cols - 2 - termpad*2
 
 for i in argv:
 	if i[0:2] == '-t':
-		xbgx = ''
+		xbgx = '\033[49m'
 	if i[0:3] == '-k:':	# "wasd", "arrows", "hjkl"
 		if i[3:] == 'wasd': dir_keys = 0
 		if i[3:] == 'arrows': dir_keys = 1
 		if i[3:] == 'hjkl': dir_keys = 2
 	if i[0:3] == '-h:':
 		if(i[3:].isdigit() & len(i[3:]) < 2):
-			play_rows = int(i[3:]) + termpad
+			play_rows = int(i[3:]) + termpad*2
 	if i[0:3] == '-w:':
 		if(i[3:].isdigit() & len(i[3:]) < 3):
-			play_cols = int(i[3:]) + termpad
+			play_cols = int(i[3:]) + termpad*2
 ################################################-- keyboard constants
 KEY_UP = KYBD[dir_keys]["K_UP"]
 KEY_DOWN = KYBD[dir_keys]["K_DOWN"]
@@ -206,12 +210,12 @@ def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename
 def set_board_spacing(): #{
 	global top_margin, left_margin, board_rows, board_cols, stat_pad, debug, termpad, play_rows, play_cols
 
-	screen_rows, screen_cols = get_tty()
+	screen_rows, screen_cols = get_rw_cl_tcl(1,0,1)
 
 	board_rows = play_rows + 2
 	board_cols = play_cols + 2
 
-	stat_grow_limit = 60 # size according to board columns
+	stat_grow_limit = 52 # size according to board columns
 
 	if (board_rows > screen_rows - 6):
 		debug = False
@@ -220,16 +224,14 @@ def set_board_spacing(): #{
 		top_margin = 0
 		left_margin = 0
 	else:
-		top_margin = int((screen_rows - board_rows) / 2 + 1)
-		left_margin = int(screen_cols - board_cols + 1)
+		top_margin = int((screen_rows - board_rows) / 2)
+		left_margin = int(screen_cols / 2) - board_cols
 
 	if board_cols <= stat_grow_limit:
 		stat_pad = 6
 	else:
 		stat_pad = board_cols - stat_grow_limit + 6
 
-	if top_margin == 0: top_margin = 1
-	if left_margin == 0: left_margin = 1
 ######################################-- Create new board array with background and border
 def build_the_board(): #{ BUILDS a blank board
 	global board_cols, board_rows
@@ -270,11 +272,15 @@ def set_midcent(topcomp, leftcomp):
 ########################################################-- print board function
 def print_board(board_array): #{
 	global top_margin, left_margin, score, lives, level, board_rows, board_cols, stat_pad, play_rows, play_cols, termpad, term_cols, term_rows
+	left = '1'
+	top = '1'
+	if top_margin > 0: top = str(top_margin)
+	if left_margin > 0: left = str(left_margin)
 
-	print('\033[?25l\033[' + str(top_margin) + ';' + str(left_margin) + 'H\033[s\033[0m')
+	print('\033[?25l\033[' + top + ';' + left + 'H\033[s\033[0m')
 
 	for rowi in range(board_rows):
-		if rowi == 0: print('\033[u' + ''.join(board_array[rowi]))
+		if (rowi == 0): print('\033[u' + ''.join(board_array[rowi]))
 		else: print('\033[u\033[' + str(rowi) +  'B' + ''.join(board_array[rowi]))
 
 	if (debug):
