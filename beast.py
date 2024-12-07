@@ -70,11 +70,11 @@ PRIORITY_ODDS = [
 	]
 #####################################################-- player direction controls
 dir_keys = 0 #   0=wasd     1=arrows     2=hjkl
-
-KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in the git repo)
-		{"title":"w,a,s,d", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
+# Get individual key codes using: python3 getkeycodes.py (included in the git repo)
+KYBD = [ # Customize the 3 options below with key codes from getkeycodes, as well as custom titles.
+		{"title":"wasd", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
 		{"title":"arrows",  "K_UP":259, "K_DOWN":258, "K_RIGHT":261, "K_LEFT":260, "PK_UP":337, "PK_DOWN":336, "PK_RIGHT":402, "PK_LEFT":393},
-		{"title":"h,j,k,l", "K_UP":107, "K_DOWN":106, "K_RIGHT":108, "K_LEFT":104, "PK_UP":75,  "PK_DOWN":74,  "PK_RIGHT":76,  "PK_LEFT":72}
+		{"title":"hjkl", "K_UP":107, "K_DOWN":106, "K_RIGHT":108, "K_LEFT":104, "PK_UP":75,  "PK_DOWN":74,  "PK_RIGHT":76,  "PK_LEFT":72}
 	]
 ################################################################################################
 ###########################################################-- Utility Functions --##############
@@ -92,13 +92,13 @@ def get_rw_cl_tcl(rw, cl, tcl): # get rows, columns, and terminal columns
 	if len(size) == 1: return size[0]
 	else: return size
 #########################################################-- background color ansi
+xbgx = '\033[40m'
+trnsprnt = False	# calibrate terminal spacing
 def tbg(ret): # tbg(1)
 	global xbgx, trnsprnt
 	if trnsprnt: xbgx = '\033[49m'
 	else: xbgx = '\033[40m'
 	if ret == 1: return xbgx
-xbgx: '\033[40m'
-trnsprnt = False	# calibrate terminal spacing
 ################################################################################################
 ######################################################-- More Global Variables --###############
 ################################################################################################
@@ -136,17 +136,15 @@ for i in argv:
 		xbgx = '\033[49m'
 		trnsprnt = True
 	if i[0:3] == '-k:':	# "wasd", "arrows", "hjkl"
-		if i[3:] == 'wasd': dir_keys = 0
-		if i[3:] == 'arrows': dir_keys = 1
-		if i[3:] == 'hjkl': dir_keys = 2
+		if i[3:] == KYBD[0]['title']: dir_keys = 0
+		if i[3:] == KYBD[1]['title']: dir_keys = 1
+		if i[3:] == KYBD[2]['title']: dir_keys = 2
 	if i[0:3] == '-h:':
 		if(i[3:].isdigit() & len(i[3:]) < 2):
 			play_rows = int(i[3:]) + top_pad*2
 	if i[0:3] == '-w:':
 		if(i[3:].isdigit() & len(i[3:]) < 3):
 			play_cols = int(i[3:]) + left_pad
-################################################-- set background post argv
-tbg(0) # set xbgx
 ################################################-- keyboard constants post argv
 KEY_UP = KYBD[dir_keys]["K_UP"]
 KEY_DOWN = KYBD[dir_keys]["K_DOWN"]
@@ -162,7 +160,8 @@ keypress = 999
 debug = False
 pulling = 'hold' # 'hold / 'tog' /  'swi' / 'sin'
 game_play_mode = False
-
+################################################-- set background post argv
+tbg(0) # set xbgx
 ##################################-- formatted character constants --##########################
 # 			Foreground	+ Background	+	Style			+	Unicode Chars 		+ 	Reset
 BAKGRD =				  xbgx 								+ '  '
@@ -718,13 +717,11 @@ def pause():
 	tbg(0) # handles transparent background
 	set_midcent(6, 8)
 	print('\033[u\033[1B' + xbgx + chr(9556) + chr(9552)*12 + chr(9559))
-	print('\033[u\033[2B' + xbgx + chr(9553) + '            ' + chr(9553))
-	print('\033[u\033[3B' + xbgx + chr(9553) + '   PAUSED   ' + chr(9553))
-	print('\033[u\033[4B' + xbgx + chr(9553) + '            ' + chr(9553))
+	print('\033[u\033[2B' + xbgx + chr(9553) + '\033[12C' + chr(9553))
+	print('\033[u\033[3B' + xbgx + chr(9553) + '\033[3CPAUSED\033[3C' + chr(9553))
+	print('\033[u\033[4B' + xbgx + chr(9553) + '\033[12C' + chr(9553))
 	print('\033[u\033[5B' + xbgx + chr(9562) + chr(9552)*12 + chr(9565))
-
-
-	print('\033[H\033[0m')
+	print('\033[?25\033[H\033[0m')
 
 	keypress = 999
 
@@ -741,8 +738,8 @@ def pause():
 ################################################################################################
 def build_level():
 	global GAME_LEVELS, NO_LIVES, NO_LEVEL, incubate, egg_speed, beast_speed, monster_speed, keypress
-	global play_rows, play_cols, board_rows, board_cols, blank_board, board, fitted
-	global newlevel, level, lives, score, mi1_opt, xbgx
+	global play_rows, play_cols, board_rows, board_cols, blank_board, board
+	global newlevel, level, lives, score, mi1_opt, xbgx, fitted, trnsprnt
 	global lvl_block_cnt, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt, lvl_box_cnt, block_type
 	global BEAST, BAKGRD, BLOCK, KILLBLOCK, game_play_mode, top_margin, left_margin, LCD_TIME
 	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT, pulling
@@ -790,7 +787,7 @@ def build_level():
 		newlevel = level + 1
 
 #################################################################-- Show Options
-	if (fitted & trnsprnt): xbgx = '\033[49m' # temporary solution until intro prints a fitted board
+	if (fitted & trnsprnt == False): xbgx = '\033[49m' # temporary solution until intro prints a fitted board
 	set_botleft(1,0)
 	print('\033[u\033[37m' + xbgx + 'Press \033[36mspacebar\033[37m to play \033[1;35mlevel ' + str(newlevel) + '\033[0m')
 	set_botleft(0,0)
@@ -798,7 +795,7 @@ def build_level():
 	if (fitted): xbgx = '\033[40m'# temporary solution until intro prints a fitted board
 	while (True):
 		if (keypress == ord(' ')):
-			sleep(1) # delay for effect before entering settings
+			sleep(.8) # delay for effect before entering settings
 			break
 		if (keypress == 9):
 			sleep(.4) # delay for effect before entering first level
@@ -966,21 +963,21 @@ def build_level():
 		global dir_keys, wasd, arrows, vi, pulling, KYBD, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_RIGHT, KEY_P_LEFT
 		if opt == 1:
 			dir_keys = 0
-			wasd = '\033[37m[\033[1;35m w,a,s,d \033[37m]'
-			arrows = '  arrows  '
-			vi = '  h,j,k,l  '
+			wasd = '\033[1:37m[\033[1;35m ' + KYBD[0]['title'] + ' \033[1;37m]\033[0m'
+			arrows = '  ' + KYBD[1]['title'] + '  '
+			vi = '  ' + KYBD[2]['title'] + '  '
 
 		elif opt == 2:
 			dir_keys = 1
-			wasd = '  w,a,s,d  '
-			arrows = '\033[37m[\033[1;35m arrows \33[37m]'
-			vi = '  h,j,k,l  '
+			wasd = '  ' + KYBD[0]['title'] + '  '
+			arrows = '\033[1;37m[\033[1;35m ' + KYBD[1]['title'] + ' \033[1;37m]\033[0m'
+			vi = '  ' + KYBD[2]['title'] + '  '
 
 		elif opt == 3:
 			dir_keys = 2
-			wasd = '  w,a,s,d  '
-			arrows = '  arrows  '
-			vi = '\033[37m[\033[1;35m h,j,k,l \033[37m]'
+			wasd = '  ' + KYBD[0]['title'] + '  '
+			arrows = '  ' + KYBD[1]['title'] + '  '
+			vi = '\033[1;37m[\033[1;35m ' + KYBD[2]['title'] + ' \033[1;37m]\033[0m'
 
 		KEY_UP = KYBD[dir_keys]["K_UP"]
 		KEY_DOWN = KYBD[dir_keys]["K_DOWN"]
@@ -996,40 +993,40 @@ def build_level():
 
 		if opt == 1:
 			pulling = 'hold'
-			hold = '\033[1;37m[\033[1;35m hold \033[37m]'
+			hold = '\033[1;37m[\033[1;35m hold \033[1;37m]\033[0m'
 			toggle = '  toggle  '
 			single = '  single  '
 			auto = '  auto  '
 		if opt == 2:
 			pulling = 'toggle'
 			hold = '  hold  '
-			toggle = '\033[1;37m[\033[1;35m toggle \033[37m]'
+			toggle = '\033[1;37m[\033[1;35m toggle \033[1;37m]\033[0m'
 			single = '  single  '
 			auto = '  auto  '
 		elif opt == 3:
 			pulling = 'single'
 			hold = '  hold  '
 			toggle = '  toggle  '
-			single = '\033[37m[\033[1;35m single \033[37m]'
+			single = '\033[1;37m[\033[1;35m single \033[1;37m]\033[0m'
 			auto = '  auto  '
 		elif opt == 4:
 			pulling = 'auto'
 			hold = '  hold  '
 			toggle = '  toggle  '
 			single = '  single  '
-			auto = '\033[37m[\033[1;35m auto \033[37m]'
+			auto = '\033[1;37m[\033[1;35m auto \033[1;37m]\033[0m'
 
 	def mi8_controls(opt):
 		global block_type, BLOCK, KILLBLOCK, normalyellow, dangerousorange
 
 		if opt == 1:
 			block_type = BLOCK
-			normalyellow = '\033[1;37m[\033[1;35m Normal Yellow \033[37m]'
+			normalyellow = '\033[1;37m[\033[1;35m Normal Yellow \033[1;37m]\033[0m'
 			dangerousorange = '  Dangerous Orange  '
 		elif opt == 2:
 			block_type = KILLBLOCK
 			normalyellow = '  Normal Yellow  '
-			dangerousorange = '\033[1;37m[\033[1;35m Dangerous Orange \033[37m]'
+			dangerousorange = '\033[1;37m[\033[1;35m Dangerous Orange \033[1;37m]\033[0m'
 
 	def tabkey_note():
 		global xbgx
