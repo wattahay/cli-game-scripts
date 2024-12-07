@@ -102,8 +102,6 @@ trnsprnt = False	# calibrate terminal spacing
 ################################################################################################
 ######################################################-- More Global Variables --###############
 ################################################################################################
-######################################-- script's directory path
-
 tcomp = 0			# compensation for ansi-based terminal spacing
 left_pad = 0		# padding for terminal fitted screen
 top_pad = 0			# padding for terminal fitted screen
