@@ -839,7 +839,8 @@ def build_level():
 	main_menu = 0
 	item_menu = 0
 	controls_menu = 9
-	tbg(0) # handles transparent background
+	#tbg(0) # handles transparent background
+	if trnsprnt: xbgx = '\033[49m'
 	dim = '\033[0m' + xbgx + '\033[2m'
 	norm = '\033[0m' + xbgx
 	ltab = '\033[0m\033[7m' + xbgx
@@ -946,19 +947,19 @@ def build_level():
 		print('\033[u\033[5B\033[35C' + xbgx + 'Used Spaces: \033[36m' + str(lvl_box_cnt + lvl_block_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt) + ' \033[37m')
 		print('\033[u\033[6B\033[35C' + xbgx + 'Free Spaces: \033[36m' + str((play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)) + ' \033[37m')
 
-		print('\033[u\033[3B' + mi3_shade + BEAST + mi3_shade + xbgx + ' - Beast Count: \033[1;35m' + str(lvl_beast_cnt) + ' \033[37m')
-		print('\033[u\033[5B' + mi4_shade + MONSTER + mi4_shade + xbgx + ' - Monster Count: \033[1;35m' + str(lvl_monster_cnt) + ' \033[37m')
-		print('\033[u\033[7B' + mi5_shade + chr(11052) + mi5_shade + xbgx + ' - Egg Count: \033[1;35m' + str(lvl_egg_cnt) + ' \033[37m')
-		print('\033[u\033[9B' + mi6_shade + BOX + mi6_shade + xbgx + ' - Box Count: \033[1;35m' + str(lvl_box_cnt) + ' \033[37m')
-		print('\033[u\033[11B' + mi7_shade + block_type + mi7_shade + xbgx + ' - Block Count: \033[1;35m' + str(lvl_block_cnt) + ' \033[37m')
-		print('\033[u\033[13B' + mi8_shade + block_type + mi8_shade + xbgx + ' - Block Type: ' + normalyellow + mi8_shade + dangerousorange + mi8_shade + ' \033[37m')
+		print('\033[u\033[3B' 	+ mi3_shade 	+ BEAST 			+ mi3_shade + xbgx + ' - Beast Count: \033[1;35m' + str(lvl_beast_cnt) + ' \033[37m')
+		print('\033[u\033[5B' 	+ mi4_shade 	+ MONSTER 			+ mi4_shade + xbgx + ' - Monster Count: \033[1;35m' + str(lvl_monster_cnt) + ' \033[37m')
+		print('\033[u\033[7B' 	+ mi5_shade 	+ chr(11052) + ' ' 	+ mi5_shade + xbgx + ' - Egg Count: \033[1;35m' + str(lvl_egg_cnt) + ' \033[37m')
+		print('\033[u\033[9B' 	+ mi6_shade 	+ BOX 				+ mi6_shade + xbgx + ' - Box Count: \033[1;35m' + str(lvl_box_cnt) + ' \033[37m')
+		print('\033[u\033[11B' 	+ mi7_shade 	+ block_type 		+ mi7_shade + xbgx + ' - Block Count: \033[1;35m' + str(lvl_block_cnt) + ' \033[37m')
+		print('\033[u\033[13B' 	+ mi8_shade 	+ block_type 		+ mi8_shade + xbgx + ' - Block Type: ' + normalyellow + mi8_shade + dangerousorange + mi8_shade + ' \033[37m')
 
 	def main_menu_3():
 		global mi9_shade, mi10_shade, mi11_shade, mi12_shade, incubate
-		print('\033[u\033[3B' + mi9_shade + BEAST + mi9_shade +        ' - Beast:           slower ' + speedbg + ' faster\033[' + str(beast_arrows + 8) +    'D' + speed_arrow + '\033[30m')
-		print('\033[u\033[5B' + mi10_shade + MONSTER + mi10_shade +    ' - Monster:         slower ' + speedbg + ' faster\033[' + str(monster_arrows + 8) +  'D' + speed_arrow + '\033[30m')
-		print('\033[u\033[7B' + mi11_shade + chr(11052) + mi11_shade +    ' - Egg Incubate:    slower ' + speedbg + ' faster\033[' + str(incubate_arrows + 8) + 'D' + speed_arrow + '\033[30m')
-		print('\033[u\033[9B' + mi12_shade + chr(11052) + chr(8320) + mi12_shade +  ' - Egg Timer:       slower ' + speedbg + ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow + '\033[30m')
+		print('\033[u\033[3B' + mi9_shade 	+ BEAST 					+ mi9_shade 	+ ' - Beast:           slower ' + speedbg + ' faster\033[' + str(beast_arrows + 8) +    'D' + speed_arrow + '\033[30m')
+		print('\033[u\033[5B' + mi10_shade 	+ MONSTER 					+ mi10_shade	+ ' - Monster:         slower ' + speedbg + ' faster\033[' + str(monster_arrows + 8) +  'D' + speed_arrow + '\033[30m')
+		print('\033[u\033[7B' + mi11_shade 	+ chr(11052) + ' ' 			+ mi11_shade 	+ ' - Egg Incubate:    slower ' + speedbg + ' faster\033[' + str(incubate_arrows + 8) + 'D' + speed_arrow + '\033[30m')
+		print('\033[u\033[9B' + mi12_shade 	+ chr(11052) + chr(8320) 	+ mi12_shade 	+ ' - Egg Timer:       slower ' + speedbg + ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow + '\033[30m')
 
 	def mi1_controls(opt):
 		global dir_keys, wasd, arrows, vi, pulling, KYBD, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_RIGHT, KEY_P_LEFT
@@ -1486,7 +1487,6 @@ try:
 			hatch_eggs()
 			flash_player()
 			print_board(board)
-			#print('\033[0;0H\033[30m\033[43m' + str(get_rw_cl_tcl(1,0,1)) + '\033[0m')
 		exec_end = time()
 		exec_time = exec_end - exec_start
 		if (LCD_TIME > exec_time):
