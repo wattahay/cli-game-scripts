@@ -80,8 +80,8 @@ KYBD = [ # Get individual key codes using: python3 getkeycodes.py (included in t
 ###########################################################-- Utility Functions --##############
 ################################################################################################
 ######################################-- Linux aplay audio function
-script_dir = path.abspath( path.dirname( __file__ ) )
 def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
+script_dir = path.abspath( path.dirname( __file__ ) )
 ######################################-- get terminal size
 def get_rw_cl_tcl(rw, cl, tcl): # get rows, columns, and terminal columns
 	rows, ttycols = [int(x) for x in popen('stty size', 'r').read().split()]
@@ -97,12 +97,13 @@ def tbg(ret): # tbg(1)
 	if trnsprnt: xbgx = '\033[49m'
 	else: xbgx = '\033[40m'
 	if ret == 1: return xbgx
+xbgx: '\033[40m'
+trnsprnt = False	# calibrate terminal spacing
 ################################################################################################
 ######################################################-- More Global Variables --###############
 ################################################################################################
 ######################################-- script's directory path
-xbgx: '\033[40m'
-trnsprnt = False	# calibrate terminal spacing
+
 tcomp = 0			# compensation for ansi-based terminal spacing
 left_pad = 0		# padding for terminal fitted screen
 top_pad = 0			# padding for terminal fitted screen
@@ -947,7 +948,7 @@ def build_level():
 
 		print('\033[u\033[3B' + mi3_shade + BEAST + mi3_shade + xbgx + ' - Beast Count: \033[1;35m' + str(lvl_beast_cnt) + ' \033[37m')
 		print('\033[u\033[5B' + mi4_shade + MONSTER + mi4_shade + xbgx + ' - Monster Count: \033[1;35m' + str(lvl_monster_cnt) + ' \033[37m')
-		print('\033[u\033[7B' + mi5_shade + EGG(32) + mi5_shade + xbgx + ' - Egg Count: \033[1;35m' + str(lvl_egg_cnt) + ' \033[37m')
+		print('\033[u\033[7B' + mi5_shade + chr(11052) + mi5_shade + xbgx + ' - Egg Count: \033[1;35m' + str(lvl_egg_cnt) + ' \033[37m')
 		print('\033[u\033[9B' + mi6_shade + BOX + mi6_shade + xbgx + ' - Box Count: \033[1;35m' + str(lvl_box_cnt) + ' \033[37m')
 		print('\033[u\033[11B' + mi7_shade + block_type + mi7_shade + xbgx + ' - Block Count: \033[1;35m' + str(lvl_block_cnt) + ' \033[37m')
 		print('\033[u\033[13B' + mi8_shade + block_type + mi8_shade + xbgx + ' - Block Type: ' + normalyellow + mi8_shade + dangerousorange + mi8_shade + ' \033[37m')
@@ -956,28 +957,28 @@ def build_level():
 		global mi9_shade, mi10_shade, mi11_shade, mi12_shade, incubate
 		print('\033[u\033[3B' + mi9_shade + BEAST + mi9_shade +        ' - Beast:           slower ' + speedbg + ' faster\033[' + str(beast_arrows + 8) +    'D' + speed_arrow + '\033[30m')
 		print('\033[u\033[5B' + mi10_shade + MONSTER + mi10_shade +    ' - Monster:         slower ' + speedbg + ' faster\033[' + str(monster_arrows + 8) +  'D' + speed_arrow + '\033[30m')
-		print('\033[u\033[7B' + mi11_shade + EGG(32) + mi11_shade +    ' - Egg Incubate:    slower ' + speedbg + ' faster\033[' + str(incubate_arrows + 8) + 'D' + speed_arrow + '\033[30m')
-		print('\033[u\033[9B' + mi12_shade + EGG(8320) + mi12_shade +  ' - Egg Timer:       slower ' + speedbg + ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow + '\033[30m')
+		print('\033[u\033[7B' + mi11_shade + chr(11052) + mi11_shade +    ' - Egg Incubate:    slower ' + speedbg + ' faster\033[' + str(incubate_arrows + 8) + 'D' + speed_arrow + '\033[30m')
+		print('\033[u\033[9B' + mi12_shade + chr(11052) + chr(8320) + mi12_shade +  ' - Egg Timer:       slower ' + speedbg + ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow + '\033[30m')
 
 	def mi1_controls(opt):
 		global dir_keys, wasd, arrows, vi, pulling, KYBD, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_RIGHT, KEY_P_LEFT
 		if opt == 1:
 			dir_keys = 0
-			wasd = '[\033[1;35m w,a,s,d \033[37m]'
+			wasd = '\033[37m[\033[1;35m w,a,s,d \033[37m]'
 			arrows = '  arrows  '
 			vi = '  h,j,k,l  '
 
 		elif opt == 2:
 			dir_keys = 1
 			wasd = '  w,a,s,d  '
-			arrows = '[\033[1;35m arrows \33[37m]'
+			arrows = '\033[37m[\033[1;35m arrows \33[37m]'
 			vi = '  h,j,k,l  '
 
 		elif opt == 3:
 			dir_keys = 2
 			wasd = '  w,a,s,d  '
 			arrows = '  arrows  '
-			vi = '[\033[1;35m h,j,k,l \033[37m]'
+			vi = '\033[37m[\033[1;35m h,j,k,l \033[37m]'
 
 		KEY_UP = KYBD[dir_keys]["K_UP"]
 		KEY_DOWN = KYBD[dir_keys]["K_DOWN"]
@@ -993,40 +994,40 @@ def build_level():
 
 		if opt == 1:
 			pulling = 'hold'
-			hold = '[\033[1;35m hold \033[37m]'
+			hold = '\033[1;37m[\033[1;35m hold \033[37m]'
 			toggle = '  toggle  '
 			single = '  single  '
 			auto = '  auto  '
 		if opt == 2:
 			pulling = 'toggle'
 			hold = '  hold  '
-			toggle = '[\033[1;35m toggle \033[37m]'
+			toggle = '\033[1;37m[\033[1;35m toggle \033[37m]'
 			single = '  single  '
 			auto = '  auto  '
 		elif opt == 3:
 			pulling = 'single'
 			hold = '  hold  '
 			toggle = '  toggle  '
-			single = '[\033[1;35m single \033[37m]'
+			single = '\033[37m[\033[1;35m single \033[37m]'
 			auto = '  auto  '
 		elif opt == 4:
 			pulling = 'auto'
 			hold = '  hold  '
 			toggle = '  toggle  '
 			single = '  single  '
-			auto = '[\033[1;35m auto \033[37m]'
+			auto = '\033[37m[\033[1;35m auto \033[37m]'
 
 	def mi8_controls(opt):
 		global block_type, BLOCK, KILLBLOCK, normalyellow, dangerousorange
 
 		if opt == 1:
 			block_type = BLOCK
-			normalyellow = '[\033[1;35m Normal Yellow \033[37m]'
+			normalyellow = '\033[1;37m[\033[1;35m Normal Yellow \033[37m]'
 			dangerousorange = '  Dangerous Orange  '
 		elif opt == 2:
 			block_type = KILLBLOCK
 			normalyellow = '  Normal Yellow  '
-			dangerousorange = '[\033[1;35m Dangerous Orange \033[37m]'
+			dangerousorange = '\033[1;37m[\033[1;35m Dangerous Orange \033[37m]'
 
 	def tabkey_note():
 		global xbgx
