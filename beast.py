@@ -1471,7 +1471,7 @@ try:
 			hatch_eggs()
 			flash_player()
 			print_board(board)
-			print('\033[0;0H\033[30m\033[43m' + str(get_rw_cl_tcl(1,0,1)) + '\033[0m')
+			#print('\033[0;0H\033[30m\033[43m' + str(get_rw_cl_tcl(1,0,1)) + '\033[0m')
 		exec_end = time()
 		exec_time = exec_end - exec_start
 		if (LCD_TIME > exec_time):
