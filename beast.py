@@ -46,13 +46,13 @@ GAME_LEVELS = [
 		{'beasts':15,	'monsters':0,	'eggs':0,	'block': 'orange'} 	# Level 15
 	]
 ########################################################-- Pawn Movement Priority Odds
-# These values are the odds of moves for an enemy if those		|---------------------
-# moves are available to it. If a move is not available,		| 5  4  3 	
-# then its odds are absorbed: 1st by its equal counterpart,		| 4  H  2 	
-# and then by the next lower priority, etc. Each of the 5 		| 3  2  1 	
-# priorities is greater or equal to the sum of all lower 		|		 \	
-# priority moves.												|		   \
-########################-- Examples								|			<>
+# These values are the odds of moves for an enemy if those		|---------|
+# moves are available to it. If a move is not available,		| 5  4  3 |
+# then its odds are absorbed: 1st by its equal counterpart,		| 4  H  2 |
+# and then by the next lower priority, etc. Each of the 5 		| 3  2  1 |
+# priorities is greater or equal to the sum of all lower 		|---------|
+# priority moves.											5 Move Priorities
+########################-- Examples
 # Max Randomness	1, 1, 1, 3, 3, 9, 9, 27
 # High				1, 1, 1, 4, 4, 16, 16, 50		1, 2, 2, 6, 6, 18, 18, 55
 # Medium			1, 1, 1, 4, 4, 20, 20, 90		1, 2, 2, 8, 8, 26, 26, 98
@@ -145,7 +145,9 @@ for i in argv:
 	if i[0:3] == '-w:':
 		if(i[3:].isdigit() & len(i[3:]) < 3):
 			play_cols = int(i[3:]) + left_pad
-################################################-- keyboard constants
+################################################-- set background post argv
+tbg(0) # set xbgx
+################################################-- keyboard constants post argv
 KEY_UP = KYBD[dir_keys]["K_UP"]
 KEY_DOWN = KYBD[dir_keys]["K_DOWN"]
 KEY_RIGHT = KYBD[dir_keys]["K_RIGHT"]
@@ -160,17 +162,7 @@ keypress = 999
 debug = False
 pulling = 'hold' # 'hold / 'tog' /  'swi' / 'sin'
 game_play_mode = False
-################################################-- move constants
-MOVES = {
-	 'U': {	'ra':-1,	'ca':0	},	# ra - "row adjustment"
-	 'D': {	'ra':1, 	'ca':0	},	# ca - "column adjustment"
-	 'L': {	'ra':0, 	'ca':-1	},
-	 'R': {	'ra':0, 	'ca':1	},
-	'UL': {	'ra':-1, 	'ca':-1	},
-	'UR': {	'ra':-1, 	'ca':1	},
-	'DL': {	'ra':1, 	'ca':-1	},
-	'DR': {	'ra':1, 	'ca':1	}
-}
+
 ##################################-- formatted character constants --##########################
 # 			Foreground	+ Background	+	Style			+	Unicode Chars 		+ 	Reset
 BAKGRD =				  xbgx 								+ '  '
@@ -199,6 +191,17 @@ plr_flashes = 5
 plr_flash = 0
 plr_frames = (int(.05 / LCD_TIME) * 2)
 plr_frame = 0
+################################################-- move constants
+MOVES = {
+	 'U': {	'ra':-1,	'ca':0	},	# ra - "row adjustment"
+	 'D': {	'ra':1, 	'ca':0	},	# ca - "column adjustment"
+	 'L': {	'ra':0, 	'ca':-1	},
+	 'R': {	'ra':0, 	'ca':1	},
+	'UL': {	'ra':-1, 	'ca':-1	},
+	'UR': {	'ra':-1, 	'ca':1	},
+	'DL': {	'ra':1, 	'ca':-1	},
+	'DR': {	'ra':1, 	'ca':1	}
+}
 ################################################-- board variables
 level = 0
 board = []
