@@ -70,7 +70,7 @@ shift.........pull blocks
 r.............restore screen for a resized terminal
 ```
 
-Player movement control has 3 options in the settings menu:
+Player movement control has 3 options in the settings menu, or as script options using: `python3 beast.py -k:example`
 
 ```
 wasd
