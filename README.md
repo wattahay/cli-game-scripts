@@ -1,6 +1,6 @@
 Linux Python script based on the **[1984 DOS game, BEAST](https://github.com/wattahay/cli-game-scripts/wiki)**. (Specifically it is created in Fedora.)
 
-Control keys can be set to h,j,k,l to practice **Vim key muscle memory**!
+Control keys can be set to h-j-k-l to practice **Vim key muscle memory**!
 
 **Visual elements** are Unicode characters drawn using **[terminal escape sequences](https://github.com/wattahay/cli-game-scripts/wiki/Inline-Cursor-Movement)**.
 
