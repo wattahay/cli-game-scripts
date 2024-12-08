@@ -8,10 +8,10 @@ from sys import argv
 ################################################################################################
 ###########################################################-- Useful Variables --###############
 ################################################################################################
-beast_speed = 1.3	# (.3 - 2.3) higher is slower
-monster_speed = 1	# (.3 - 2.3) higher is slower
-incubate = 25		# (4 - 40) higher is longer
-egg_speed = 3		# (.5 to 5) higher is longer
+beast_speed = 	.3 + .2 * (5)	# (x) = 0 - 9
+monster_speed =	.3 + .2 * (5)	# (x) = 0 - 9
+incubate = 		 4 +  4 * (7)	# (x) = 0 - 9
+egg_speed = 	.5 + .5 * (5)	# (x) = 0 - 9
 lives = 5			# starting level lives
 BEAST_SCR = 6		# points for killing beasts
 EGG_SCR = 8			# points for killing eggs
@@ -21,7 +21,7 @@ NO_LEVEL = 3		# level penalty for losing all lives
 #########################################################-- game frame time
 LCD_TIME = .02		# example: .03 = 1 frame every .03 seconds (3 hundredths of a second)
 #########################################################-- size of the board
-# Possible values depend on screen resolution and terminal text size
+# Lowest possible values are 15 x 30
 play_rows = 20		# 20 - 80
 play_cols = 40		# 40 - 120
 #########################################################-- game levels
@@ -145,10 +145,10 @@ for i in argv:
 		if i[3:] == KYBD[1]['title']: dir_keys = 1
 		if i[3:] == KYBD[2]['title']: dir_keys = 2
 	if i[0:3] == '-h:':
-		if(i[3:].isdigit() & len(i[3:]) < 2):
+		if(i[3:].isdigit() & len(i[3:]) < 121):
 			play_rows = int(i[3:]) + top_pad*2
 	if i[0:3] == '-w:':
-		if(i[3:].isdigit() & len(i[3:]) < 3):
+		if(i[3:].isdigit() & len(i[3:]) < 121):
 			play_cols = int(i[3:]) + left_pad
 ################################################-- keyboard constants post argv
 KEY_UP = 		KYBD[dir_keys]["K_UP"]
