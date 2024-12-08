@@ -69,7 +69,7 @@ b.............debug stats
 shift.........pull blocks
 r.............restore screen for a resized terminal
 ```
-See here for [adding controller settings](https://github.com/wattahay/cli-game-scripts/blob/master/examples/controller.md)
+See: [Adding Controller Option](https://github.com/wattahay/cli-game-scripts/blob/master/examples/controller.md)
 
 Player movement control has 3 options in the settings menu:
 
