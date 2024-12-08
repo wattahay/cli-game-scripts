@@ -46,7 +46,7 @@ AntiMicroX is found on Linux in the conventional app centers.
 2. Remove the pound sign to uncomment the line.
 3. Add a pound sign to another line to keep the options at 3.
 
-> **Note:** Uncommented ptions over 3 should not cause an error. They will simply not be used.
+> **Note:** The 1st 3 options are used if all 4 are uncommented.
 
 ```
 KYBD = [
