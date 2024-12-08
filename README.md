@@ -79,7 +79,7 @@ hjkl
 ```
 These options can be customized in the beast.py file using the KYBD array.
 
-See: [Adding Controller Option](https://github.com/wattahay/cli-game-scripts/blob/master/examples/controller.md)
+Also see: [Adding Controller Option](https://github.com/wattahay/cli-game-scripts/blob/master/examples/controller.md)
 
 ### Change Many Default Settings in the beast.py Script
 
