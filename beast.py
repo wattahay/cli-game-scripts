@@ -47,12 +47,12 @@ GAME_LEVELS = [
 	]
 ########################################################-- Pawn Movement Priority Odds
 # These values are the odds of moves for an enemy if those		|---------------------
-# moves are available to it. If a move is not available,		| 5  4  3 	
-# then its odds are absorbed: 1st by its equal counterpart,		| 4  H  2 	
-# and then by the next lower priority, etc. Each of the 5 		| 3  2  1 	
-# priorities is greater or equal to the sum of all lower 		|		 \	
-# priority moves.												|		   \
-########################-- Examples								|			<>
+# moves are available to it. If a move is not available,		| 5  4  3
+# then its odds are absorbed: 1st by its equal counterpart,		| 4  H  2
+# and then by the next lower priority, etc. Each of the 5 		| 3  2  1
+# priorities is greater or equal to the sum of all lower 		|		 \
+# priority moves.												|	      \
+########################-- Examples								|		   <>
 # Max Randomness	1, 1, 1, 3, 3, 9, 9, 27
 # High				1, 1, 1, 4, 4, 16, 16, 50		1, 2, 2, 6, 6, 18, 18, 55
 # Medium			1, 1, 1, 4, 4, 20, 20, 90		1, 2, 2, 8, 8, 26, 26, 98
@@ -69,14 +69,17 @@ PRIORITY_ODDS = [
 		[1, False] 		# Backwards (5th priority)
 	]
 #####################################################-- player direction controls
-dir_keys = 1 #   0=option one     1=option two     2=option 3
 # Get individual key codes using: python3 getkeycodes.py (included in the git repo)
-KYBD = [ # Customize the 3 options below with key codes from getkeycodes, as well as custom titles.
+# Customize the 3 options below with key codes from getkeycodes, as well as custom titles.
+# Changing the titles will change the script -k option to the value of 'title':"word" (-k:word), as well as the option in the settings menu
+# The default settings option is the middle one.
+
+KYBD = [
 		{"title":"wasd", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
 		#{"title":"XBOX",  "K_UP":105, "K_DOWN":117, "K_RIGHT":111, "K_LEFT":121, "PK_UP":73, "PK_DOWN":85, "PK_RIGHT":79, "PK_LEFT":89},
 		{"title":"arrows",  "K_UP":259, "K_DOWN":258, "K_RIGHT":261, "K_LEFT":260, "PK_UP":337, "PK_DOWN":336, "PK_RIGHT":402, "PK_LEFT":393},
 		{"title":"hjkl", "K_UP":107, "K_DOWN":106, "K_RIGHT":108, "K_LEFT":104, "PK_UP":75,  "PK_DOWN":74,  "PK_RIGHT":76,  "PK_LEFT":72}
-	] # Changing the titles will also change the script option argument to -k:title
+	]
 ################################################################################################
 ###########################################################-- Utility Functions --##############
 ################################################################################################
@@ -93,21 +96,22 @@ def get_rw_cl_tcl(rw, cl, tcl): # get rows, columns, and terminal columns
 	if len(size) == 1: return size[0]
 	else: return size
 #########################################################-- background color ansi
-xbgx = '\033[40m'
-trnsprnt = False	# calibrate terminal spacing
 def tbg(ret): # tbg(1)
 	global xbgx, trnsprnt
 	if trnsprnt: xbgx = '\033[49m'
 	else: xbgx = '\033[40m'
 	if ret == 1: return xbgx
+xbgx = '\033[40m'
+trnsprnt = False	# calibrate terminal spacing
 ################################################################################################
 ######################################################-- More Global Variables --###############
 ################################################################################################
-tcomp = 0			# compensation for ansi-based terminal spacing
-left_pad = 0		# padding for terminal fitted screen
-top_pad = 0			# padding for terminal fitted screen
-fitted = False		# whether or not the -f option is chosen
-stat_rows = 1		# rows for game stats
+dir_keys = 1	# default key controls is the center option
+tcomp = 0		# compensation for ansi-based terminal spacing
+left_pad = 0	# padding for terminal fitted screen
+top_pad = 0		# padding for terminal fitted screen
+fitted = False	# whether or not the -f option is chosen
+stat_rows = 1	# rows for game stats
 ################################################-- argv assignments
 for i in argv:
 	if i[0:3] == '-f:':
@@ -787,13 +791,16 @@ def build_level():
 	else:
 		newlevel = level + 1
 
-#################################################################-- Show Options
-	if (fitted & trnsprnt == False): xbgx = '\033[49m' # temporary solution until intro prints a fitted board
+#################################################################-- Show Intro Options
+	if (fitted == True  & trnsprnt == False): xbgx = '\033[49m' # temporary solution
+	if (fitted == True): xbgx = '\033[49m' # temporary solution
+	if (fitted == False & trnsprnt == False): tbg(0) # temporary solution
+	if (fitted == False & trnsprnt == True): tbg(0) # temporary solution
 	set_botleft(1,0)
 	print('\033[u\033[37m' + xbgx + 'Press \033[36mspacebar\033[37m to play \033[1;35mlevel ' + str(newlevel) + '\033[0m')
 	set_botleft(0,0)
 	print('\033[u\033[37m' + xbgx + 'Press \033[36mtab\033[37m for \033[1;35msettings\033[37m\033[0m')
-	if (fitted): xbgx = '\033[40m'# temporary solution until intro prints a fitted board
+	if (fitted): xbgx = '\033[40m'# temporary solution
 	while (True):
 		if (keypress == ord(' ')):
 			sleep(.8) # delay for effect before entering settings
