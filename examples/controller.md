@@ -29,7 +29,18 @@ AntiMicroX is found on Linux in the conventional app centers.
         \     _/                    \_     /       Tab: Y    (to Tab)
          \___/                        \___/
 ```
-### Edit the beast.py file
+
+### Steps
+
+1. Install and test AntiMicroX to ensure it works with your setup.
+2. Decide which keys to map to your controller, and map the controller.
+3. Use getkeycodes.py to get the keyboard codes for UP, DOWN, LEFT, RIGHT, pull UP, pull DOWN, pull LEFT, pull RIGHT
+4. Edit the beast.py file to include an entry for the keycodes you use.
+5. Run the beast.py script with the newly created option, or select the option in settings. Example: `python3 beast.py -k:XBOX`
+
+> **Note:** If you map existing keys used by beast.py, then you do not have to edit the beast.py file.
+
+### Example in the beast.py file
 
 1. Locate the KYBD array, which contains a commented out XBOX dictionary.
 2. Remove the pound sign to uncomment the line.
