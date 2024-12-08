@@ -46,6 +46,8 @@ AntiMicroX is found on Linux in the conventional app centers.
 2. Remove the pound sign to uncomment the line.
 3. Add a pound sign to another line to keep the options at 3.
 
+> **Note:** Uncommented ptions over 3 should not cause an error. They will simply not be used.
+
 ```
 KYBD = [
 {"title":"wasd", 	"K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
