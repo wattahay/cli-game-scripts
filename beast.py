@@ -69,7 +69,7 @@ PRIORITY_ODDS = [
 		[1, False] 		# Backwards (5th priority)
 	]
 #####################################################-- player direction controls
-dir_keys = 0 #   0=option one     1=option two     2=option 3
+dir_keys = 1 #   0=option one     1=option two     2=option 3
 # Get individual key codes using: python3 getkeycodes.py (included in the git repo)
 KYBD = [ # Customize the 3 options below with key codes from getkeycodes, as well as custom titles.
 		{"title":"wasd", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
