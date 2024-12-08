@@ -47,13 +47,13 @@ AntiMicroX is found on Linux in the conventional app centers.
 3. Add a pound sign to another line to keep the options at 3.
 
 ```
-# Get individual key codes using: python3 getkeycodes.py (included in the git repo)
-KYBD = [ # Customize the 3 options below with key codes from getkeycodes, as well as custom titles.
+
+KYBD = [
 {"title":"wasd", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
 {"title":"XBOX",  "K_UP":105, "K_DOWN":117, "K_RIGHT":111, "K_LEFT":121, "PK_UP":73, "PK_DOWN":85, "PK_RIGHT":79, "PK_LEFT":89},
 #{"title":"arrows",  "K_UP":259, "K_DOWN":258, "K_RIGHT":261, "K_LEFT":260, "PK_UP":337, "PK_DOWN":336, "PK_RIGHT":402, "PK_LEFT":393},
 {"title":"hjkl", "K_UP":107, "K_DOWN":106, "K_RIGHT":108, "K_LEFT":104, "PK_UP":75,  "PK_DOWN":74,  "PK_RIGHT":76,  "PK_LEFT":72}
-] # Changing the titles will also change the script option argument to -k:title
+]
 ```
 
 
