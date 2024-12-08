@@ -38,7 +38,7 @@ AntiMicroX is found on Linux in the conventional app centers.
 4. Edit the beast.py file to include an entry for the keycodes you use.
 5. Run the beast.py script with the newly created option, or select the option in settings. Example: `python3 beast.py -k:XBOX`
 
-> **Note:** If you map existing keys used by beast.py, then you do not have to get any codes. You can still change the name of an entry in the beast.py file.
+> **Note:** If you map existing keys used by beast.py, then you do not have to get any keyboard key codes. You can still change the name of an entry in the beast.py file.
 
 ### Example in the beast.py file
 
