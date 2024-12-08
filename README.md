@@ -77,7 +77,7 @@ wasd
 arrows
 hjkl
 ```
-These options can be customized in the beast.py file using the KYBD array.
+These options can be customized in the beast.py file, in the KYBD array. The getkeycodes.py script identifies the codes for the keys you want to use.
 
 Also see: [Adding Controller Option](https://github.com/wattahay/cli-game-scripts/blob/master/examples/controller.md)
 
