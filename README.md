@@ -69,16 +69,17 @@ b.............debug stats
 shift.........pull blocks
 r.............restore screen for a resized terminal
 ```
-See: [Adding Controller Option](https://github.com/wattahay/cli-game-scripts/blob/master/examples/controller.md)
 
 Player movement control has 3 options in the settings menu:
 
 ```
-w,a,s,d
-arrow keys
-h,j,k,l
+wasd
+arrows
+hjkl
 ```
+These options can be customized in the beast.py file using the KYBD array.
 
+See: [Adding Controller Option](https://github.com/wattahay/cli-game-scripts/blob/master/examples/controller.md)
 
 ### Change Many Default Settings in the beast.py Script
 
