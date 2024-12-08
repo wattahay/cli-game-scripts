@@ -29,7 +29,7 @@ play_cols = 40		# 40 - 120
 # Each level is surrounded by curly brackets, while the outer brackets are square
 # Make sure all bracketted levels are followed by a comma (except for the last level)
 GAME_LEVELS = [
-		{'beasts':3,	'monsters':0,	'eggs':5, 	'block': 'yellow'}, # Level 1
+		{'beasts':0,	'monsters':0,	'eggs':10, 	'block': 'yellow'}, # Level 1
 		{'beasts':5,	'monsters':0,	'eggs':0,	'block': 'orange'},	# Level 2
 		{'beasts':5,	'monsters':0,	'eggs':2,	'block': 'yellow'}, # Level 3
 		{'beasts':0,	'monsters':0,	'eggs':1,	'block': 'orange'},	# Level 4
@@ -69,10 +69,11 @@ PRIORITY_ODDS = [
 		[1, False] 		# Backwards (5th priority)
 	]
 #####################################################-- player direction controls
-dir_keys = 0 #   0=wasd     1=arrows     2=hjkl
+dir_keys = 0 #   0=option one     1=option two     2=option 3
 # Get individual key codes using: python3 getkeycodes.py (included in the git repo)
 KYBD = [ # Customize the 3 options below with key codes from getkeycodes, as well as custom titles.
 		{"title":"wasd", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
+		#{"title":"XBOX",  "K_UP":105, "K_DOWN":117, "K_RIGHT":111, "K_LEFT":121, "PK_UP":73, "PK_DOWN":85, "PK_RIGHT":79, "PK_LEFT":89},
 		{"title":"arrows",  "K_UP":259, "K_DOWN":258, "K_RIGHT":261, "K_LEFT":260, "PK_UP":337, "PK_DOWN":336, "PK_RIGHT":402, "PK_LEFT":393},
 		{"title":"hjkl", "K_UP":107, "K_DOWN":106, "K_RIGHT":108, "K_LEFT":104, "PK_UP":75,  "PK_DOWN":74,  "PK_RIGHT":76,  "PK_LEFT":72}
 	] # Changing the titles will also change the script option argument to -k:title
