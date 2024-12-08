@@ -47,7 +47,6 @@ AntiMicroX is found on Linux in the conventional app centers.
 3. Add a pound sign to another line to keep the options at 3.
 
 ```
-
 KYBD = [
 {"title":"wasd", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
 {"title":"XBOX",  "K_UP":105, "K_DOWN":117, "K_RIGHT":111, "K_LEFT":121, "PK_UP":73, "PK_DOWN":85, "PK_RIGHT":79, "PK_LEFT":89},
