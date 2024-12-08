@@ -29,7 +29,7 @@ play_cols = 40		# 40 - 120
 # Each level is surrounded by curly brackets, while the outer brackets are square
 # Make sure all bracketted levels are followed by a comma (except for the last level)
 GAME_LEVELS = [
-		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'yellow'}, # Level 1
+		{'beasts':0,	'monsters':0,	'eggs':4, 	'block': 'yellow'}, # Level 1
 		{'beasts':5,	'monsters':0,	'eggs':0,	'block': 'orange'},	# Level 2
 		{'beasts':5,	'monsters':0,	'eggs':2,	'block': 'yellow'}, # Level 3
 		{'beasts':0,	'monsters':0,	'eggs':1,	'block': 'orange'},	# Level 4
@@ -76,7 +76,7 @@ PRIORITY_ODDS = [
 
 KYBD = [
 		{"title":"wasd", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
-		#{"title":"XBOX",  "K_UP":105, "K_DOWN":117, "K_RIGHT":111, "K_LEFT":121, "PK_UP":73, "PK_DOWN":85, "PK_RIGHT":79, "PK_LEFT":89},
+		#{"title":"XBOX",  "K_UP":105, "K_DOWN":117, "K_RIGHT":111, "K_LEFT":121, "PK_UP":73, "PK_DOWN":85, "PK_RIGHT":79, "PK_LEFT":89}, # Codes are for y-u-i-o, but are somewhat irrelevant
 		{"title":"arrows",  "K_UP":259, "K_DOWN":258, "K_RIGHT":261, "K_LEFT":260, "PK_UP":337, "PK_DOWN":336, "PK_RIGHT":402, "PK_LEFT":393},
 		{"title":"hjkl", "K_UP":107, "K_DOWN":106, "K_RIGHT":108, "K_LEFT":104, "PK_UP":75,  "PK_DOWN":74,  "PK_RIGHT":76,  "PK_LEFT":72}
 	]
@@ -96,11 +96,11 @@ def get_rw_cl_tcl(rw, cl, tcl): # get rows, columns, and terminal columns
 	if len(size) == 1: return size[0]
 	else: return size
 #########################################################-- background color ansi
-def tbg(ret): # tbg(1)
+def tbg(rtrn): # tbg(1)
 	global xbgx, trnsprnt
 	if trnsprnt: xbgx = '\033[49m'
 	else: xbgx = '\033[40m'
-	if ret == 1: return xbgx
+	if rtrn == 1: return xbgx
 xbgx = '\033[40m'
 trnsprnt = False	# calibrate terminal spacing
 ################################################################################################
@@ -130,11 +130,11 @@ for i in argv:
 		if term_rows % 2 == 0: alt = 0
 		else: alt = 1
 		play_rows = term_rows - 2 - top_pad*2 - stat_rows
-		if (play_rows % 2 == 1):
-			play_rows -= 1 # board size must be even until multi-egg pushing allows odd
+		#if (play_rows % 2 == 1):
+			#play_rows -= 1 # board size must be even until multi-egg pushing allows odd
 		play_cols = (tot_cols - 4 - left_pad * 2) / 2
-		if (play_cols % 2 == 1): # board size must be even until multi-egg pushing allows odd
-			play_cols -= 1
+		#if (play_cols % 2 == 1): # board size must be even until multi-egg pushing allows odd
+			#play_cols -= 1
 
 for i in argv:
 	if i[0:2] == '-t':
@@ -151,14 +151,14 @@ for i in argv:
 		if(i[3:].isdigit() & len(i[3:]) < 3):
 			play_cols = int(i[3:]) + left_pad
 ################################################-- keyboard constants post argv
-KEY_UP = KYBD[dir_keys]["K_UP"]
-KEY_DOWN = KYBD[dir_keys]["K_DOWN"]
-KEY_RIGHT = KYBD[dir_keys]["K_RIGHT"]
-KEY_LEFT = KYBD[dir_keys]["K_LEFT"]
-KEY_P_UP = KYBD[dir_keys]["PK_UP"]
-KEY_P_DOWN = KYBD[dir_keys]["PK_DOWN"]
-KEY_P_RIGHT = KYBD[dir_keys]["PK_RIGHT"]
-KEY_P_LEFT = KYBD[dir_keys]["PK_LEFT"]
+KEY_UP = 		KYBD[dir_keys]["K_UP"]
+KEY_DOWN = 		KYBD[dir_keys]["K_DOWN"]
+KEY_RIGHT = 	KYBD[dir_keys]["K_RIGHT"]
+KEY_LEFT = 		KYBD[dir_keys]["K_LEFT"]
+KEY_P_UP = 		KYBD[dir_keys]["PK_UP"]
+KEY_P_DOWN = 	KYBD[dir_keys]["PK_DOWN"]
+KEY_P_RIGHT = 	KYBD[dir_keys]["PK_RIGHT"]
+KEY_P_LEFT = 	KYBD[dir_keys]["PK_LEFT"]
 
 mi1_opt = dir_keys + 1 # initial keyboard setting
 keypress = 999
@@ -186,10 +186,10 @@ def EGG(sub):
 def deteggt(chegg):
 	if (chegg[0:12] == '\033[0m\033[0m\033[0m'): return True
 ################################################-- Pawn Classes (Dictionaries)
-beasts = [{ 'frames': (int(beast_speed / LCD_TIME)), 'frame':0, 'chr': BEAST, 'pnts': BEAST_SCR }]
-monsters = [{ 'frames': (int(monster_speed / LCD_TIME)), 'frame':0, 'chr': MONSTER, 'pnts': MONSTER_SCR }]
-eggs = [{ 'frames': (int(egg_speed / LCD_TIME)), 'frame':0, 'incu_frames': (int(1 / LCD_TIME)), 'incu_frame': 0, 'pnts': EGG_SCR }]
-player = [{ 'flash_frames': (int(.05 / LCD_TIME) * 2), 'chr': PLAYER, 'pnts': 10 }]
+beasts = 	[{ 'frames': 		(int(beast_speed / LCD_TIME)), 		'frame':0, 	'chr': BEAST, 'pnts': BEAST_SCR }]
+monsters = 	[{ 'frames': 		(int(monster_speed / LCD_TIME)), 	'frame':0, 	'chr': MONSTER, 'pnts': MONSTER_SCR }]
+eggs = 		[{ 'frames': 		(int(egg_speed / LCD_TIME)), 		'frame':0, 'incu_frames': (int(1 / LCD_TIME)), 'incu_frame': 0, 'pnts': EGG_SCR }]
+player = 	[{ 'flash_frames': 	(int(.05 / LCD_TIME) * 2), 						'chr': PLAYER, 'pnts': 10 }]
 
 plr_flashes = 5
 plr_flash = 0
@@ -210,8 +210,8 @@ MOVES = {
 level = 0
 board = []
 blank_board = []
-if (play_rows < 20): play_rows = 20
-if (play_cols < 40): play_rows = 40
+if (play_rows < 15): play_rows = 15
+if (play_cols < 30): play_rows = 30
 play_rows = int(play_rows)
 play_cols = int(play_cols)
 board_rows = play_rows + 2
@@ -936,36 +936,36 @@ def build_level():
 	def main_menu_1(): #### -- First Tab
 		global mi1_opt, mi1_shade, mi2_shade, wasd, arrows, vi, pulling, single, toggle, auto
 
-		print('\033[u\033[3B' + mi1_shade + 'Movement Keys: ' + wasd + mi1_shade + arrows + mi1_shade + vi)
-		print('\033[u\033[5B' + mi2_shade + 'Pulling Boxes: ' + hold + mi2_shade + toggle + mi2_shade + single + mi2_shade + auto)
+		print('\033[u\033[2B' + mi1_shade + 'Movement Keys: ' + wasd + mi1_shade + arrows + mi1_shade + vi)
+		print('\033[u\033[4B' + mi2_shade + 'Pulling Boxes: ' + hold + mi2_shade + toggle + mi2_shade + single + mi2_shade + auto)
 
 		pullkey = ''
 		if (pulling == 'hold'): pullkey = 'Shift   '
 		else: pullkey = 'Spacebar'
 
-		print('\033[u\033[8B\033[0m' + xbgx + '\033[37m' + ' '*32 + 'Box-Pull Key: \033[36m' + pullkey + ' \033[0m')
+		print('\033[u\033[7B\033[0m' + xbgx + '\033[37m' + ' '*32 + 'Box-Pull Key: \033[36m' + pullkey + ' \033[0m')
 
 	def main_menu_2():
 		global mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, BLOCK, block_type, KILLBLOCK, normalyellow, dangerousorange,  play_rows, play_cols
 		global lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt
 
-		print('\033[u\033[4B\033[34C' + xbgx + 'Total Spaces: \033[36m' + str(play_rows * play_cols) + ' \033[37m')
-		print('\033[u\033[5B\033[35C' + xbgx + 'Used Spaces: \033[36m' + str(lvl_box_cnt + lvl_block_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt) + ' \033[37m')
-		print('\033[u\033[6B\033[35C' + xbgx + 'Free Spaces: \033[36m' + str((play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)) + ' \033[37m')
+		print('\033[u\033[3B\033[34C' + xbgx + 'Total Spaces: \033[36m' + str(play_rows * play_cols) + ' \033[37m')
+		print('\033[u\033[4B\033[35C' + xbgx + 'Used Spaces: \033[36m' + str(lvl_box_cnt + lvl_block_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt) + ' \033[37m')
+		print('\033[u\033[5B\033[35C' + xbgx + 'Free Spaces: \033[36m' + str((play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)) + ' \033[37m')
 
-		print('\033[u\033[3B' 	+ mi3_shade 	+ BEAST 			+ mi3_shade + xbgx + ' - Beast Count: \033[1;35m' + str(lvl_beast_cnt) + ' \033[37m')
-		print('\033[u\033[5B' 	+ mi4_shade 	+ MONSTER 			+ mi4_shade + xbgx + ' - Monster Count: \033[1;35m' + str(lvl_monster_cnt) + ' \033[37m')
-		print('\033[u\033[7B' 	+ mi5_shade 	+ chr(11052) + ' ' 	+ mi5_shade + xbgx + ' - Egg Count: \033[1;35m' + str(lvl_egg_cnt) + ' \033[37m')
-		print('\033[u\033[9B' 	+ mi6_shade 	+ BOX 				+ mi6_shade + xbgx + ' - Box Count: \033[1;35m' + str(lvl_box_cnt) + ' \033[37m')
-		print('\033[u\033[11B' 	+ mi7_shade 	+ block_type 		+ mi7_shade + xbgx + ' - Block Count: \033[1;35m' + str(lvl_block_cnt) + ' \033[37m')
-		print('\033[u\033[13B' 	+ mi8_shade 	+ block_type 		+ mi8_shade + xbgx + ' - Block Type: ' + normalyellow + mi8_shade + dangerousorange + mi8_shade + ' \033[37m')
+		print('\033[u\033[2B' 	+ mi3_shade 	+ BEAST 			+ mi3_shade + xbgx + ' - Beast Count: \033[1;35m' + str(lvl_beast_cnt) + ' \033[37m')
+		print('\033[u\033[4B' 	+ mi4_shade 	+ MONSTER 			+ mi4_shade + xbgx + ' - Monster Count: \033[1;35m' + str(lvl_monster_cnt) + ' \033[37m')
+		print('\033[u\033[6B' 	+ mi5_shade 	+ chr(11052) + ' ' 	+ mi5_shade + xbgx + ' - Egg Count: \033[1;35m' + str(lvl_egg_cnt) + ' \033[37m')
+		print('\033[u\033[8B' 	+ mi6_shade 	+ BOX 				+ mi6_shade + xbgx + ' - Box Count: \033[1;35m' + str(lvl_box_cnt) + ' \033[37m')
+		print('\033[u\033[10B' 	+ mi7_shade 	+ block_type 		+ mi7_shade + xbgx + ' - Block Count: \033[1;35m' + str(lvl_block_cnt) + ' \033[37m')
+		print('\033[u\033[12B' 	+ mi8_shade 	+ block_type 		+ mi8_shade + xbgx + ' - Block Type: ' + normalyellow + mi8_shade + dangerousorange + mi8_shade + ' \033[37m')
 
 	def main_menu_3():
 		global mi9_shade, mi10_shade, mi11_shade, mi12_shade, incubate
-		print('\033[u\033[3B' + mi9_shade 	+ BEAST 					+ mi9_shade 	+ ' - Beast:           slower ' + speedbg + ' faster\033[' + str(beast_arrows + 8) +    'D' + speed_arrow + '\033[30m')
-		print('\033[u\033[5B' + mi10_shade 	+ MONSTER 					+ mi10_shade	+ ' - Monster:         slower ' + speedbg + ' faster\033[' + str(monster_arrows + 8) +  'D' + speed_arrow + '\033[30m')
-		print('\033[u\033[7B' + mi11_shade 	+ chr(11052) + ' ' 			+ mi11_shade 	+ ' - Egg Incubate:    slower ' + speedbg + ' faster\033[' + str(incubate_arrows + 8) + 'D' + speed_arrow + '\033[30m')
-		print('\033[u\033[9B' + mi12_shade 	+ chr(11052) + chr(8320) 	+ mi12_shade 	+ ' - Egg Timer:       slower ' + speedbg + ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow + '\033[30m')
+		print('\033[u\033[2B' + mi9_shade 	+ BEAST 					+ mi9_shade 	+ ' - Beast:           slower ' + speedbg + ' faster\033[' + str(beast_arrows + 8) +    'D' + speed_arrow + '\033[30m')
+		print('\033[u\033[4B' + mi10_shade 	+ MONSTER 					+ mi10_shade	+ ' - Monster:         slower ' + speedbg + ' faster\033[' + str(monster_arrows + 8) +  'D' + speed_arrow + '\033[30m')
+		print('\033[u\033[6B' + mi11_shade 	+ chr(11052) + ' ' 			+ mi11_shade 	+ ' - Egg Incubate:    slower ' + speedbg + ' faster\033[' + str(incubate_arrows + 8) + 'D' + speed_arrow + '\033[30m')
+		print('\033[u\033[8B' + mi12_shade 	+ chr(11052) + chr(8320) 	+ mi12_shade 	+ ' - Egg Timer:       slower ' + speedbg + ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow + '\033[30m')
 
 	def mi1_controls(opt):
 		global dir_keys, wasd, arrows, vi, pulling, KYBD, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_RIGHT, KEY_P_LEFT
@@ -1049,6 +1049,9 @@ def build_level():
 	mi1_controls(mi1_opt)
 	mi2_controls(mi2_opt)
 	mi8_controls(mi8_opt)
+	tab_line = 20
+	if play_cols < 40: tab_line = 24 + play_cols - 40 # Based on smallest playboard size = 16 x 30 (18 x 32 with borders)
+	else: tab_line = 20
 	if keypress == 9:
 		print_board(blank_board)
 		while (True):###################################-- Settings Menu Frame-Draw Loop
@@ -1067,42 +1070,40 @@ def build_level():
 					print('\033[u' + norm + chr(9473)
 						+ dtab + ' key options ' + norm + chr(9473)
 						+ dtab + ' level setup ' + norm + chr(9473)
-						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
+						+ dtab + ' pawn speeds ' + norm + chr(9473)*tab_line)
 					sleep(.07) # delay between tab switches for audio sync
 					print('\033[u' + norm + chr(9473)
 						+ ltab + ' key options ' + norm + chr(9473)
 						+ dtab + ' level setup ' + norm + chr(9473)
-						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
+						+ dtab + ' pawn speeds ' + norm + chr(9473)*tab_line)
 				elif main_menu == 2:
 					print_board(blank_board)
-					tabkey_note()
 					item_menu = 2
 					dim_menus(2)
 					set_topleft(0,0)
 					print('\033[u' + norm + chr(9473)
 						+ dtab + ' key options ' + norm + chr(9473)
 						+ dtab + ' level setup ' + norm + chr(9473)
-						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
+						+ dtab + ' pawn speeds ' + norm + chr(9473)*tab_line)
 					sleep(.07) # delay between tab switches for audio sync
 					print('\033[u' + norm + chr(9473)
 						+ dtab + ' key options ' + norm + chr(9473)
 						+ ltab + ' level setup ' + norm + chr(9473)
-						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
+						+ dtab + ' pawn speeds ' + norm + chr(9473)*tab_line)
 				elif main_menu == 3:
 					print_board(blank_board)
-					tabkey_note()
 					item_menu = 8
 					dim_menus(8)
 					set_topleft(0,0)
 					print('\033[u' + norm + chr(9473)
 						+ dtab + ' key options ' + norm + chr(9473)
 						+ dtab + ' level setup ' + norm + chr(9473)
-						+ dtab + ' pawn speeds ' + norm + chr(9473)*20)
+						+ dtab + ' pawn speeds ' + norm + chr(9473)*tab_line)
 					sleep(.07) # delay between tab switches for audio sync
 					print('\033[u' + norm + chr(9473)
 						+ dtab + ' key options ' + norm + chr(9473)
 						+ dtab + ' level setup ' + norm + chr(9473)
-						+ ltab + ' pawn speeds ' + norm + chr(9473)*20)
+						+ ltab + ' pawn speeds ' + norm + chr(9473)*tab_line)
 			if main_menu == 1:
 				main_menu_1()
 			elif main_menu == 2:
