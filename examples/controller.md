@@ -8,7 +8,7 @@ There are instruction below on how to do it.
 
 This is a very specific example of an XBOX 360 controller, using another application to map a conroller to basic keyboard keys.
 
-Functionality is built in to the beast.py script to use custom keyboard keys (not standalone controller support), with a custom title such as "XBOX".
+Functionality is built in to the beast.py script to use custom keyboard keys with a custom title such as "XBOX".
 
 AntiMicroX is found on Linux in the conventional app centers.
 
