@@ -54,16 +54,3 @@ KYBD = [
 {"title":"hjkl", 	"K_UP":107, "K_DOWN":106, "K_RIGHT":108, "K_LEFT":104, "PK_UP":75,  "PK_DOWN":74,  "PK_RIGHT":76,  "PK_LEFT":72}
 ]
 ```
-
-
-### Steps on Major Linux distribution:
-
-1. Install the Flatpak for AntiMicroX
-2. Load the controller file from the repository
-3. Edit the beast.py to uncomment the XBOX line, and comment out another line. (There are only 3 options allowed at this time.
-4. Run the script with the option `-k:XBOX` (Must match the custom title in the code.)
-
-Example:
-```
-python3 beast.py -f:2 -k:XBOX
-```
