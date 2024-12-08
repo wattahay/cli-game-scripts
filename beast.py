@@ -8,22 +8,23 @@ from sys import argv
 ################################################################################################
 ###########################################################-- Useful Variables --###############
 ################################################################################################
-beast_speed = 	.3 + .2 * (5)	# (x) = 0 - 9
-monster_speed =	.3 + .2 * (5)	# (x) = 0 - 9
-incubate = 		 4 +  4 * (7)	# (x) = 0 - 9
-egg_speed = 	.5 + .5 * (5)	# (x) = 0 - 9
 lives = 5			# starting level lives
 BEAST_SCR = 6		# points for killing beasts
 EGG_SCR = 8			# points for killing eggs
 MONSTER_SCR = 10	# points for killing monsters
 NO_LIVES = 50		# point penalty for losing all lives
 NO_LEVEL = 3		# level penalty for losing all lives
+#########################################################-- pawn speeds
+beast_speed = 	.5 + .2 * (5) # (x) = 0 - 9, lower is faster
+monster_speed =	.5 + .2 * (4) # (x) = 0 - 9, lower is faster
+incubate = 		 4 +  4 * (7) # (x) = 0 - 9, lower is faster
+egg_speed = 	.5 + .5 * (7) # (x) = 0 - 9, lower is faster
 #########################################################-- game frame time
 LCD_TIME = .02		# example: .03 = 1 frame every .03 seconds (3 hundredths of a second)
 #########################################################-- size of the board
 # Lowest possible values are 15 x 30
-play_rows = 20		# 20 - 80
-play_cols = 40		# 40 - 120
+play_rows = 20		# 15 +
+play_cols = 40		# 30 +
 #########################################################-- game levels
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the outer brackets are square
