@@ -186,6 +186,11 @@ def EGG(sub):
 # The below function is used to detect an egg independent of its changing subscript
 def deteggt(chegg):
 	if (chegg[0:12] == '\033[0m\033[0m\033[0m'): return True
+################################################-- adapt speed variables
+beast_speed = 	.5 + .2 * (beast_steps - 1)
+monster_speed =	.5 + .2 * (monster_steps - 1)
+incubate = 		 4 +  4 * (incubation - 1)
+egg_speed = 	.5 + .5 * (egg_timer - 1)
 ################################################-- Pawn Classes (Dictionaries)
 beasts = 	[{ 'frames': 		(int(beast_speed / LCD_TIME)), 		'frame':0, 	'chr': BEAST, 'pnts': BEAST_SCR }]
 monsters = 	[{ 'frames': 		(int(monster_speed / LCD_TIME)), 	'frame':0, 	'chr': MONSTER, 'pnts': MONSTER_SCR }]
@@ -217,11 +222,6 @@ play_rows = int(play_rows)
 play_cols = int(play_cols)
 board_rows = play_rows + 2
 board_cols = play_cols + 2
-################################################-- adapt speed variables
-beast_speed = 	.5 + .2 * (beast_steps - 1)
-monster_speed =	.5 + .2 * (monster_steps - 1)
-incubate = 		 4 +  4 * (incubation - 1)
-egg_speed = 	.5 + .5 * (egg_timer - 1)
 ################################################-- spacing variables
 left_margin = 0
 top_margin = 0 # 1 is the lowest that the top margin can be, because of a specific issue with the print function
