@@ -30,7 +30,7 @@ play_cols = 	40	# 30 +
 # Each level is surrounded by curly brackets, while the outer brackets are square
 # Make sure all bracketted levels are followed by a comma (except for the last level)
 GAME_LEVELS = [
-		{'beasts':0,	'monsters':0,	'eggs':4, 	'block': 'yellow'}, # Level 1
+		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'yellow'}, # Level 1
 		{'beasts':5,	'monsters':0,	'eggs':0,	'block': 'orange'},	# Level 2
 		{'beasts':5,	'monsters':0,	'eggs':2,	'block': 'yellow'}, # Level 3
 		{'beasts':0,	'monsters':0,	'eggs':1,	'block': 'orange'},	# Level 4
