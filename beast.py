@@ -15,10 +15,10 @@ MONSTER_SCR = 10	# points for killing monsters
 NO_LIVES = 50		# point penalty for losing all lives
 NO_LEVEL = 3		# level penalty for losing all lives
 #########################################################-- pawn speeds
-beast_speed = 	.5 + .2 * (5) # (x) = 0 - 9, lower is faster
-monster_speed =	.5 + .2 * (4) # (x) = 0 - 9, lower is faster
-incubate = 		 4 +  4 * (7) # (x) = 0 - 9, lower is faster
-egg_speed = 	.5 + .5 * (7) # (x) = 0 - 9, lower is faster
+beast_speed = 	5	# (1 - 10), higher is slower
+monster_speed =	4	# (1 - 10), higher is slower
+incubate = 		7	# (1 - 10), higher is slower
+egg_speed = 	7	# (1 - 10), higher is slower
 #########################################################-- game frame time
 LCD_TIME = .02		# example: .03 = 1 frame every .03 seconds (3 hundredths of a second)
 #########################################################-- size of the board
@@ -217,6 +217,11 @@ play_rows = int(play_rows)
 play_cols = int(play_cols)
 board_rows = play_rows + 2
 board_cols = play_cols + 2
+################################################-- adapt speed variables
+beast_speed = 	.5 + .2 * (beast_speed - 1)
+monster_speed =	.5 + .2 * (monster_speed - 1)
+incubate = 		 4 +  4 * (incubate - 1)
+egg_speed = 	.5 + .5 * (egg_speed - 1)
 ################################################-- spacing variables
 left_margin = 0
 top_margin = 0 # 1 is the lowest that the top margin can be, because of a specific issue with the print function
