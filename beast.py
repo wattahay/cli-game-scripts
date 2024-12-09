@@ -1055,6 +1055,7 @@ def build_level():
 	else: tab_line = 20
 	if keypress == 9:
 		print_board(blank_board)
+		show_tabkey_note = True
 		while (True):###################################-- Settings Menu Frame-Draw Loop
 			if keypress == 9: ####-- spacebar key switches tabs
 				keypress = 999
@@ -1064,7 +1065,8 @@ def build_level():
 					main_menu = 1
 				if main_menu == 1:
 					print_board(blank_board)
-					tabkey_note()
+					if keypress != 9 & show_tabkey_note == True: tabkey_note()
+					show_tabkey_note = False
 					item_menu = 0
 					dim_menus(0)
 					set_topleft(0,0)
