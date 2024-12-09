@@ -793,10 +793,17 @@ def build_level():
 		newlevel = level + 1
 
 #################################################################-- Show Intro Options
+
+
 	if (fitted == True  & trnsprnt == False): xbgx = '\033[49m' # temporary solution
 	if (fitted == True): xbgx = '\033[49m' # temporary solution
 	if (fitted == False & trnsprnt == False): tbg(0) # temporary solution
 	if (fitted == False & trnsprnt == True): tbg(0) # temporary solution
+	if level == 0:
+		if fitted == True: xbgx = '\033[49m'
+	if level > 0:
+		tbg(0)
+
 	set_botleft(1,0)
 	print('\033[u\033[37m' + xbgx + 'Press \033[36mspacebar\033[37m to play \033[1;35mlevel ' + str(newlevel) + '\033[0m')
 	set_botleft(0,0)
