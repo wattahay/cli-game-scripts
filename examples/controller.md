@@ -1,16 +1,16 @@
-I have an example mapping in the beast.py file.
+I have an example key mapping in the beast.py file, with the title: XBOX.
 
-It uses the y-u-i-o keys, although it really does not matter.
+It uses the y-u-i-o keys, although the keys are somewhat arbitrary.
 
-There are instruction below on how to do it.
+There are instructions below on how to do it.
 
 ### **AntiMicroX** with an **XBOX 360** Controller
 
 This is a very specific example of an XBOX 360 controller, using another application to map a conroller to basic keyboard keys.
 
-Functionality is built in to the beast.py script to use custom keyboard keys with a custom title such as "XBOX".
-
 AntiMicroX is found on Linux in the conventional app centers.
+
+There is an [example file](https://github.com/wattahay/cli-game-scripts/blob/master/examples/xbox360.gamecontroller.amgp) to import into AntiMicroX for the mapping that exists in the beast.py file.
 
 
 ### Controller Mapping
