@@ -10,7 +10,7 @@ This is a very specific example of an XBOX 360 controller, using another applica
 
 AntiMicroX is found on Linux in the conventional app centers.
 
-There is an [example file](https://github.com/wattahay/cli-game-scripts/blob/master/examples/xbox360.gamecontroller.amgp) to import into AntiMicroX for the mapping that exists in the beast.py file.
+There is an [example xbox360.gamecontroller.amgp file](https://github.com/wattahay/cli-game-scripts/blob/master/examples/xbox360.gamecontroller.amgp) to import into AntiMicroX for the mapping that exists in the beast.py file.
 
 
 ### Controller Mapping
@@ -30,7 +30,7 @@ There is an [example file](https://github.com/wattahay/cli-game-scripts/blob/mas
          \___/                        \___/
 ```
 
-### Steps
+### Manual Steps
 
 1. Install and test AntiMicroX to ensure it works with your setup.
 2. Decide which keys to map to your controller, and map the controller.
@@ -40,11 +40,12 @@ There is an [example file](https://github.com/wattahay/cli-game-scripts/blob/mas
 
 > **Note:** If you map existing keys used by beast.py, then you do not have to get any keyboard key codes. You can still change the name of an entry in the beast.py file.
 
-### Example in the beast.py file
+### Using the provided example.
 
-1. Locate the KYBD array, which contains a commented out XBOX dictionary.
-2. Remove the pound sign to uncomment the line.
-3. Add a pound sign to another line to keep the options at 3.
+1. In AntiMicroX, import the [example xbox360.gamecontroller.amgp file](https://github.com/wattahay/cli-game-scripts/blob/master/examples/xbox360.gamecontroller.amgp) file.
+2. Locate the KYBD array, which contains a commented out XBOX dictionary.
+3. Remove the pound sign to uncomment the line.
+4. Add a pound sign to another line to keep the options at 3.
 
 > **Note:** The 1st 3 options are used if all 4 are uncommented.
 
