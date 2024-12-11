@@ -21,7 +21,7 @@ There is an [example xbox360.gamecontroller.amgp file](https://github.com/wattah
       LT  /  /--\      ___        (Y)   \  RT     Down: Dv   (to u) 117,85
           | | LS |  B ( G ) S  (X)   (B) |       Right: D>   (to o) 111,79
           |  \__/      ---        (A)    |        Left: D<   (to y) 121,89
-         |         ^         /--\         |      Start: GD   (to Spacebar)
+         |         ^         /--\         |      Start: G    (to Spacebar)
          |       < D >      | RS |        |       Pull: (A)  (to Shift)
         |          v         \__/          |     Start: (B)  (to Spacebar)
         |         ________________         |     Pause: (X)  (to p)
