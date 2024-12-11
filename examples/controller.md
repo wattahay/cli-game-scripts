@@ -18,9 +18,9 @@ There is an [example xbox360.gamecontroller.amgp file](https://github.com/wattah
 ```       
               LB                   RB         
            /======\_____________/======\            Up: D^   (to i) 105,73
-      LT  /  /--\       __        |Y|   \  RT     Down: Dv   (to u) 117,85
-          | | LS |   B |GD| S  |X|   |B| |       Right: D>   (to o) 111,79
-          |  \__/       --        |A|    |        Left: D<   (to y) 121,89
+      LT  /  /--\      ___        (Y)   \  RT     Down: Dv   (to u) 117,85
+          | | LS |  B ( G ) S  (X)   (B) |       Right: D>   (to o) 111,79
+          |  \__/      ---        (A)    |        Left: D<   (to y) 121,89
          |         ^         /--\         |       Pull: A    (to Shift)
          |       < D >      | RS |        |       Exit: LB   (to ESC)
         |          v         \__/          |      Exit: RB   (to Ctrl-c)
