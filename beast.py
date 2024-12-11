@@ -20,11 +20,11 @@ monster_steps =	4	# (1 - 10), higher is slower
 incubation = 	7	# (1 - 10), higher is slower
 egg_timer = 	7	# (1 - 10), higher is slower
 #########################################################-- game frame time
-LCD_TIME = 		.02	# example: .03 = 1 frame every .03 seconds (3 hundredths of a second)
+LCD_TIME = 		.02	# example: .02 = 1 frame every .02 seconds = 2/100 >>> 100/2 fps = 50 fps
 #########################################################-- size of the board
 # Lowest possible values are 15 x 30. Old game was 20 x 40.
-play_rows = 	20	# 15 +
-play_cols = 	40	# 30 +
+play_rows = 	20	# 15+ Height
+play_cols = 	40	# 30+ Width
 #########################################################-- game levels
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the outer brackets are square
@@ -70,10 +70,12 @@ PRIORITY_ODDS = [
 		[1, False] 		# Backwards (5th priority)
 	]
 #####################################################-- player direction controls
-# Get individual key codes using: python3 getkeycodes.py (included in the git repo)
+# Without editing, the default settings option is the middle one.
+# The script only allows for a total of 3 options at a time
 # Customize the 3 options below with key codes from getkeycodes, as well as custom titles.
-# Changing the titles will change the script -k option to the value of 'title':"word" (-k:word), as well as the option in the settings menu
-# The default settings option is the middle one.
+# Changing the value of word as in: 'title':"word"
+#	1. change the script -k option to -k:word
+#	2. change the settings menu option to [ word ]
 
 KYBD = [
 		{"title":"wasd", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
@@ -116,7 +118,7 @@ stat_rows = 1	# rows for game stats
 ################################################-- argv assignments
 for i in argv:
 	if i[0:3] == '-f:':
-		if(i[3:].isdigit() & len(i[3:]) < 3):
+		if(i[3:].isdigit() and len(i[3:]) < 3):
 			left_pad = int(i[3:]) * 2
 			top_pad = int(i[3:])
 		else:
@@ -131,11 +133,7 @@ for i in argv:
 		if term_rows % 2 == 0: alt = 0
 		else: alt = 1
 		play_rows = term_rows - 2 - top_pad*2 - stat_rows
-		#if (play_rows % 2 == 1):
-			#play_rows -= 1 # board size must be even until multi-egg pushing allows odd
 		play_cols = (tot_cols - 4 - left_pad * 2) / 2
-		#if (play_cols % 2 == 1): # board size must be even until multi-egg pushing allows odd
-			#play_cols -= 1
 
 for i in argv:
 	if i[0:2] == '-t':
@@ -143,13 +141,13 @@ for i in argv:
 		trnsprnt = True
 	if i[0:3] == '-k:':	# "wasd", "arrows", "hjkl"
 		if i[3:] == KYBD[0]['title']: dir_keys = 0
-		if i[3:] == KYBD[1]['title']: dir_keys = 1
-		if i[3:] == KYBD[2]['title']: dir_keys = 2
+		elif i[3:] == KYBD[1]['title']: dir_keys = 1
+		elif i[3:] == KYBD[2]['title']: dir_keys = 2
 	if i[0:3] == '-h:':
-		if(i[3:].isdigit() & len(i[3:]) < 121):
+		if(i[3:].isdigit() and len(i[3:]) < 121):
 			play_rows = int(i[3:]) + top_pad*2
 	if i[0:3] == '-w:':
-		if(i[3:].isdigit() & len(i[3:]) < 121):
+		if(i[3:].isdigit() and len(i[3:]) < 121):
 			play_cols = int(i[3:]) + left_pad
 ################################################-- keyboard constants post argv
 KEY_UP = 		KYBD[dir_keys]["K_UP"]
@@ -160,14 +158,15 @@ KEY_P_UP = 		KYBD[dir_keys]["PK_UP"]
 KEY_P_DOWN = 	KYBD[dir_keys]["PK_DOWN"]
 KEY_P_RIGHT = 	KYBD[dir_keys]["PK_RIGHT"]
 KEY_P_LEFT = 	KYBD[dir_keys]["PK_LEFT"]
-
+################################################-- other game variables
+fps_avg_frames = LCD_TIME
 mi1_opt = dir_keys + 1 # initial keyboard setting
 keypress = 999
 debug = False
 pulling = 'hold' # 'hold / 'tog' /  'swi' / 'sin'
 game_play_mode = False
 ################################################-- set background post argv
-tbg(0) # set xbgx
+tbg(0) # set xbgx after argv, and before character contants
 ##################################-- formatted character constants --##########################
 # 			Foreground	+ Background	+	Style			+	Unicode Chars 		+ 	Reset
 BAKGRD =				  xbgx 								+ '  '
@@ -219,7 +218,11 @@ blank_board = []
 if (play_rows < 15): play_rows = 15
 if (play_cols < 30): play_rows = 30
 play_rows = int(play_rows)
+#if (play_rows % 2 == 1):
+	#play_rows -= 1 # board size must be even until multi-egg pushing allows odd
 play_cols = int(play_cols)
+	#if (play_cols % 2 == 1): # board size must be even until multi-egg pushing allows odd
+		#play_cols -= 1
 board_rows = play_rows + 2
 board_cols = play_cols + 2
 ################################################-- spacing variables
@@ -232,14 +235,18 @@ min_rows = board_rows + stat_rows
 ###########################################################-- Utility Functions --##############
 ################################################################################################
 def close_game(): # close game function
-	system('clear')
-	sleep(.1)
+	print('\033[?25\033[0;0H')
 	system('clear')
 	try:
+		print('\033[?25\033[0;0H')
+		print('clear')
 		raise KeyboardInterrupt
 	except KeyboardInterrupt:
+		print('\033[?25\033[0;0H')
 		system('clear')
-		sleep(.1)
+		system('reset')
+	finally:
+		print('\033[?25\033[0;0H')
 		system('clear')
 		system('reset')
 		exit()
@@ -302,7 +309,7 @@ def build_the_board(): #{ BUILDS a blank board
 
 	for rowi in range(board_rows): # draws the game boarders on the board
 		for coli in range(board_cols):
-			if(rowi == 0) | (rowi == (board_rows - 1)) | (coli == 0) | (coli == (board_cols - 1)):
+			if(rowi == 0) or (rowi == (board_rows - 1)) or (coli == 0) or (coli == (board_cols - 1)):
 				screen_board[rowi][coli] = BLOCK
 
 	return screen_board
@@ -419,13 +426,13 @@ def hatch_eggs():
 	for i in range(1, (len(eggs))):
 		if (eggs[i - di]['wait'] > 0):
 			eggs[i - di]['wait'] -= 1
-		elif (eggs[i - di]['wait'] == 0) & (eggs[i - di]['sub'] == 32):
+		elif (eggs[i - di]['wait'] == 0) and (eggs[i - di]['sub'] == 32):
 			eggs[i - di]['sub'] = 8329
 		elif (eggs[i - di]['wait'] == 0) :
-			if ((eggs[i - di]['stg'] == eggs[0]['frame']) & (eggs[i - di]['sub'] > 8320)):
+			if ((eggs[i - di]['stg'] == eggs[0]['frame']) and (eggs[i - di]['sub'] > 8320)):
 				eggs[i - di]['sub'] -= 1
 				board[eggs[i - di]['ro']][eggs[i - di]['co']] = EGG(eggs[i - di]['sub'])
-			elif ((eggs[i - di]['sub'] == 8320) & (eggs[i - di]['stg'] == eggs[0]['frame'])):
+			elif ((eggs[i - di]['sub'] == 8320) and (eggs[i - di]['stg'] == eggs[0]['frame'])):
 				hatch_monster(eggs[i - di]['ro'], eggs[i - di]['co'])
 				del eggs[i - di]
 				play_audio('hatch')
@@ -492,26 +499,26 @@ def move_enemies(pawns): #{
 			rdistance = player[1]['ro'] - pawns[pwni]['ro'] # player row minus beast row
 			cdistance = player[1]['co'] - pawns[pwni]['co'] # player column minus beast column
 
-			if (rdistance == 0) | (cdistance == 0): # avoid division by zero
+			if (rdistance == 0) or (cdistance == 0): # avoid division by zero
 				distance_ratio = 0.0 # if the player is on the same row or column, the distance ratio is zero
 			else:
 				distance_ratio = rdistance / cdistance # division of row distance by column distance
 
-			if ((rdistance < 0.0) & (cdistance < 0.0) & (distance_ratio >= .5) & (distance_ratio <= 2.0)):
+			if ((rdistance < 0.0) and (cdistance < 0.0) and (distance_ratio >= .5) and (distance_ratio <= 2.0)):
 				move_priority = [ 'UL', 'U', 'L', 'DL', 'UR', 'D', 'R', 'DR' ] # UPPER LEFT range priorities
-			elif ((rdistance < 0.0) & (cdistance > 0.0) & (distance_ratio <= -.5) & (distance_ratio >= -2.0)):
+			elif ((rdistance < 0.0) and (cdistance > 0.0) and (distance_ratio <= -.5) and (distance_ratio >= -2.0)):
 				move_priority = [ 'UR', 'U', 'R', 'UL', 'DR', 'L', 'D', 'DL' ] # UPPER RIGHT range priorities
-			elif ((rdistance > 0.0) & (cdistance > 0.0) & (distance_ratio >= .5) & (distance_ratio <= 2.0)):
+			elif ((rdistance > 0.0) and (cdistance > 0.0) and (distance_ratio >= .5) and (distance_ratio <= 2.0)):
 				move_priority = [ 'DR', 'D', 'R', 'DL', 'UR', 'U', 'L', 'UL' ] # DOWN RIGHT range priorities
-			elif ((rdistance > 0.0) & (cdistance < 0.0) & (distance_ratio <= -.5) & (distance_ratio >= -2.0)):
+			elif ((rdistance > 0.0) and (cdistance < 0.0) and (distance_ratio <= -.5) and (distance_ratio >= -2.0)):
 				move_priority = [ 'DL', 'D', 'L', 'UL', 'DR', 'U', 'R', 'UR' ] # DOWN LEFT range priorities
-			elif ((rdistance < 0.0) & ((abs(distance_ratio) > 2.0) | (distance_ratio == 0.0))):
+			elif ((rdistance < 0.0) and ((abs(distance_ratio) > 2.0) or (distance_ratio == 0.0))):
 				move_priority = [ 'U', 'UL', 'UR', 'L', 'R', 'DL', 'DR', 'D' ] # UPWARD range priorities
-			elif ((cdistance > 0.0) & ((abs(distance_ratio) < .5) | (distance_ratio == 0.0))):
+			elif ((cdistance > 0.0) and ((abs(distance_ratio) < .5) or (distance_ratio == 0.0))):
 				move_priority = [ 'R', 'UR', 'DR', 'U', 'D', 'UL', 'DL', 'L' ] # RIGHT range priorities
-			elif ((rdistance > 0.0) & ((abs(distance_ratio) > 2.0) | (distance_ratio == 0.0))):
+			elif ((rdistance > 0.0) and ((abs(distance_ratio) > 2.0) or (distance_ratio == 0.0))):
 				move_priority = [ 'D', 'DL', 'DR', 'L', 'R', 'UL', 'UR', 'U' ] # DOWNWARD range priorities
-			elif ((cdistance < 0.0) & ((abs(distance_ratio) < .5) | (distance_ratio == 0.0))):
+			elif ((cdistance < 0.0) and ((abs(distance_ratio) < .5) or (distance_ratio == 0.0))):
 				move_priority = [ 'L', 'UL', 'DL', 'U', 'D', 'UR', 'DR', 'R' ] # LEFT range priorities
 
 			for priopti in range(8):
@@ -529,7 +536,7 @@ def move_enemies(pawns): #{
 					PRIORITY_ODDS[priopti][1] = True
 				else:
 					PRIORITY_ODDS[priopti][1] = False
-					if ((pawns[0]['chr'] == MONSTER) & ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == MONSTER) | (board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == BEAST))):
+					if ((pawns[0]['chr'] == MONSTER) and ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == MONSTER) or (board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == BEAST))):
 						if (choices([True, False], [3, 127], k=1)) == [True]:
 							place_eggs(1)
 
@@ -537,8 +544,8 @@ def move_enemies(pawns): #{
 				if (PRIORITY_ODDS[prioddi][1] == True): # if it is true that the priority move is a blank space, then loop through and fill out the likely_moves list
 					for ti in range(PRIORITY_ODDS[prioddi][0]): # loop through by number in "priorities" loop, to fill out likely_moves list
 						likely_moves.append(move_priority[prioddi])
-				if ((prioddi == 2) | (prioddi == 4) | (prioddi == 6)):
-					if ((not PRIORITY_ODDS[prioddi - 1][1]) & (PRIORITY_ODDS[prioddi][1] == True)):
+				if ((prioddi == 2) or (prioddi == 4) or (prioddi == 6)):
+					if ((not PRIORITY_ODDS[prioddi - 1][1]) and (PRIORITY_ODDS[prioddi][1] == True)):
 						for ti in range(PRIORITY_ODDS[prioddi][0]):
 							likely_moves.append(move_priority[prioddi])
 
@@ -588,7 +595,7 @@ def push_tree(intent):
 		for i in range(len(push_eggs)):
 			eggs[push_eggs[i]]['ro'] += MOVES[intent]['ra']
 			eggs[push_eggs[i]]['co'] += MOVES[intent]['ca']
-		if ((player[1]['tug']) & (board[tug_r][tug_c] == BOX)):
+		if ((player[1]['tug']) and (board[tug_r][tug_c] == BOX)):
 			board[tug_r][tug_c] = BAKGRD
 			board[stnce_r][stnce_c] = BOX
 		else:
@@ -603,7 +610,7 @@ def push_tree(intent):
 		del_index = 0
 
 		for i in range(1, (len(pawns))):
-			if ((pawns[i]['ro'] == row) & (pawns[i]['co'] == col)):
+			if ((pawns[i]['ro'] == row) and (pawns[i]['co'] == col)):
 				del_index = i
 				break
 		del pawns[del_index]
@@ -616,7 +623,7 @@ def push_tree(intent):
 		space = board[probe_r(probe)][probe_c(probe)]
 		ram_space = board[ram_r(probe)][ram_c(probe)]
 
-		if (((probe_r(probe) != 0) & (probe_r(probe) != (len(board) - 1))) & ((probe_c(probe) != 0) & (probe_c(probe) != len(board[0]) - 1))):
+		if (((probe_r(probe) != 0) and (probe_r(probe) != (len(board) - 1))) and ((probe_c(probe) != 0) and (probe_c(probe) != len(board[0]) - 1))):
 			wall_space = board[wall_r(probe)][wall_c(probe)]
 
 		if (space == BOX):		# if space is a box
@@ -625,15 +632,15 @@ def push_tree(intent):
 			push_move()
 			loop = False
 		elif (deteggt(space) == True): 	# if space is a egg
-			if (wall_space == BLOCK) | (wall_space == KILLBLOCK):	# if next block after egg is a border
+			if (wall_space == BLOCK) or (wall_space == KILLBLOCK):	# if next block after egg is a border
 				kill_enemy(eggs, probe_r(probe), probe_c(probe)) 			# del egg from global egg list
 				play_audio('hatch')
 				push_move()
 				loop = False						# make space same as preceeding space
-#			elif ((wall_space == BAKGRD) | (wall_space == BOX)):
+#			elif ((wall_space == BAKGRD) or (wall_space == BOX)):
 			else:
 				for i in range(1, len(eggs)):
-					if ((eggs[i]['ro'] == probe_r(probe)) & (eggs[i]['co'] == probe_c(probe))):
+					if ((eggs[i]['ro'] == probe_r(probe)) and (eggs[i]['co'] == probe_c(probe))):
 						push_eggs = [i] + push_eggs
 				probe += 1
 		elif (space == BLOCK):				# if space is a border
@@ -644,13 +651,13 @@ def push_tree(intent):
 			board[probe_r(probe - 1)][probe_c(probe - 1)] = KILLBLOCK
 			loop = False
 		elif (space == BEAST): # if space is a beast
-			if ((wall_space == KILLBLOCK) | (wall_space == BOX) | (wall_space == BLOCK)):
+			if ((wall_space == KILLBLOCK) or (wall_space == BOX) or (wall_space == BLOCK)):
 				kill_enemy(beasts, probe_r(probe), probe_c(probe))
 				play_audio('squish')
 				push_move()
 			loop = False
 		elif (space == MONSTER):# if space is a monster
-			if ((wall_space == KILLBLOCK) | (wall_space == BLOCK)):
+			if ((wall_space == KILLBLOCK) or (wall_space == BLOCK)):
 				kill_enemy(monsters, probe_r(probe), probe_c(probe))
 				play_audio('squish')
 				push_move()
@@ -670,7 +677,7 @@ def move_player(direction):
 	rtug = row - MOVES[direction]['ra']
 	ctug = col - MOVES[direction]['ca']
 	board[fow][fol] = PLAYER
-	if (player[1]['tug']) & (board[rtug][ctug] == BOX):
+	if (player[1]['tug']) and (board[rtug][ctug] == BOX):
 		board[rtug][ctug] = BAKGRD
 		board[row][col] = BOX
 		if (pulling == 'hold'):
@@ -689,7 +696,7 @@ def direct_move(tap_move):
 		move_player(tap_move)
 	elif (space == BOX):
 		push_tree(tap_move)
-	elif (space == MONSTER) | (space == BEAST) | (space == KILLBLOCK):
+	elif (space == MONSTER) or (space == BEAST) or (space == KILLBLOCK):
 		kill_player()
 
 def direct_keypress(tap):
@@ -800,10 +807,10 @@ def build_level():
 #################################################################-- Show Intro Options
 
 
-	if (fitted == True  & trnsprnt == False): xbgx = '\033[49m' # temporary solution
+	if (fitted == True  and trnsprnt == False): xbgx = '\033[49m' # temporary solution
 	if (fitted == True): xbgx = '\033[49m' # temporary solution
-	if (fitted == False & trnsprnt == False): tbg(0) # temporary solution
-	if (fitted == False & trnsprnt == True): tbg(0) # temporary solution
+	if (fitted == False and trnsprnt == False): tbg(0) # temporary solution
+	if (fitted == False and trnsprnt == True): tbg(0) # temporary solution
 	if level == 0:
 		if fitted == True: xbgx = '\033[49m'
 	if level > 0:
@@ -1077,7 +1084,7 @@ def build_level():
 					main_menu = 1
 				if main_menu == 1:
 					print_board(blank_board)
-					if keypress != 9 & show_tabkey_note == True: tabkey_note()
+					if keypress != 9 and show_tabkey_note == True: tabkey_note()
 					show_tabkey_note = False
 					item_menu = 0
 					dim_menus(0)
@@ -1126,7 +1133,7 @@ def build_level():
 			elif main_menu == 3:
 				main_menu_3()
 
-			if ((keypress == KEY_UP) | (keypress == KEY_DOWN)):
+			if ((keypress == KEY_UP) or (keypress == KEY_DOWN)):
 				if (main_menu == 1):
 
 					main_menu_1()
@@ -1180,9 +1187,9 @@ def build_level():
 					elif (item_menu == 10): dim_menus(10)
 					elif (item_menu == 11): dim_menus(11)
 					elif (item_menu == 12): dim_menus(12)
-			elif ((keypress == KEY_LEFT) | (keypress == KEY_RIGHT)):
+			elif ((keypress == KEY_LEFT) or (keypress == KEY_RIGHT)):
 				maxed_cnt = (play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)
-				if (main_menu == 1) & (item_menu == 1):
+				if (main_menu == 1) and (item_menu == 1):
 					if (keypress == KEY_LEFT):
 						mi1_opt -= 1
 						if mi1_opt < 1: mi1_opt = 3
@@ -1197,7 +1204,7 @@ def build_level():
 						mi1_controls(3)
 					play_audio('menu_item_tick')
 					keypress = 999
-				elif (main_menu == 1) & (item_menu == 2):
+				elif (main_menu == 1) and (item_menu == 2):
 					if (keypress == KEY_LEFT):
 						mi2_opt -= 1
 						if mi2_opt < 1: mi2_opt = 4
@@ -1211,7 +1218,7 @@ def build_level():
 					if item_menu != 3: play_audio('menu_item_tick')
 					keypress = 999
 
-				elif (main_menu == 2) & (item_menu == 3):
+				elif (main_menu == 2) and (item_menu == 3):
 					if (keypress == KEY_LEFT):
 						lvl_beast_cnt -= 1
 						if lvl_beast_cnt < 0:
@@ -1227,7 +1234,7 @@ def build_level():
 						else:
 							play_audio('menu_item_tick')
 					keypress = 999
-				elif (main_menu == 2) & (item_menu == 4):
+				elif (main_menu == 2) and (item_menu == 4):
 					if (keypress == KEY_LEFT):
 						lvl_monster_cnt -= 1
 						if lvl_monster_cnt < 0:
@@ -1243,7 +1250,7 @@ def build_level():
 						else:
 							play_audio('menu_item_tick')
 					keypress = 999
-				elif (main_menu == 2) & (item_menu == 5):
+				elif (main_menu == 2) and (item_menu == 5):
 					if (keypress == KEY_LEFT):
 						lvl_egg_cnt -= 1
 						if lvl_egg_cnt < 0:
@@ -1259,7 +1266,7 @@ def build_level():
 						else:
 							play_audio('menu_item_tick')
 					keypress = 999
-				elif (main_menu == 2) & (item_menu == 6):
+				elif (main_menu == 2) and (item_menu == 6):
 					if (keypress == KEY_LEFT):
 						lvl_box_cnt -= 1
 						if lvl_box_cnt < 0:
@@ -1275,7 +1282,7 @@ def build_level():
 						else:
 							play_audio('menu_item_tick')
 					keypress = 999
-				elif (main_menu == 2) & (item_menu == 7):
+				elif (main_menu == 2) and (item_menu == 7):
 					if (keypress == KEY_LEFT):
 						lvl_block_cnt -= 1
 						if lvl_block_cnt < 0:
@@ -1291,7 +1298,7 @@ def build_level():
 						else:
 							play_audio('menu_item_tick')
 					keypress = 999
-				elif (main_menu == 2) & (item_menu == 8):
+				elif (main_menu == 2) and (item_menu == 8):
 					if (keypress == KEY_LEFT):
 						mi8_opt -= 1
 						if mi8_opt < 1: mi8_opt = 2
@@ -1302,7 +1309,7 @@ def build_level():
 					elif mi8_opt == 2: mi8_controls(2)
 					play_audio('menu_item_tick')
 					keypress = 999
-				elif (main_menu == 3) & (item_menu == 9):
+				elif (main_menu == 3) and (item_menu == 9):
 					if (keypress == KEY_RIGHT):
 						beast_speed -= beast_speed_inc
 						if beast_speed < beast_speed_min:
@@ -1319,7 +1326,7 @@ def build_level():
 							play_audio('menu_item_tick')
 					beast_arrows = int((beast_speed - beast_speed_min ) / beast_speed_inc)
 					keypress = 999
-				elif (main_menu == 3) & (item_menu == 10):
+				elif (main_menu == 3) and (item_menu == 10):
 					if (keypress == KEY_RIGHT):
 						monster_speed -= monster_speed_inc
 						if monster_speed < monster_speed_min:
@@ -1336,7 +1343,7 @@ def build_level():
 							play_audio('menu_item_tick')
 					monster_arrows = int((monster_speed - monster_speed_min ) / monster_speed_inc)
 					keypress = 999
-				elif (main_menu == 3) & (item_menu == 11):
+				elif (main_menu == 3) and (item_menu == 11):
 					if (keypress == KEY_RIGHT):
 						incubate -= incubate_inc
 						if incubate < incubate_min:
@@ -1353,7 +1360,7 @@ def build_level():
 							play_audio('menu_item_tick')
 					incubate_arrows = int((incubate - incubate_min ) / incubate_inc)
 					keypress = 999
-				elif (main_menu == 3) & (item_menu == 12):
+				elif (main_menu == 3) and (item_menu == 12):
 					if (keypress == KEY_RIGHT):
 						egg_speed -= timer_inc
 						if egg_speed < timer_min:
@@ -1494,7 +1501,7 @@ try:
 		elif keypress == ord('p'):
 			pause()
 		else:
-			if ((lives == 0) | ((len(beasts) == 1) & (len(monsters) == 1) & (len(eggs) == 1))):
+			if ((lives == 0) or ((len(beasts) == 1) and (len(monsters) == 1) and (len(eggs) == 1))):
 				game_play_mode = False
 				if lives == 0:
 					play_audio('loss')
