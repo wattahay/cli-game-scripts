@@ -21,13 +21,13 @@ There is an [example xbox360.gamecontroller.amgp file](https://github.com/wattah
       LT  /  /--\      ___        (Y)   \  RT     Down: Dv   (to u) 117,85
           | | LS |  B ( G ) S  (X)   (B) |       Right: D>   (to o) 111,79
           |  \__/      ---        (A)    |        Left: D<   (to y) 121,89
-         |         ^         /--\         |       Pull: (A)  (to Shift)
-         |       < D >      | RS |        |       Exit: LB   (to ESC)
-        |          v         \__/          |      Exit: RB   (to Ctrl-c)
+         |         ^         /--\         |      Start: GD   (to Spacebar)
+         |       < D >      | RS |        |       Pull: (A)  (to Shift)
+        |          v         \__/          |     Start: (B)  (to Spacebar)
         |         ________________         |     Pause: (X)  (to p)
-        |       _/                \_       |     Start: GD   (to Spacebar)
-        \     _/                    \_     /     Start: (B)  (to Spacebar)
-         \___/                        \___/        Tab: (y)  (to Tab)
+        |       _/                \_       |       Tab: (Y)  (to Tab)
+        \     _/                    \_     /      Exit: LB   (to ESC)
+         \___/                        \___/       Exit: RB   (to Ctrl-c) 
 ```
 
 ### Manual Steps
