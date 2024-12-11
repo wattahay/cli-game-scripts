@@ -27,7 +27,7 @@ There is an [example xbox360.gamecontroller.amgp file](https://github.com/wattah
         |         ________________         |     Pause: (X)  (to p)
         |       _/                \_       |     Start: GD   (to Spacebar)
         \     _/                    \_     /     Start: (B)  (to Spacebar)
-         \___/                        \___/		   Tab: (y)  (to Tab)
+         \___/                        \___/        Tab: (y)  (to Tab)
 ```
 
 ### Manual Steps
