@@ -30,8 +30,6 @@ play_cols = 	40	# 30+ Width
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the outer brackets are square
 # Make sure all bracketted levels are followed by a comma (except for the last level)
-# Block/Box counts set to '-1' leave the counts procedural
-#	The Block/Box counts are for specifying very low counts. (higher counts than available spaces will crash the script at this time.)
 GAME_LEVELS = [
 		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'yellow',	'blocks': -1,	'boxes': -1},	# Level 1
 		{'beasts':5,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 2
@@ -794,7 +792,7 @@ def build_level():
 	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT, pulling
 
 	def print_beast():
-		set_midcent(6,29)
+		set_midcent(5,29)
 		print('\033[u\033[0m' + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*3 + BEAST*1 + BAKGRD*4 + BEAST*3 + BAKGRD*2 + BEAST*5)
 		print('\033[u\033[1B\033[0m' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*6 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*2 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1)
 		print('\033[u\033[2B\033[0m' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*7 + BEAST*1)
@@ -812,7 +810,7 @@ def build_level():
 	newlevel = 1
 	lostlevels = 0
 	wordvar = ''
-
+	keypress = 999
 ########################################################-- Intro Screen (level 0)
 	if (level == 0):
 		sleep(1) # delay for effect
@@ -831,7 +829,7 @@ def build_level():
 		if level == 1: wordvar = ' level'
 		else: wordvar = ' levels'
 		set_topleft(3,3)
-		print('\033[u\033[37m' + xbgx + 'Player defeated. You lost \033[36m' + str(NO_LIVES) + ' points\033[37m and got held back \033[36m' + str(lostlevels) + wordvar + '.\033[37m\033[0m')
+		print('\033[u\033[37m' + xbgx + 'Player defeated. . .\033[u\033[2B' + xbgx + 'You lost \033[36m' + str(NO_LIVES) + ' points\033[37m and got held back \033[36m' + str(lostlevels) + wordvar + '.\033[37m\033[0m')
 	else:
 		newlevel = level + 1
 
