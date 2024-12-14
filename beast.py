@@ -198,7 +198,7 @@ monsters = 	[{ 'frames': 		(int(monster_speed / LCD_TIME)), 	'frame':0, 	'chr': 
 eggs = 		[{ 'frames': 		(int(egg_speed / LCD_TIME)), 		'frame':0, 'incu_frames': (int(1 / LCD_TIME)), 'incu_frame': 0, 'pnts': EGG_SCR }]
 player = 	[{ 'flash_frames': 	(int(.05 / LCD_TIME) * 2), 						'chr': PLAYER, 'pnts': 10 }]
 
-plr_flashes = 5
+PLR_FLASHES = 11
 plr_flash = 0
 plr_frames = (int(.05 / LCD_TIME) * 2)
 plr_frame = 0
@@ -452,12 +452,11 @@ def hatch_eggs():
 				di += 1
 #####################################-- move pieces
 def flash_player():
-	global player, PLAYER, plr_flashes, plr_flash, plr_frames, plr_frame
+	global player, PLAYER, PLR_FLASHES, plr_flash, plr_frames, plr_frame
 
 	neg_PLAYER = '\033[7m\033[34m' + xbgx + chr(9664) + chr(9654) + '\033[0m'
-	pos_PLAYER = '\033[34m' + xbgx + chr(9664) + chr(9654) + '\033[0m'
 
-	if plr_flash <= plr_flashes:
+	if plr_flash <= PLR_FLASHES:
 		if plr_frame < plr_frames:
 			plr_frame += 1
 		elif plr_frame == plr_frames:
@@ -466,10 +465,11 @@ def flash_player():
 				board[player[1]['ro']][player[1]['co']] = neg_PLAYER
 			else:
 				board[player[1]['ro']][player[1]['co']] = PLAYER
-
 			plr_flash += 1
+	elif board[player[1]['ro']][player[1]['co']] == neg_PLAYER:
+				board[player[1]['ro']][player[1]['co']] = PLAYER
 
-	# if the flash is greater than 0
+
 def place_player():
 	global player, PLAYER, plr_flash
 
@@ -482,7 +482,7 @@ def place_player():
 			step += 1
 			player.append({'ro': row, 'co': col, 'tug': False })
 			step += 1
-	plr_flash = 0
+	plr_flash = 0 # This is what induces the flash_player() functions
 
 def kill_player():
 	global BAKGRD, player, lives, board
@@ -750,7 +750,6 @@ def pause():
 		print('\033[u\033[3B' + xbgx + chr(9553) + '\033[3CPAUSED\033[3C' + chr(9553))
 		print('\033[u\033[4B' + xbgx + chr(9553) + '\033[12C' + chr(9553))
 		print('\033[u\033[5B' + xbgx + chr(9562) + chr(9552)*12 + chr(9565))
-		print('\033[?25\033[H\033[0m')
 
 	play_audio('pause')
 	tbg(0) # handles transparent background
