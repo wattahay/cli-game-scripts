@@ -30,6 +30,8 @@ play_cols = 	40	# 30+ Width
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the outer brackets are square
 # Make sure all bracketted levels are followed by a comma (except for the last level)
+# Block/Box counts set to '-1' leave the counts procedural
+#	The Block/Box counts are for specifying very low counts. (higher counts than available spaces will crash the script at this time.)
 GAME_LEVELS = [
 		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'yellow',	'blocks': -1,	'boxes': -1},	# Level 1
 		{'beasts':5,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 2
