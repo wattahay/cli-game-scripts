@@ -8,7 +8,7 @@ from sys import argv
 ################################################################################################
 ###########################################################-- Useful Variables --###############
 ################################################################################################
-PLR_FLASHES = 	5	# Number of times a spawned player flashes for attention
+PLR_FLASHES = 	6	# Number of times a spawned player flashes
 lives = 		5	# starting level lives
 BEAST_SCR = 	6	# points for killing beasts
 EGG_SCR = 		8	# points for killing eggs
@@ -1561,10 +1561,10 @@ try:
 			if keypress == ord('p'):
 				pause()
 			exec_start = time()
+			flash_player()
 			move_enemies(beasts)
 			move_enemies(monsters)
 			hatch_eggs()
-			flash_player()
 			print_board(board)
 			exec_end = time()
 			exec_time = exec_end - exec_start
