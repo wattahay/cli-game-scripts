@@ -8,6 +8,7 @@ from sys import argv
 ################################################################################################
 ###########################################################-- Useful Variables --###############
 ################################################################################################
+PLR_FLASHES = 	5	# Number of times a spawned player flashes for attention
 lives = 		5	# starting level lives
 BEAST_SCR = 	6	# points for killing beasts
 EGG_SCR = 		8	# points for killing eggs
@@ -198,7 +199,7 @@ monsters = 	[{ 'frames': 		(int(monster_speed / LCD_TIME)), 	'frame':0, 	'chr': 
 eggs = 		[{ 'frames': 		(int(egg_speed / LCD_TIME)), 		'frame':0, 'incu_frames': (int(1 / LCD_TIME)), 'incu_frame': 0, 'pnts': EGG_SCR }]
 player = 	[{ 'flash_frames': 	(int(.05 / LCD_TIME) * 2), 						'chr': PLAYER, 'pnts': 10 }]
 
-PLR_FLASHES = 11
+PLR_FLASHES = (PLR_FLASHES * 2) + 1
 plr_flash = 0
 plr_frames = (int(.05 / LCD_TIME) * 2)
 plr_frame = 0
@@ -467,7 +468,7 @@ def flash_player():
 				board[player[1]['ro']][player[1]['co']] = PLAYER
 			plr_flash += 1
 	elif board[player[1]['ro']][player[1]['co']] == neg_PLAYER:
-				board[player[1]['ro']][player[1]['co']] = PLAYER
+		board[player[1]['ro']][player[1]['co']] = PLAYER
 
 
 def place_player():
