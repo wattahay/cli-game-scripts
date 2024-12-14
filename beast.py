@@ -31,21 +31,21 @@ play_cols = 	40	# 30+ Width
 # Each level is surrounded by curly brackets, while the outer brackets are square
 # Make sure all bracketted levels are followed by a comma (except for the last level)
 GAME_LEVELS = [
-		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'yellow',	'blocks': -1,	'boxes': -1},	# Level 1
-		{'beasts':5,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 2
-		{'beasts':5,	'monsters':0,	'eggs':2,	'block': 'yellow',	'blocks': -1,	'boxes': -1},	# Level 3
-		{'beasts':0,	'monsters':0,	'eggs':1,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 4
-		{'beasts':4,	'monsters':2,	'eggs':2,	'block': 'yellow',	'blocks': -1,	'boxes': -1},	# Level 5
-		{'beasts':8,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 6
-		{'beasts':0,	'monsters':0,	'eggs':8,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 7
-		{'beasts':0,	'monsters':8,	'eggs':0,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 8
-		{'beasts':3,	'monsters':3,	'eggs':3,	'block': 'yellow',	'blocks': -1,	'boxes': -1},	# Level 9
-		{'beasts':2,	'monsters':4,	'eggs':3,	'block': 'yellow',	'blocks': -1,	'boxes': -1},	# Level 10
-		{'beasts':1,	'monsters':5,	'eggs':4,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 11
-		{'beasts':1,	'monsters':6,	'eggs':4,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 12
-		{'beasts':0,	'monsters':0,	'eggs':12,	'block': 'yellow',	'blocks': -1,	'boxes': -1},	# Level 13
-		{'beasts':0,	'monsters':12,	'eggs':0,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 14
-		{'beasts':15,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -1,	'boxes': -1} 	# Level 15
+		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'yellow'}, # Level 1
+		{'beasts':5,	'monsters':0,	'eggs':0,	'block': 'orange'},	# Level 2
+		{'beasts':5,	'monsters':0,	'eggs':2,	'block': 'yellow'}, # Level 3
+		{'beasts':0,	'monsters':0,	'eggs':1,	'block': 'orange'},	# Level 4
+		{'beasts':4,	'monsters':2,	'eggs':2,	'block': 'yellow'}, # Level 5
+		{'beasts':8,	'monsters':0,	'eggs':0,	'block': 'orange'}, # Level 6
+		{'beasts':0,	'monsters':0,	'eggs':8,	'block': 'orange'}, # Level 7
+		{'beasts':0,	'monsters':8,	'eggs':0,	'block': 'orange'}, # Level 8
+		{'beasts':3,	'monsters':3,	'eggs':3,	'block': 'yellow'},	# Level 9
+		{'beasts':2,	'monsters':4,	'eggs':3,	'block': 'yellow'}, # Level 10
+		{'beasts':1,	'monsters':5,	'eggs':4,	'block': 'orange'}, # Level 11
+		{'beasts':1,	'monsters':6,	'eggs':4,	'block': 'orange'}, # Level 12
+		{'beasts':0,	'monsters':0,	'eggs':12,	'block': 'yellow'},	# Level 13
+		{'beasts':0,	'monsters':12,	'eggs':0,	'block': 'orange'},	# Level 14
+		{'beasts':15,	'monsters':0,	'eggs':0,	'block': 'orange'} 	# Level 15
 	]
 ########################################################-- Pawn Movement Priority Odds
 # These values are the odds of moves for an enemy if those		|---------------------
@@ -319,11 +319,10 @@ def print_stats():
 	score_stat = chr(9477) + ' SCORE: ' + str(score) + ' ' + chr(9477)
 	lives_stat = chr(9477) + ' LIVES: ' + str(lives) + ' ' + chr(9477)
 
-	print('\033[?25\033[?7l\033[1;1H\033[' + str(top_margin + board_rows) + ';' + str(left_margin) + 'H\033[s\033[0m\033[37m' +
-		'\033[s\033[?7l\033[' + str(statpad) 									+ 'C'	+ level_stat + '   ' +
-		'\033[u\033[?7l\033[' + str(board_cols - int(len(score_stat)/2))		+ 'C' 	+ score_stat + '   ' +
-		'\033[u\033[?7l\033[' + str(board_cols*2 - statpad - len(lives_stat))	+ 'C' 	+ lives_stat + '   ' +
-		'\033[0m\033[?25\033[1A\033[0;0H\033[?7l')
+	print('\033[?7l\033[' + str(top_margin + board_rows) + ';' + str(left_margin) + 'H\033[s\033[0m\033[37m' +
+		'\033[s\033[' + str(statpad) 									+ 'C'	+ level_stat + '   ' +
+		'\033[u\033[' + str(board_cols - int(len(score_stat)/2))		+ 'C' 	+ score_stat + '   ' +
+		'\033[u\033[' + str(board_cols*2 - statpad - len(lives_stat))	+ 'C' 	+ lives_stat + '   ' + '\033[1A')
 
 def print_debug():
 	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, play_rows, play_cols, term_cols, term_rows
@@ -761,7 +760,6 @@ def pause():
 
 	while(True):
 		if (keypress == ord('r')):
-			keypress = 999
 			tot_rows, tot_cols = get_rw_cl_tcl(1,0,1)
 			if (tot_rows != term_rows) or (tot_cols != term_cols):
 				#system('clear')
@@ -792,7 +790,7 @@ def build_level():
 	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT, pulling
 
 	def print_beast():
-		set_midcent(5,29)
+		set_midcent(7,29)
 		print('\033[u\033[0m' + BEAST*4 + BAKGRD*2 + BEAST*5 + BAKGRD*3 + BEAST*1 + BAKGRD*4 + BEAST*3 + BAKGRD*2 + BEAST*5)
 		print('\033[u\033[1B\033[0m' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*6 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*2 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*3 + BEAST*1)
 		print('\033[u\033[2B\033[0m' + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*5 + BEAST*1 + BAKGRD*3 + BEAST*1 + BAKGRD*1 + BEAST*1 + BAKGRD*7 + BEAST*1)
@@ -810,7 +808,7 @@ def build_level():
 	newlevel = 1
 	lostlevels = 0
 	wordvar = ''
-	keypress = 999
+
 ########################################################-- Intro Screen (level 0)
 	if (level == 0):
 		sleep(1) # delay for effect
@@ -829,7 +827,7 @@ def build_level():
 		if level == 1: wordvar = ' level'
 		else: wordvar = ' levels'
 		set_topleft(3,3)
-		print('\033[u\033[37m' + xbgx + 'Player defeated. . .\033[u\033[2B' + xbgx + 'You lost \033[36m' + str(NO_LIVES) + ' points\033[37m and got held back \033[36m' + str(lostlevels) + wordvar + '.\033[37m\033[0m')
+		print('\033[u\033[37m' + xbgx + 'Player defeated. You lost \033[36m' + str(NO_LIVES) + ' points\033[37m and got held back \033[36m' + str(lostlevels) + wordvar + '.\033[37m\033[0m')
 	else:
 		newlevel = level + 1
 
@@ -838,11 +836,9 @@ def build_level():
 ################################################################-- Keyboard, Resize, Print, Loop
 	while (True):
 		if (keypress == ord(' ')):
-			keypress = 999
 			sleep(.8) # delay for effect before entering settings
 			break
 		if (keypress == 9):
-			keypress = 999
 			sleep(.4) # delay for effect before entering first level
 			break
 		if (level == 0 or keypress == ord('r')):
@@ -878,18 +874,8 @@ def build_level():
 		lvl_beast_cnt = GAME_LEVELS[level-1]["beasts"]
 		lvl_monster_cnt = GAME_LEVELS[level-1]["monsters"]
 		lvl_egg_cnt = GAME_LEVELS[level-1]["eggs"]
-		if (GAME_LEVELS[level - 1]["block"] == 'yellow'): block_type = BLOCK
-		if (GAME_LEVELS[level - 1]["block"] == 'orange'): block_type = KILLBLOCK
-		if (GAME_LEVELS[level - 1]["blocks"] == -1):
-			lvl_block_cnt = int(play_rows * play_cols * .012)
-		else:
-			lvl_block_cnt = GAME_LEVELS[level - 1]["blocks"]
-		if (GAME_LEVELS[level - 1]["boxes"] == -1):
-			lower_boxes = int(play_rows * play_cols / 4 - 10)
-			upper_boxes = int(play_rows * play_cols / 4 + 10)
-			lvl_box_cnt = randint(lower_boxes, upper_boxes) # Default Level Boxes
-		else:
-			lvl_box_cnt = GAME_LEVELS[level - 1]["boxes"]
+		if (GAME_LEVELS[level -1]["block"] == 'yellow'): block_type = BLOCK
+		if (GAME_LEVELS[level -1]["block"] == 'orange'): block_type = KILLBLOCK
 	else:
 		lvl_beast_cnt =	int(level / 3)
 		lvl_monster_cnt = int(level / 3)
@@ -900,10 +886,10 @@ def build_level():
 		elif (level % 3) == 2:
 			lvl_beast_cnt += 1
 			lvl_egg_cnt += 1
-		lvl_block_cnt = int(play_rows * play_cols * .012)
-		lower_boxes = int(play_rows * play_cols / 4 - 10)
-		upper_boxes = int(play_rows * play_cols / 4 + 10)
-		lvl_box_cnt = randint(lower_boxes, upper_boxes) # Default Level Boxes
+	lower_boxes = int(play_rows * play_cols / 4 - 10)
+	upper_boxes = int(play_rows * play_cols / 4 + 10)
+	lvl_box_cnt = randint(lower_boxes, upper_boxes) # Default Level Boxes
+	lvl_block_cnt = int(play_rows * play_cols * .012)
 #################################################################-- Settings Variables
 	main_menu_tab = 0
 	item_menu = 0
