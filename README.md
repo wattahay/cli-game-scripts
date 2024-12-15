@@ -24,7 +24,8 @@ Eggs.....................hatch into monsters
 Green Blocks.............can be pushed and pulled
 Yellow/Orange Blocks.....immovable
 	Orange blocks destroy green blocks that are pushed into them.
-	Orange blocks kill you if you walk into them
+	Orange blocks take a life if you walk into them
+	Walking into am orange block gives you some green boxes if you are low.
 ```
 
 ### Runs in Linux Terminal
