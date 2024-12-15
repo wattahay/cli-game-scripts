@@ -40,7 +40,7 @@ play_cols = 	40	# 30+ Width
 #	> Positive decimal: adds percentage of blocks/boxes to default formula
 #		> ie: .15 (has absolute value less than 1)
 GAME_LEVELS = [
-		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'yellow',	'blocks': -999,	'boxes': -999},	# Level 1
+		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 1
 		{'beasts':5,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 2
 		{'beasts':5,	'monsters':0,	'eggs':2,	'block': 'yellow',	'blocks': -999,	'boxes': -999},	# Level 3
 		{'beasts':1,	'monsters':1,	'eggs':3,	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 4
@@ -335,26 +335,26 @@ def print_stats():
 
 def print_debug():
 	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, play_rows, play_cols, term_cols, term_rows
-	print('\033[?25\033[?7l\033[1;1H\033[' + str(top_margin + board_rows + 2) + ';' + str(left_margin) + 'H\033[s\033[0m\033[37m' +
+	print('\033[?7l\033[1;1H\033[' + str(top_margin + board_rows + 2) + ';' + str(left_margin) + 'H\033[s\033[0m\033[37m' +
 	'Player: ' + str(player) )
 	for i in range(0, len(eggs)):
-		if i == 0: print('\033[u' + '\033[' + str(2 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37m\033[?7lEggs: ' + str(eggs[i]))
-		else: print('\033[u' + '\033[' + str(2 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37m\033[?7lEgg ' + str(i) + ': ' + str(eggs[i]))
+		if i == 0: print('\033[u' + '\033[' + str(2 + i) + 'B' + '\r\033[K\033[1B\033[K\033[?7l\033[1A\033[0m\033[37mEggs: ' + str(eggs[i]))
+		else: print('\033[u' + '\033[' + str(2 + i) + 'B' + '\r\033[K\033[1B\033[K\033[?7l\033[1A\t\033[0m\033[37mEgg ' + str(i) + ': ' + str(eggs[i]))
 	for i in range(0, len(beasts)):
-		if i == 0: print('\033[u' + '\033[' + str(len(eggs) + 3 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37m\033[?7lBeasts: ' + str(beasts[i]))
-		else: print('\033[u' + '\033[' + str(len(eggs) + 3 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37m\033[?7lBeast ' + str(i) + ': ' + str(beasts[i]))
+		if i == 0: print('\033[u' + '\033[' + str(len(eggs) + 3 + i) + 'B' + '\r\033[K\033[1B\033[K\033[?7l\033[1A\033[0m\033[37mBeasts: ' + str(beasts[i]))
+		else: print('\033[u' + '\033[' + str(len(eggs) + 3 + i) + 'B' + '\r\033[K\033[1B\033[K\033[?7l\033[1A\t\033[0m\033[37mBeast ' + str(i) + ': ' + str(beasts[i]))
 	for i in range(0, len(monsters)):
-		if i == 0: print('\033[u' + '\033[' + str(len(eggs) + len(beasts) + 4 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37m\033[?7lMonsters: ' + str(monsters[i]))
-		else: print('\033[u' + '\033[' + str(len(eggs) + len(beasts) + 4 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37m\033[?7lMonster ' + str(i) + ': ' + str(monsters[i]))
+		if i == 0: print('\033[u' + '\033[' + str(len(eggs) + len(beasts) + 4 + i) + 'B' + '\r\033[K\033[?7l\033[1B\033[K\033[1A\033[0m\033[37mMonsters: ' + str(monsters[i]))
+		else: print('\033[u' + '\033[' + str(len(eggs) + len(beasts) + 4 + i) + 'B' + '\r\033[K\033[?7l\033[1B\033[K\033[1A\t\033[0m\033[37mMonster ' + str(i) + ': ' + str(monsters[i]))
 
 def egg_debug():
 	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, play_rows, play_cols, term_cols, term_rows
 	print('\033[?25\033[?7l\033[' + str(top_margin + board_rows + 1) + ';' + str(left_margin) + 'H\033[s\033[0m\033[37mEggs: ')
 	for i in range(1, len(eggs)):
 		if( ( player[1]['ro'] == eggs[i]['ro'] ) or ( player[1]['co'] == eggs[i]['co'] ) ):
-			print('\033[u' + '\033[' + str(i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37m\033[?7lEgg ' + str(i) + ':  Row:' + str(eggs[i]['ro']) + '  Col:' + str(eggs[i]['co']) )
+			print('\033[u' + '\033[' + str(i) + 'B' + '\r\033[K\033[1B\033[K\033[?7l\033[1A\t\033[0m\033[37mlEgg ' + str(i) + ':  Row:' + str(eggs[i]['ro']) + '  Col:' + str(eggs[i]['co']) )
 		else:
-			print('\033[u' + '\033[' + str(i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37m\033[?7lEgg ' + str(i))
+			print('\033[u' + '\033[' + str(i) + 'B' + '\r\033[K\033[1B\033[K\033[?7l\033[1A\t\033[0m\033[37mEgg ' + str(i))
 
 ########################################################-- print board function
 def print_board(board_array): #{
