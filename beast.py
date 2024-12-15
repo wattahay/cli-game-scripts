@@ -35,7 +35,7 @@ play_cols = 	40	# 30+ Width
 #	> Negative Integer: use built-in count formula
 #		> The default formula stays within a pretty small range.
 #	> Positive Integer: specify exact number of blocks or boxes
-#	> Negative decimal: subtracts percentage of blocks/boxes to default formula
+#	> Negative decimal: subtracts percentage of blocks/boxes from default formula
 #		> ie: -.15 (has absolute value less than 1)
 #	> Positive decimal: adds percentage of blocks/boxes to default formula
 #		> ie: .15 (has absolute value less than 1)
