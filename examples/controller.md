@@ -42,8 +42,8 @@ There is an [example xbox360.gamecontroller.amgp file](https://github.com/wattah
 
 ### Using the provided example.
 
-1. In AntiMicroX, import the [example xbox360.gamecontroller.amgp file](https://github.com/wattahay/cli-game-scripts/blob/master/examples/xbox360.gamecontroller.amgp) file.
-2. Locate the KYBD array, which contains a commented out XBOX dictionary.
+1. In AntiMicroX, import the [example xbox360.gamecontroller.amgp file](https://github.com/wattahay/cli-game-scripts/blob/master/examples/xbox360.gamecontroller.amgp).
+2. Locate the KYBD array in beast.py, which contains a commented out XBOX dictionary.
 3. Remove the pound sign to uncomment the line.
 4. Add a pound sign to another line to keep the options at 3.
 
