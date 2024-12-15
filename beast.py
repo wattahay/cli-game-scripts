@@ -40,7 +40,7 @@ play_cols = 	40	# 30+ Width
 #	> Positive decimal: adds percentage of blocks/boxes to default formula
 #		> ie: .15 (has absolute value less than 1)
 GAME_LEVELS = [
-		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 1
+		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'yellow',	'blocks': -999,	'boxes': -999},	# Level 1
 		{'beasts':5,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 2
 		{'beasts':5,	'monsters':0,	'eggs':2,	'block': 'yellow',	'blocks': -999,	'boxes': -999},	# Level 3
 		{'beasts':1,	'monsters':1,	'eggs':3,	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 4
