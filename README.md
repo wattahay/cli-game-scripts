@@ -35,6 +35,8 @@ Yellow/Orange Blocks.....immovable
 3. Set up a terminal with an increased font size, and a Dark Tango color palette
 4. Run the game: `python3 beast.py`
 
+> Resizing the terminal just after the intro will adjust the board to the center of the terminal.
+
 ### Script Options
 
 Example: `python3 beast.py -w:54 -h:30 -t -k:hjkl`
@@ -53,6 +55,8 @@ Example: `python3 beast.py -w:54 -h:30 -t -k:hjkl`
 ```
 
 See: [Terminal Fitting Options](https://github.com/wattahay/cli-game-scripts/wiki/Terminal-Fitting-Options)
+
+
 
 ### Controls
 
