@@ -8,7 +8,6 @@ from sys import argv
 ################################################################################################
 ###########################################################-- Useful Variables --###############
 ################################################################################################
-PLR_FLASHES = 	6	# Number of times a spawned player flashes
 lives = 		5	# starting level lives
 BEAST_SCR = 	6	# points for killing beasts
 EGG_SCR = 		8	# points for killing eggs
@@ -16,6 +15,7 @@ MONSTER_SCR =	10	# points for killing monsters
 NO_LIVES = 		50	# point penalty for losing all lives
 NO_LEVEL = 		3	# level penalty for losing all lives
 WIN_LEVEL =		25	# points for winning a level
+PLR_FLASHES = 	6	# Number of times a spawned player flashes
 #########################################################-- pawn speeds
 beast_steps = 	5	# (1 - 10), higher is slower
 monster_steps =	4	# (1 - 10), higher is slower
@@ -31,23 +31,32 @@ play_cols = 	40	# 30+ Width
 # You can create as many or few levels as you want to here.
 # Each level is surrounded by curly brackets, while the outer brackets are square
 # Make sure all bracketted levels are followed by a comma (except for the last level)
+# Blocks and Boxes:
+#	> Negative Integer: use built-in count formula
+#		> The default formula stays within a pretty small range.
+#	> Positive Integer: specify exact number of blocks or boxes
+#	> Negative decimal: subtracts percentage of blocks/boxes to default formula
+#		> ie: -.15 (has absolute value less than 1)
+#	> Positive decimal: adds percentage of blocks/boxes to default formula
+#		> ie: .15 (has absolute value less than 1)
 GAME_LEVELS = [
-		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'yellow',	'blocks': -1,	'boxes': -1},	# Level 1
-		{'beasts':5,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 2
-		{'beasts':5,	'monsters':0,	'eggs':2,	'block': 'yellow',	'blocks': -1,	'boxes': -1},	# Level 3
-		{'beasts':0,	'monsters':0,	'eggs':1,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 4
-		{'beasts':4,	'monsters':2,	'eggs':2,	'block': 'yellow',	'blocks': -1,	'boxes': -1},	# Level 5
-		{'beasts':8,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 6
-		{'beasts':0,	'monsters':0,	'eggs':8,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 7
-		{'beasts':0,	'monsters':8,	'eggs':0,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 8
-		{'beasts':3,	'monsters':3,	'eggs':3,	'block': 'yellow',	'blocks': -1,	'boxes': -1},	# Level 9
-		{'beasts':2,	'monsters':4,	'eggs':3,	'block': 'yellow',	'blocks': -1,	'boxes': -1},	# Level 10
-		{'beasts':1,	'monsters':5,	'eggs':4,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 11
-		{'beasts':1,	'monsters':6,	'eggs':4,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 12
-		{'beasts':0,	'monsters':0,	'eggs':12,	'block': 'yellow',	'blocks': -1,	'boxes': -1},	# Level 13
-		{'beasts':0,	'monsters':12,	'eggs':0,	'block': 'orange',	'blocks': -1,	'boxes': -1},	# Level 14
-		{'beasts':15,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -1,	'boxes': -1} 	# Level 15
+		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 1
+		{'beasts':5,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 2
+		{'beasts':5,	'monsters':0,	'eggs':2,	'block': 'yellow',	'blocks': -999,	'boxes': -999},	# Level 3
+		{'beasts':1,	'monsters':1,	'eggs':3,	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 4
+		{'beasts':4,	'monsters':2,	'eggs':2,	'block': 'yellow',	'blocks': -999,	'boxes': -999},	# Level 5
+		{'beasts':8,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -999,	'boxes': 47},	# Level 6
+		{'beasts':0,	'monsters':0,	'eggs':8,	'block': 'orange',	'blocks': -999,	'boxes': 47},	# Level 7
+		{'beasts':0,	'monsters':8,	'eggs':0,	'block': 'orange',	'blocks': -999,	'boxes': 47},	# Level 8
+		{'beasts':3,	'monsters':3,	'eggs':3,	'block': 'yellow',	'blocks': -999,	'boxes': -999},	# Level 9
+		{'beasts':2,	'monsters':4,	'eggs':3,	'block': 'yellow',	'blocks': -999,	'boxes': -999},	# Level 10
+		{'beasts':1,	'monsters':5,	'eggs':4,	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 11
+		{'beasts':1,	'monsters':6,	'eggs':4,	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 12
+		{'beasts':0,	'monsters':0,	'eggs':12,	'block': 'yellow',	'blocks': -999,	'boxes': -999},	# Level 13
+		{'beasts':0,	'monsters':12,	'eggs':0,	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 14
+		{'beasts':15,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -999,	'boxes': -999} 	# Level 15
 	]
+lowest_boxes = 5 # Some boxes are required to play the game
 ########################################################-- Pawn Movement Priority Odds
 # These values are the odds of moves for an enemy if those		|---------------------
 # moves are available to it. If a move is not available,		| 5  4  3
@@ -113,7 +122,6 @@ trnsprnt = False	# calibrate terminal spacing
 ######################################################-- More Global Variables --###############
 ################################################################################################
 dir_keys = 1	# default key controls is the center option
-tcomp = 0		# compensation for ansi-based terminal spacing
 left_pad = 0	# padding for terminal fitted screen
 top_pad = 0		# padding for terminal fitted screen
 fitted = False	# whether or not the -f option is chosen
@@ -162,7 +170,7 @@ KEY_P_DOWN = 	KYBD[dir_keys]["PK_DOWN"]
 KEY_P_RIGHT = 	KYBD[dir_keys]["PK_RIGHT"]
 KEY_P_LEFT = 	KYBD[dir_keys]["PK_LEFT"]
 ################################################-- other game variables
-fps_avg_frames = LCD_TIME
+#fps_avg_frames = LCD_TIME
 mi1_opt = dir_keys + 1 # initial keyboard setting
 keypress = 999
 debug = False
@@ -170,15 +178,15 @@ pulling = 'hold' # 'hold / 'tog' /  'swi' / 'sin'
 game_play_mode = False
 ################################################-- set background post argv
 tbg(0) # set xbgx after argv, and before character contants
-##################################-- formatted character constants --##########################
-# 			Foreground	+ Background	+	Style			+	Unicode Chars 		+ 	Reset
-BAKGRD =				  xbgx 								+ '  '
-BLOCK =					  '\033[43m'						+ '  '					+ '\033[0m'
-KILLBLOCK =	'\033[31m'	+ '\033[43m'						+ chr(9618) + chr(9618)	+ '\033[0m'
-BOX =		'\033[32m'	+ xbgx 								+ chr(9618) + chr(9618)	+ '\033[0m'
-BEAST =		'\033[31m'	+ xbgx 								+ chr(9500) + chr(9508)	+ '\033[0m'
-MONSTER =	'\033[31m'	+ xbgx 								+ chr(9568) + chr(9571)	+ '\033[0m'
-PLAYER =	'\033[34m'	+ xbgx 								+ chr(9664) + chr(9654)	+ '\033[0m'
+################################################-- formatted character constants
+# 			Foreground	+  Background	+    	Unicode Chars		+ 	Reset
+BAKGRD =				  xbgx 			+ '  '
+BLOCK =					  '\033[43m'	+ '  '						+ '\033[0m'
+KILLBLOCK =	'\033[31m'	+ '\033[43m'	+ chr(9618) + chr(9618) 	+ '\033[0m'
+BOX =		'\033[32m'	+ xbgx 			+ chr(9618) + chr(9618) 	+ '\033[0m'
+BEAST =		'\033[31m'	+ xbgx 			+ chr(9500) + chr(9508) 	+ '\033[0m'
+MONSTER =	'\033[31m'	+ xbgx 			+ chr(9568) + chr(9571) 	+ '\033[0m'
+PLAYER =	'\033[34m'	+ xbgx 			+ chr(9664) + chr(9654) 	+ '\033[0m'
 # https://en.wikipedia.org/wiki/ANSI_escape_code
 eggsub = 8329   # unicode key for subscript 9 (8328 = 8, and so on)
 egg2nd = 32     # unicode key for a space character
@@ -338,6 +346,16 @@ def print_debug():
 	for i in range(0, len(monsters)):
 		if i == 0: print('\033[u' + '\033[' + str(len(eggs) + len(beasts) + 4 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\033[0m\033[37m\033[?7lMonsters: ' + str(monsters[i]))
 		else: print('\033[u' + '\033[' + str(len(eggs) + len(beasts) + 4 + i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37m\033[?7lMonster ' + str(i) + ': ' + str(monsters[i]))
+
+def egg_debug():
+	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, play_rows, play_cols, term_cols, term_rows
+	print('\033[?25\033[?7l\033[' + str(top_margin + board_rows + 1) + ';' + str(left_margin) + 'H\033[s\033[0m\033[37mEggs: ')
+	for i in range(1, len(eggs)):
+		if( ( player[1]['ro'] == eggs[i]['ro'] ) or ( player[1]['co'] == eggs[i]['co'] ) ):
+			print('\033[u' + '\033[' + str(i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37m\033[?7lEgg ' + str(i) + ':  Row:' + str(eggs[i]['ro']) + '  Col:' + str(eggs[i]['co']) )
+		else:
+			print('\033[u' + '\033[' + str(i) + 'B' + '\r\033[K\033[1B\033[K\033[1A\t\033[0m\033[37m\033[?7lEgg ' + str(i))
+
 ########################################################-- print board function
 def print_board(board_array): #{
 	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, play_rows, play_cols, term_cols, term_rows, keypress
@@ -359,7 +377,7 @@ def print_board(board_array): #{
 	if level > 0: print_stats()
 
 	if debug: print_debug()
-
+	#if debug: egg_debug()
 
 
 
@@ -455,7 +473,7 @@ def hatch_eggs():
 def flash_player():
 	global player, PLAYER, PLR_FLASHES, plr_flash, plr_frames, plr_frame
 
-	neg_PLAYER = '\033[7m\033[34m' + xbgx + chr(9664) + chr(9654) + '\033[0m'
+	PLAYER_negative = '\033[0m\033[7m\033[34m' + xbgx + chr(9664) + chr(9654) + '\033[0m'
 
 	if plr_flash <= PLR_FLASHES:
 		if plr_frame < plr_frames:
@@ -463,11 +481,11 @@ def flash_player():
 		elif plr_frame == plr_frames:
 			plr_frame = 0
 			if board[player[1]['ro']][player[1]['co']] == PLAYER:
-				board[player[1]['ro']][player[1]['co']] = neg_PLAYER
+				board[player[1]['ro']][player[1]['co']] = PLAYER_negative
 			else:
 				board[player[1]['ro']][player[1]['co']] = PLAYER
 			plr_flash += 1
-	elif board[player[1]['ro']][player[1]['co']] == neg_PLAYER:
+	elif board[player[1]['ro']][player[1]['co']] == PLAYER_negative:
 		board[player[1]['ro']][player[1]['co']] = PLAYER
 
 
@@ -497,7 +515,7 @@ def kill_player():
 	play_audio('death')
 
 def move_enemies(pawns): #{
-	global board, player, MOVES, PRIORITY_ODDS
+	global board, player, MOVES, PRIORITY_ODDS, PLR_FLASHES, plr_flash
 
 	if pawns[0]['frame'] >= pawns[0]['frames']:
 		pawns[0]['frame'] = 0
@@ -538,12 +556,13 @@ def move_enemies(pawns): #{
 			for priopti in range(8):
 				# if the first priority move is the player, then take that move (pawn kills player)
 				if ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ]) == PLAYER ):
-					move = move_priority[0]
-					board[pawns[pwni]['ro']][pawns[pwni]['co']] = BAKGRD
-					pawns[pwni]['ro'] = player[1]['ro']
-					pawns[pwni]['co'] = player[1]['co']
-					kill_player()
-					board[pawns[pwni]['ro']][pawns[pwni]['co']] = pawns[0]['chr']
+					if(plr_flash >= PLR_FLASHES): # player immunity while flashing
+						move = move_priority[0]
+						board[pawns[pwni]['ro']][pawns[pwni]['co']] = BAKGRD
+						pawns[pwni]['ro'] = player[1]['ro']
+						pawns[pwni]['co'] = player[1]['co']
+						kill_player()
+						board[pawns[pwni]['ro']][pawns[pwni]['co']] = pawns[0]['chr']
 					return 0
 				# else if the priority move is not available, then mark it as unavailable
 				elif ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[priopti]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[priopti]]['ca'])) ]) == BAKGRD ):
@@ -607,8 +626,8 @@ def push_tree(intent):
 		for i in range(probe):
 			board[ probe_r(probe - i) ][ probe_c(probe - i) ] = board[ probe_r(probe - 1 - i) ][ probe_c(probe - 1 - i) ]	# make board space same as preceeding space
 		for i in range(len(push_eggs)):
-			eggs[push_eggs[i]]['ro'] += MOVES[intent]['ra']
-			eggs[push_eggs[i]]['co'] += MOVES[intent]['ca']
+			eggs[push_eggs[i]['dex']]['ro'] += MOVES[intent]['ra']
+			eggs[push_eggs[i]['dex']]['co'] += MOVES[intent]['ca']
 		if ((player[1]['tug']) and (board[tug_r][tug_c] == BOX)):
 			board[tug_r][tug_c] = BAKGRD
 			board[stnce_r][stnce_c] = BOX
@@ -633,29 +652,38 @@ def push_tree(intent):
 	probe = 2
 	loop = True
 	while (loop):
-
 		space = board[probe_r(probe)][probe_c(probe)]
-		ram_space = board[ram_r(probe)][ram_c(probe)]
 
 		if (((probe_r(probe) != 0) and (probe_r(probe) != (len(board) - 1))) and ((probe_c(probe) != 0) and (probe_c(probe) != len(board[0]) - 1))):
 			wall_space = board[wall_r(probe)][wall_c(probe)]
 
 		if (space == BOX):		# if space is a box
-			probe += 1 		# start loop over
-		elif (space == BAKGRD): 		# if space is
+			probe += 1 			# start loop over
+		elif (space == BAKGRD): # if space is
 			push_move()
 			loop = False
 		elif (deteggt(space) == True): 	# if space is a egg
 			if (wall_space == BLOCK) or (wall_space == KILLBLOCK):	# if next block after egg is a border
-				kill_enemy(eggs, probe_r(probe), probe_c(probe)) 			# del egg from global egg list
+				kill_enemy(eggs, probe_r(probe), probe_c(probe))
+				board[probe_r(probe)][probe_c(probe)] = BAKGRD
+				sleep(.02)
 				play_audio('hatch')
+				for i in range(len(push_eggs)):
+					x = len(push_eggs) - i - 1
+					kill_enemy(eggs, push_eggs[x]['ro'], push_eggs[x]['co'])
+					board[push_eggs[x]['ro']][push_eggs[x]['co']] = BAKGRD
+					sleep(.02)
+					play_audio('hatch')
+				push_eggs = []
 				push_move()
-				loop = False						# make space same as preceeding space
-#			elif ((wall_space == BAKGRD) or (wall_space == BOX)):
+				loop = False			# make space same as preceeding space
 			else:
-				for i in range(1, len(eggs)):
+				for i in range(1, len(eggs)): # The first row of eggs[] is other information
 					if ((eggs[i]['ro'] == probe_r(probe)) and (eggs[i]['co'] == probe_c(probe))):
-						push_eggs = [i] + push_eggs
+						push_eggs.append({})
+						push_eggs[-1]['dex'] = i
+						push_eggs[-1]['ro'] = eggs[i]['ro']
+						push_eggs[-1]['co'] = eggs[i]['co']
 				probe += 1
 		elif (space == BLOCK):				# if space is a border
 			loop = False
@@ -702,7 +730,7 @@ def move_player(direction):
 	player[1]['co'] = fol
 
 def direct_move(tap_move):
-	global player, MOVES, board
+	global player, MOVES, board, lowest_boxes
 
 	space = board[player[1]['ro'] + MOVES[tap_move]['ra'] ][ player[1]['co'] + MOVES[tap_move]['ca'] ]
 
@@ -711,7 +739,16 @@ def direct_move(tap_move):
 	elif (space == BOX):
 		push_tree(tap_move)
 	elif (space == MONSTER) or (space == BEAST) or (space == KILLBLOCK):
-		kill_player()
+		if(plr_flash >= PLR_FLASHES): # player immunity while flashing
+			kill_player()
+			if space == KILLBLOCK:
+				box_step = 0
+				while(box_step < lowest_boxes):
+					boxrow = randint(1, (board_rows - 1))
+					boxcol = randint(1, (board_cols - 1))
+					if(board[boxrow][boxcol] == BAKGRD):
+						board[boxrow][boxcol] = BOX
+						box_step += 1
 
 def direct_keypress(tap):
 	global player, MOVES, board, KEY_P_UP, KEY_P_DOWN, KEY_P_RIGHT, KEY_P_LEFT, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, pulling
@@ -874,21 +911,29 @@ def build_level():
 	board = build_the_board()	# clears the board after end of level
 	print_board(board)			# prints cleared board after end of level
 	if (level <= (len(GAME_LEVELS) - 1)):
-		lvl_beast_cnt = GAME_LEVELS[level-1]["beasts"]
-		lvl_monster_cnt = GAME_LEVELS[level-1]["monsters"]
-		lvl_egg_cnt = GAME_LEVELS[level-1]["eggs"]
-		if (GAME_LEVELS[level - 1]["block"] == 'yellow'): block_type = BLOCK
-		if (GAME_LEVELS[level - 1]["block"] == 'orange'): block_type = KILLBLOCK
-		if (GAME_LEVELS[level - 1]["blocks"] == -1):
+		lvl_beast_cnt = GAME_LEVELS[level-1]['beasts']
+		lvl_monster_cnt = GAME_LEVELS[level-1]['monsters']
+		lvl_egg_cnt = GAME_LEVELS[level-1]['eggs']
+		if (GAME_LEVELS[level - 1]['block'] == 'yellow'): block_type = BLOCK
+		if (GAME_LEVELS[level - 1]['block'] == 'orange'): block_type = KILLBLOCK
+		if (GAME_LEVELS[level - 1]['blocks'] <= -1):
 			lvl_block_cnt = int(play_rows * play_cols * .012)
+		elif (abs(GAME_LEVELS[level - 1]['blocks']) < 1):
+			lvl_block_cnt = play_rows * play_cols * .012
+			lvl_block_cnt = int(lvl_block_cnt + (lvl_block_cnt * GAME_LEVELS[level - 1]['blocks']))
 		else:
-			lvl_block_cnt = GAME_LEVELS[level - 1]["blocks"]
-		if (GAME_LEVELS[level - 1]["boxes"] == -1):
+			lvl_block_cnt = GAME_LEVELS[level - 1]['blocks']
+		if (GAME_LEVELS[level - 1]['boxes'] <= -1):
 			lower_boxes = int(play_rows * play_cols / 4 - 10)
 			upper_boxes = int(play_rows * play_cols / 4 + 10)
 			lvl_box_cnt = randint(lower_boxes, upper_boxes) # Default Level Boxes
+		elif (abs(GAME_LEVELS[level - 1]['boxes'] < 1)):
+			lower_boxes = int(play_rows * play_cols / 4 - 10)
+			upper_boxes = int(play_rows * play_cols / 4 + 10)
+			lvl_box_cnt = randint(lower_boxes, upper_boxes) # Default Level Boxes
+			lvl_box_cnt = int(lvl_box_cnt + (lvl_box_cnt * GAME_LEVELS[level - 1]['boxes']))
 		else:
-			lvl_box_cnt = GAME_LEVELS[level - 1]["boxes"]
+			lvl_box_cnt = GAME_LEVELS[level - 1]['boxes']
 	else:
 		lvl_beast_cnt =	int(level / 3)
 		lvl_monster_cnt = int(level / 3)
@@ -903,6 +948,7 @@ def build_level():
 		lower_boxes = int(play_rows * play_cols / 4 - 10)
 		upper_boxes = int(play_rows * play_cols / 4 + 10)
 		lvl_box_cnt = randint(lower_boxes, upper_boxes) # Default Level Boxes
+	if lvl_box_cnt < lowest_boxes: lvl_box_cnt = lowest_boxes # Lowest number of boxes set at beginning of script
 #################################################################-- Settings Variables
 	main_menu_tab = 0
 	item_menu = 0
