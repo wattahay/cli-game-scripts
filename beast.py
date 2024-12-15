@@ -227,7 +227,7 @@ level = 0
 board = []
 blank_board = []
 if (play_rows < 15): play_rows = 15
-if (play_cols < 30): play_rows = 30
+if (play_cols < 30): play_cols = 30
 play_rows = int(play_rows)
 #if (play_rows % 2 == 1):
 	#play_rows -= 1 # board size must be even until multi-egg pushing allows odd
