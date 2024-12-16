@@ -32,7 +32,7 @@ Yellow/Orange Blocks.....immovable
 
 1. On the git page, click the green Clone/Download button to get the .zip file
 2. Extract the zipped files, maintaining the same directory structure
-3. Set up a terminal with an increased font size, and a Dark Tango color palette
+3. Set up a terminal with an increased font size, and a **Dark Tango** color palette
 4. Run the game: `python3 beast.py`
 
 > Resizing the terminal just after the intro will adjust the board to the center of the terminal.
