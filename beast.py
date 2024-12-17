@@ -229,11 +229,7 @@ blank_board = []
 if (play_rows < 15): play_rows = 15
 if (play_cols < 30): play_cols = 30
 play_rows = int(play_rows)
-#if (play_rows % 2 == 1):
-	#play_rows -= 1 # board size must be even until multi-egg pushing allows odd
 play_cols = int(play_cols)
-	#if (play_cols % 2 == 1): # board size must be even until multi-egg pushing allows odd
-		#play_cols -= 1
 board_rows = play_rows + 2
 board_cols = play_cols + 2
 ################################################-- spacing variables
