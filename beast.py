@@ -626,8 +626,8 @@ def push_tree(intent):
 		for i in range(probe):
 			board[ probe_r(probe - i) ][ probe_c(probe - i) ] = board[ probe_r(probe - 1 - i) ][ probe_c(probe - 1 - i) ]	# make board space same as preceeding space
 		for i in range(len(push_eggs)):
-			eggs[push_eggs[i]['dex']]['ro'] += MOVES[intent]['ra']
-			eggs[push_eggs[i]['dex']]['co'] += MOVES[intent]['ca']
+			eggs[push_eggs[i]]['ro'] += MOVES[intent]['ra']
+			eggs[push_eggs[i]]['co'] += MOVES[intent]['ca']
 		if ((player[1]['tug']) and (board[tug_r][tug_c] == BOX)):
 			board[tug_r][tug_c] = BAKGRD
 			board[stnce_r][stnce_c] = BOX
@@ -664,26 +664,21 @@ def push_tree(intent):
 			loop = False
 		elif (deteggt(space) == True): 	# if space is a egg
 			if (wall_space == BLOCK) or (wall_space == KILLBLOCK):	# if next block after egg is a border
-				kill_enemy(eggs, probe_r(probe), probe_c(probe))
-				board[probe_r(probe)][probe_c(probe)] = BAKGRD
-				sleep(.02)
+				kill_enemy(eggs, probe_r(probe), probe_c(probe))	# del egg from global egg list
+				for i in range(len(push_eggs)): push_eggs[i] -= 1 	# subtract list refs in push_eggs
 				play_audio('hatch')
-				for i in range(len(push_eggs)):
-					x = len(push_eggs) - i - 1
-					kill_enemy(eggs, push_eggs[x]['ro'], push_eggs[x]['co'])
-					board[push_eggs[x]['ro']][push_eggs[x]['co']] = BAKGRD
-					sleep(.02)
-					play_audio('hatch')
-				push_eggs = []
 				push_move()
-				loop = False			# make space same as preceeding space
+				loop = False						# make space same as preceeding space
 			else:
 				for i in range(1, len(eggs)): # The first row of eggs[] is other information
 					if ((eggs[i]['ro'] == probe_r(probe)) and (eggs[i]['co'] == probe_c(probe))):
-						push_eggs.append({})
-						push_eggs[-1]['dex'] = i
-						push_eggs[-1]['ro'] = eggs[i]['ro']
-						push_eggs[-1]['co'] = eggs[i]['co']
+						system('echo "    |i: ' + str(i) + ' ' + '" >> file.txt')
+						eggs.append(eggs.pop(i))
+						push_eggs.append(0)
+						break
+				for i in range(len(push_eggs)):
+					x = len(push_eggs) - i - 1
+					push_eggs[i] = len(eggs) - x - 1
 				probe += 1
 		elif (space == BLOCK):				# if space is a border
 			loop = False
