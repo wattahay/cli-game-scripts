@@ -56,7 +56,7 @@ GAME_LEVELS = [
 		{'beasts':0,	'monsters':12,	'eggs':0,	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 14
 		{'beasts':15,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -999,	'boxes': -999} 	# Level 15
 	]
-lowest_boxes = 5 # Some boxes are required to play the game
+lowest_boxes = 15 # Some boxes are required to play the game
 ########################################################-- Pawn Movement Priority Odds
 # These values are the odds of moves for an enemy if those		|---------------------
 # moves are available to it. If a move is not available,		| 5  4  3
@@ -232,6 +232,7 @@ play_rows = int(play_rows)
 play_cols = int(play_cols)
 board_rows = play_rows + 2
 board_cols = play_cols + 2
+lvl_box_cnt = 0
 ################################################-- spacing variables
 left_margin = 0
 top_margin = 0 # 1 is the lowest that the top margin can be, because of a specific issue with the print function
@@ -362,7 +363,6 @@ def print_board(board_array): #{
 			term_rows = tot_rows
 			term_cols = tot_cols
 			set_board_spacing()
-			system('clear')
 
 	print('\033[0m\033[1;1H\033[?25l\033[?7l\033[' + str(top_margin) + ';' + str(left_margin) + 'H\033[s\033[0m\033[?7l')
 
@@ -592,8 +592,8 @@ def move_enemies(pawns): #{
 				pawns[pwni]['co'] = pawns[pwni]['co'] + MOVES[move]['ca']
 #}
 
-def push_tree(intent):
-	global player, eggs, board, BLOCK, MOVES, BAKGRD, BOX, PLAYER
+def push_loop(intent):
+	global player, eggs, board, BLOCK, MOVES, BAKGRD, BOX, PLAYER, lvl_box_cnt
 
 	push_eggs = []
 
@@ -682,6 +682,7 @@ def push_tree(intent):
 			play_audio('flatten')
 			push_move()
 			board[probe_r(probe - 1)][probe_c(probe - 1)] = KILLBLOCK
+			lvl_box_cnt -= 1
 			loop = False
 		elif (space == BEAST): # if space is a beast
 			if ((wall_space == KILLBLOCK) or (wall_space == BOX) or (wall_space == BLOCK)):
@@ -721,25 +722,25 @@ def move_player(direction):
 	player[1]['co'] = fol
 
 def direct_move(tap_move):
-	global player, MOVES, board, lowest_boxes
+	global player, MOVES, board, lowest_boxes, lvl_box_cnt
 
 	space = board[player[1]['ro'] + MOVES[tap_move]['ra'] ][ player[1]['co'] + MOVES[tap_move]['ca'] ]
 
 	if (space == BAKGRD):
 		move_player(tap_move)
 	elif (space == BOX):
-		push_tree(tap_move)
+		push_loop(tap_move)
 	elif (space == MONSTER) or (space == BEAST) or (space == KILLBLOCK):
 		if(plr_flash >= PLR_FLASHES): # player immunity while flashing
 			kill_player()
 			if space == KILLBLOCK:
 				box_step = 0
-				while(box_step < lowest_boxes):
+				while(lvl_box_cnt < lowest_boxes):
 					boxrow = randint(1, (board_rows - 1))
 					boxcol = randint(1, (board_cols - 1))
 					if(board[boxrow][boxcol] == BAKGRD):
 						board[boxrow][boxcol] = BOX
-						box_step += 1
+						lvl_box_cnt += 1
 
 def direct_keypress(tap):
 	global player, MOVES, board, KEY_P_UP, KEY_P_DOWN, KEY_P_RIGHT, KEY_P_LEFT, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, pulling
@@ -770,8 +771,11 @@ def direct_keypress(tap):
 			direct_move('D')
 			player[1]['tug'] = False
 
+
 def pause():
-	global board_rows, board_cols, left_margin, top_margin, keypress, term_cols, term_rows
+	global board_rows, board_cols, left_margin, top_margin, keypress, term_cols, term_rows, game_play_mode
+
+	game_play_mode = False
 
 	def print_pause():
 		print('\033[u\033[1B' + xbgx + chr(9556) + chr(9552)*12 + chr(9559))
@@ -787,24 +791,28 @@ def pause():
 	keypress = 999
 
 	while(True):
-		if (keypress == ord('r')):
-			keypress = 999
-			tot_rows, tot_cols = get_rw_cl_tcl(1,0,1)
-			if (tot_rows != term_rows) or (tot_cols != term_cols):
-				#system('clear')
-				print_board(board)
-				set_midcent(6, 8)
-				print_pause()
-				print_stats()
-				term_rows = tot_rows
-				term_cols = tot_cols
-		sleep(LCD_TIME) # keeps the while loop sane
 		if (keypress == ord('p')): break
-		if (keypress == 27):
+		elif (keypress == 27):
 			close_game()
+		sleep(LCD_TIME)
 
 	keypress = 999
 	play_audio('pause')
+	game_play_mode = True
+
+
+def resize_terminal():
+	global term_rows, term_cols, game_play_mode, keypress, xbgx, board
+
+	keypress = 999
+	while(keypress != ord('r')):
+		system('clear')
+		term_rows, term_cols = get_rw_cl_tcl(1,0,1)
+		set_board_spacing()
+		print_board(board)
+		sleep(LCD_TIME)
+		if game_play_mode:
+			break
 
 ################################################################################################
 ############################################################-- Level Function --################
@@ -1512,11 +1520,7 @@ def take_input():
 		keypress = gameterm.getch()
 		if (game_play_mode):
 			if keypress == ord('r'):
-				system('clear')
-				term_rows, term_cols = get_rw_cl_tcl(1,0,1)
-				set_board_spacing()
-				print_board(board)
-				system('clear')
+				resize_terminal()
 				keypress = 999
 			elif keypress == ord('b'):
 				if debug == True:
