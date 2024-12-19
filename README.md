@@ -18,7 +18,7 @@ Beasts...................red 'H's
 Monsters.................double-lined red 'H's
 	Monsters must be squashed against yellow/orange blocks
 Eggs.....................hatch into monsters
-	Eggs can only be moved using green block.
+	Eggs can only be moved using green blocks.
 	Like Monsters, they must be squashed against yellow or orange blocks.
 	New eggs appear in the distance when Monsters swarm around you
 Green Blocks.............can be pushed and pulled
