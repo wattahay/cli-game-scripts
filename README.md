@@ -20,7 +20,7 @@ Monsters.................double-lined red 'H's
 Eggs.....................hatch into monsters
 	Eggs can only be moved using green blocks.
 	Like Monsters, they must be squashed against yellow or orange blocks.
-	New eggs appear in the distance when Monsters swarm around you
+	New eggs appear when Monsters group together
 Green Blocks (Boxes).....can be pushed and pulled
 Yellow/Orange Blocks.....immovable
 	Orange blocks destroy green blocks that are pushed into them.
