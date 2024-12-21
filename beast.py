@@ -351,7 +351,7 @@ def egg_debug():
 	print('\033[?25\033[?7l\033[' + str(top_margin + board_rows + 1) + ';' + str(left_margin) + 'H\033[s\033[0m\033[37mEggs: ')
 	for i in range(1, len(eggs)):
 		if( ( player[1]['ro'] == eggs[i]['ro'] ) or ( player[1]['co'] == eggs[i]['co'] ) ):
-			print('\033[u' + '\033[' + str(i) + 'B' + '\r\033[K\033[1B\033[K\033[?7l\033[1A\t\033[0m\033[37mlEgg ' + str(i) + ':  Row:' + str(eggs[i]['ro']) + '  Col:' + str(eggs[i]['co']) )
+			print('\033[u' + '\033[' + str(i) + 'B' + '\r\033[K\033[1B\033[K\033[?7l\033[1A\t\033[0m\033[37mEgg ' + str(i) + ':  Row:' + str(eggs[i]['ro']) + '  Col:' + str(eggs[i]['co']) )
 		else:
 			print('\033[u' + '\033[' + str(i) + 'B' + '\r\033[K\033[1B\033[K\033[?7l\033[1A\t\033[0m\033[37mEgg ' + str(i))
 
@@ -369,8 +369,8 @@ def print_board(board_array): #{
 	print('\033[0m\033[1;1H\033[?25l\033[?7l\033[' + str(top_margin) + ';' + str(left_margin) + 'H\033[s\033[0m\033[?7l')
 
 	for rowi in range(board_rows):
-		if (rowi == 0): print('\033[0m\033[u\033[?7l' + ''.join(board_array[rowi]) + '\033[?7l')
-		else: print('\033[0m\033[u\033[?7l\033[' + str(rowi) +  'B' + ''.join(board_array[rowi]) + '\033[?7l' )
+		if (rowi == 0): print('\033[0m\033[u\033[?7l' + ''.join(board_array[rowi]))
+		else: print('\033[0m\033[u\033[?7l\033[' + str(rowi) +  'B' + ''.join(board_array[rowi]))
 
 	if level > 0: print_stats()
 
@@ -529,7 +529,7 @@ def move_enemies(pawns): #{
 			rdistance = player[1]['ro'] - pawns[pwni]['ro'] # player row minus beast row
 			cdistance = player[1]['co'] - pawns[pwni]['co'] # player column minus beast column
 
-			vdistance = int(((player[1]['co'] - pawns[pwni]['co'])**2 + (player[1]['ro'] - pawns[pwni]['ro'])**2)**.5) # distance equation
+			vdistance = int((cdistance**2 + rdistance**2)**.5) # distance equation
 
 			if (rdistance == 0) or (cdistance == 0): # avoid division by zero
 				distance_ratio = 0.0 # if the player is on the same row or column, the distance ratio is zero
@@ -961,7 +961,7 @@ def build_level():
 			lvl_egg_cnt += 1
 		lvl_block_cnt = int(play_rows * play_cols * .012)
 		lower_boxes = int(play_rows * play_cols / 4 - 10)
-		upper_boxes = int(play_rows * play_cols / 4 + 10)
+		upper_boxes = lower_boxes + 20
 		lvl_box_cnt = randint(lower_boxes, upper_boxes) # Default Level Boxes
 	if lvl_box_cnt < lowest_boxes: lvl_box_cnt = lowest_boxes # Lowest number of boxes set at beginning of script
 #################################################################-- Settings Variables
