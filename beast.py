@@ -15,11 +15,13 @@ MONSTER_SCR =	10	# points for killing monsters
 NO_LIVES = 		50	# point penalty for losing all lives
 NO_LEVEL = 		3	# level penalty for losing all lives
 WIN_LEVEL =		25	# points for winning a level
-PLR_FLASHES = 	6	# Number of times a spawned player flashes
+PLR_FLASHES = 	7	# Number of times a spawned player flashes
+SCENT = 		20	# distance at which enemies smell you strongly
+SCENT_EDGE = 	20	# distance past scent for mild scent
 #########################################################-- pawn speeds
-beast_steps = 	5	# (1 - 10), higher is slower
-monster_steps =	4	# (1 - 10), higher is slower
-incubation = 	7	# (1 - 10), higher is slower
+beast_steps = 	4	# (1 - 10), higher is slower
+monster_steps =	3	# (1 - 10), higher is slower
+incubation = 	8	# (1 - 10), higher is slower
 egg_timer = 	7	# (1 - 10), higher is slower
 #########################################################-- game frame time
 LCD_TIME = 		.02	# example: .02 = 1 frame every .02 seconds = 2/100 >>> 100/2 fps = 50 fps
@@ -63,7 +65,7 @@ lowest_boxes = 15 # Some boxes are required to play the game
 # then its odds are absorbed: 1st by its equal counterpart,		| 4  H  2
 # and then by the next lower priority, etc. Each of the 5 		| 3  2  1
 # priorities is greater or equal to the sum of all lower 		|		 \
-# priority moves.												|	      \
+# priority moves' odds.											|	      \
 ########################-- Examples								|		   <>
 # Max Randomness	1, 1, 1, 3, 3, 9, 9, 27
 # High				1, 1, 1, 4, 4, 16, 16, 50		1, 2, 2, 6, 6, 18, 18, 55
@@ -372,8 +374,8 @@ def print_board(board_array): #{
 
 	if level > 0: print_stats()
 
-	if debug: print_debug()
-	#if debug: egg_debug()
+	#if debug: print_debug()
+	if debug: egg_debug()
 
 
 
@@ -511,7 +513,7 @@ def kill_player():
 	play_audio('death')
 
 def move_enemies(pawns): #{
-	global board, player, MOVES, PRIORITY_ODDS, PLR_FLASHES, plr_flash
+	global board, player, MOVES, PRIORITY_ODDS, PLR_FLASHES, plr_flash, SCENT, SCENT_EDGE
 
 	if pawns[0]['frame'] >= pawns[0]['frames']:
 		pawns[0]['frame'] = 0
@@ -526,6 +528,8 @@ def move_enemies(pawns): #{
 		if (pawns[pwni]['stg'] == pawns[0]['frame']):
 			rdistance = player[1]['ro'] - pawns[pwni]['ro'] # player row minus beast row
 			cdistance = player[1]['co'] - pawns[pwni]['co'] # player column minus beast column
+
+			vdistance = int(((player[1]['co'] - pawns[pwni]['co'])**2 + (player[1]['ro'] - pawns[pwni]['ro'])**2)**.5) # distance equation
 
 			if (rdistance == 0) or (cdistance == 0): # avoid division by zero
 				distance_ratio = 0.0 # if the player is on the same row or column, the distance ratio is zero
@@ -569,16 +573,28 @@ def move_enemies(pawns): #{
 						if (choices([True, False], [3, 127], k=1)) == [True]:
 							place_eggs(1)
 
-			for prioddi in range(8): # loop through priorities to add them to likely_moves if available
-				if (PRIORITY_ODDS[prioddi][1] == True): # if it is true that the priority move is a blank space, then loop through and fill out the likely_moves list
-					for ti in range(PRIORITY_ODDS[prioddi][0]): # loop through by number in "priorities" loop, to fill out likely_moves list
-						likely_moves.append(move_priority[prioddi])
-				if ((prioddi == 2) or (prioddi == 4) or (prioddi == 6)):
-					if ((not PRIORITY_ODDS[prioddi - 1][1]) and (PRIORITY_ODDS[prioddi][1] == True)):
-						for ti in range(PRIORITY_ODDS[prioddi][0]):
-							likely_moves.append(move_priority[prioddi])
+			#######################################################################-- Add count of each available move to a list to create final odds
 
-			# the move is finally decided out of the available set in the list
+			if (vdistance <= SCENT): # if the player is within the strong scent range
+				for prioddi in range(8): # loop through priorities to add them to likely_moves if available
+					if (PRIORITY_ODDS[prioddi][1] == True): # if it is true that the priority move is a blank space, then loop through and fill out the likely_moves list
+						for ti in range(PRIORITY_ODDS[prioddi][0]): # loop through by number in "priorities" loop, to fill out likely_moves list
+							likely_moves.append(move_priority[prioddi])
+					if ((prioddi == 2) or (prioddi == 4) or (prioddi == 6)):
+						if ((not PRIORITY_ODDS[prioddi - 1][1]) and (PRIORITY_ODDS[prioddi][1] == True)):
+							for ti in range(PRIORITY_ODDS[prioddi][0]):
+								likely_moves.append(move_priority[prioddi])
+			elif (vdistance > SCENT and vdistance <= SCENT+SCENT_EDGE): # If the player is in the mild scent range
+				for prioddi in range(8):
+					if (PRIORITY_ODDS[prioddi][1] == True):
+						for i in range(8*5 - prioddi*3): # 24 -
+							likely_moves.append(move_priority[prioddi])
+			else: # If the player is outside range of enemy scent/smell(), then odds of all available moves is 1
+				for prioddi in range(8):
+					if (PRIORITY_ODDS[prioddi][1] == True):
+						likely_moves.append(move_priority[prioddi])
+
+			#######################################################################-- the move is finally decided out of the available set in the list
 			if (len(likely_moves) > 0):
 				move = likely_moves[randint(0, (len(likely_moves)) - 1)]
 				likely_moves = []
