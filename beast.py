@@ -374,8 +374,8 @@ def print_board(board_array): #{
 
 	if level > 0: print_stats()
 
-	#if debug: print_debug()
-	if debug: egg_debug()
+	if debug: print_debug()
+	#if debug: egg_debug()
 
 
 
