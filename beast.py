@@ -86,9 +86,9 @@ PRIORITY_ODDS = [
 # Without editing, the default settings option is the middle one.
 # The script only allows for a total of 3 options at a time
 # Customize the 3 options below with key codes from getkeycodes, as well as custom titles.
-# Changing the value of word as in: 'title':"word"
-#	1. change the script -k option to -k:word
-#	2. change the settings menu option to [ word ]
+# Changing the value of word as in ............ "title":"word"
+#	> changes the script -k option to: ........ -k:word
+#	> changes the settings menu option to: .... [ word ]
 
 KYBD = [
 		{"title":"wasd", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
