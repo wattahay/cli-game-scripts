@@ -684,7 +684,6 @@ def push_loop(intent):
 			else:
 				for i in range(1, len(eggs)): # The first row of eggs[] is other information
 					if ((eggs[i]['ro'] == probe_r(probe)) and (eggs[i]['co'] == probe_c(probe))):
-						system('echo "    |i: ' + str(i) + ' ' + '" >> file.txt')
 						eggs.append(eggs.pop(i))
 						push_eggs.append(0)
 						break
@@ -712,9 +711,7 @@ def push_loop(intent):
 				play_audio('squish')
 				push_move()
 			loop = False
-
 		else:
-			system('echo \"' + str(space) + '\" >> probe_space.txt')
 			loop = False
 
 def move_player(direction):
