@@ -38,6 +38,15 @@ Yellow/Orange Blocks.....immovable
 
 > Resizing the terminal just after the intro will adjust the board to the center of the terminal.
 
+### Compile a Portable Version
+
+This creates a portable executable for your architecture about 9MB.
+
+```
+pip3 install --upgrade --user pyinstaller
+pyinstaller -F --add-data audio:audio beast.py
+```
+
 ### Script Options
 
 Example: `python3 beast.py -w:54 -h:30 -t -k:hjkl`
