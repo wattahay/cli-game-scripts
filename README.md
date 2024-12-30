@@ -45,6 +45,8 @@ This creates a portable executable for your architecture about 9MB.
 ```
 pip3 install --upgrade --user pyinstaller
 pyinstaller -F --add-data audio:audio beast.py
+cd dist/
+./beast
 ```
 
 ### Script Options
