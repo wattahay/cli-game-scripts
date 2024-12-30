@@ -3,7 +3,7 @@ from random import randint, choices
 from os import system, popen, path
 from time import sleep, time
 from threading import Thread
-from sys import argv
+from sys import exit, argv
 
 ################################################################################################
 ###########################################################-- Useful Variables --###############
@@ -102,6 +102,7 @@ KYBD = [
 ######################################-- Linux aplay audio function
 def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
 script_dir = path.abspath( path.dirname( __file__ ) )
+play_audio('menu_item_tick') # Sound test helps "initialize" in some cases
 ######################################-- get terminal size
 def get_rw_cl_tcl(rw, cl, tcl): # get rows, columns, and terminal columns
 	rows, ttycols = [int(x) for x in popen('stty size', 'r').read().split()]
@@ -257,7 +258,7 @@ def close_game(): # close game function
 		print('\033[?25\033[0;0H')
 		system('clear')
 		system('reset')
-		exit()
+		exit(0)
 ########################################################-- cursor preset functions
 def set_topleft(top, left):
 	global top_margin, left_margin, xbgx
