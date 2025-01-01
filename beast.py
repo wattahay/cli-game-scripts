@@ -177,7 +177,6 @@ KEY_P_LEFT = 	KYBD[dir_keys]["PK_LEFT"]
 mi1_opt = dir_keys + 1 # initial keyboard setting
 keypress = 999
 debug = False
-pulling = 'hold' # 'hold / 'tog' /  'swi' / 'sin'
 game_play_mode = False
 ################################################-- set background post argv
 tbg(0) # set xbgx after argv, and before character contants
@@ -716,7 +715,7 @@ def push_loop(intent):
 			loop = False
 
 def move_player(direction):
-	global PLAYER, player, board, MOVES, BAKGRD, BOX, pulling
+	global PLAYER, player, board, MOVES, BAKGRD, BOX
 
 	row = player[1]['ro']
 	col = player[1]['co']
@@ -756,7 +755,7 @@ def direct_move(tap_move):
 						lvl_box_cnt += 1
 
 def direct_keypress(tap):
-	global player, MOVES, board, KEY_P_UP, KEY_P_DOWN, KEY_P_RIGHT, KEY_P_LEFT, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, pulling
+	global player, MOVES, board, KEY_P_UP, KEY_P_DOWN, KEY_P_RIGHT, KEY_P_LEFT, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT
 
 	if (tap == KEY_UP):
 		direct_move('U')
@@ -836,7 +835,7 @@ def build_level():
 	global newlevel, level, lives, score, mi1_opt, xbgx, fitted, trnsprnt
 	global lvl_block_cnt, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt, lvl_box_cnt, block_type
 	global BEAST, BAKGRD, BLOCK, KILLBLOCK, game_play_mode, top_margin, left_margin, LCD_TIME
-	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT, pulling
+	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT
 
 	def print_beast():
 		set_midcent(5,29)
@@ -976,7 +975,7 @@ def build_level():
 	mi1_shade = '' ########### 1 -- direction keys group
 	#mi1_opt = #  (set globally at the beginning of the script)
 	mi2_shade = '' ########### 2 -- block-pull method
-	mi2_opt = 1
+	#mi2_opt = 1
 	mi3_shade = '' ############ 3 -- level beast count
 	mi4_shade = '' ############ 4 -- level monster count
 	mi5_shade = '' ############ 5 -- level egg count
@@ -1048,7 +1047,7 @@ def build_level():
 		if mi != 12: mi12_shade = dim ######## 12 -- egg countdown speed
 		else: mi12_shade = norm
 	def main_menu_1(): #### -- First Tab
-		global mi1_opt, mi1_shade, mi2_shade, wasd, arrows, vi, pulling, single, toggle, auto
+		global mi1_opt, mi1_shade, mi2_shade, wasd, arrows, vi
 
 		print('\033[u\033[2B' + mi1_shade + 'Movement Keys: ' + wasd + mi1_shade + arrows + mi1_shade + vi)
 
@@ -1077,7 +1076,7 @@ def build_level():
 		print('\033[u\033[8B' + mi12_shade 	+ chr(11052) + chr(8320) 	+ mi12_shade 	+ ' - Egg Timer:       slower ' + speedbg + ' faster\033[' + str(timer_arrows + 8) +    'D' + speed_arrow + '\033[30m')
 
 	def mi1_controls(opt):
-		global dir_keys, wasd, arrows, vi, pulling, KYBD, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_RIGHT, KEY_P_LEFT
+		global dir_keys, wasd, arrows, vi, KYBD, KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_RIGHT, KEY_P_LEFT
 		if opt == 1:
 			dir_keys = 0
 			wasd = '\033[1:37m[\033[1;35m ' + KYBD[0]['title'] + ' \033[1;37m]\033[0m'
@@ -1105,15 +1104,7 @@ def build_level():
 		KEY_P_RIGHT = KYBD[dir_keys]["PK_RIGHT"]
 		KEY_P_LEFT = KYBD[dir_keys]["PK_LEFT"]
 
-	def mi2_controls(opt):
-		global pulling, toggle, single, auto, hold
-
-		if opt == 1:
-			pulling = 'hold'
-			hold = '\033[1;37m[\033[1;35m hold \033[1;37m]\033[0m'
-			toggle = '  toggle  '
-			single = '  single  '
-			auto = '  auto  '
+	#def mi2_controls(opt):
 
 
 	def mi8_controls(opt):
@@ -1139,7 +1130,7 @@ def build_level():
 
 	dim_menus(0)
 	mi1_controls(mi1_opt)
-	mi2_controls(mi2_opt)
+	#mi2_controls(mi2_opt)
 	mi8_controls(mi8_opt)
 	tab_line = 20
 	if play_cols < 40: tab_line = 24 + play_cols - 40 # Based on smallest playboard size = 16 x 30 (18 x 32 with borders)
@@ -1496,9 +1487,7 @@ def build_level():
 ################################################################################################
 
 def take_input():
-	global pulling, gameterm, debug, keypress, player, top_margin, left_margin, key_move, game_play_mode, term_cols, term_rows
-
-	noecho()
+	global gameterm, debug, keypress, player, top_margin, left_margin, key_move, game_play_mode, term_cols, term_rows
 
 	while(True):
 		sleep(LCD_TIME - .009) # keeps the input loop sane. works faster than the game loop
