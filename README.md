@@ -117,11 +117,12 @@ OS keyboard codes
 
 1. gnome-terminal
 2. kitty
-3. xfce-terminal
-4. konsole
-5. xterm
-6. "uxterm" (lxterm)
-7. "Terminator" (x-terminal-emulator)
+3. blackbox-terminal
+4. xfce4-terminal
+5. konsole
+6. xterm
+7. "uxterm" (lxterm)
+8. "Terminator" (x-terminal-emulator)
 
 Most terminals have profiles you can create for unique purposes.
 
