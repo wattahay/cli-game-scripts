@@ -728,8 +728,7 @@ def move_player(direction):
 	if (player[1]['tug']) and (board[rtug][ctug] == BOX):
 		board[rtug][ctug] = BAKGRD
 		board[row][col] = BOX
-		if (pulling == 'hold'):
-			player[1]['tug'] == False
+		player[1]['tug'] == False
 	else:
 		board[row][col] = BAKGRD
 	player[1]['ro'] = fow
@@ -767,23 +766,22 @@ def direct_keypress(tap):
 		direct_move('D')
 	elif (tap == KEY_RIGHT):
 		direct_move('R')
-	if (pulling == 'hold'):
-		if (tap == KEY_P_UP):
-			player[1]['tug'] = True
-			direct_move('U')
-			player[1]['tug'] = False
-		elif (tap == KEY_P_LEFT):
-			player[1]['tug'] = True
-			direct_move('L')
-			player[1]['tug'] = False
-		elif (tap == KEY_P_RIGHT):
-			player[1]['tug'] = True
-			direct_move('R')
-			player[1]['tug'] = False
-		elif (tap == KEY_P_DOWN):
-			player[1]['tug'] = True
-			direct_move('D')
-			player[1]['tug'] = False
+	if (tap == KEY_P_UP):
+		player[1]['tug'] = True
+		direct_move('U')
+		player[1]['tug'] = False
+	elif (tap == KEY_P_LEFT):
+		player[1]['tug'] = True
+		direct_move('L')
+		player[1]['tug'] = False
+	elif (tap == KEY_P_RIGHT):
+		player[1]['tug'] = True
+		direct_move('R')
+		player[1]['tug'] = False
+	elif (tap == KEY_P_DOWN):
+		player[1]['tug'] = True
+		direct_move('D')
+		player[1]['tug'] = False
 
 
 def pause():
@@ -978,12 +976,7 @@ def build_level():
 	mi1_shade = '' ########### 1 -- direction keys group
 	#mi1_opt = #  (set globally at the beginning of the script)
 	mi2_shade = '' ########### 2 -- block-pull method
-	mi2_opt = 0
-	if pulling == 'hold': mi2_opt = 1
-	elif pulling == 'toggle': mi2_opt = 2
-	elif pulling == 'single': mi2_opt = 3
-	elif pulling == 'auto': mi2_opt = 4
-	toggle, single, auto = '', '', ''
+	mi2_opt = 1
 	mi3_shade = '' ############ 3 -- level beast count
 	mi4_shade = '' ############ 4 -- level monster count
 	mi5_shade = '' ############ 5 -- level egg count
@@ -1058,13 +1051,8 @@ def build_level():
 		global mi1_opt, mi1_shade, mi2_shade, wasd, arrows, vi, pulling, single, toggle, auto
 
 		print('\033[u\033[2B' + mi1_shade + 'Movement Keys: ' + wasd + mi1_shade + arrows + mi1_shade + vi)
-		print('\033[u\033[4B' + mi2_shade + 'Pulling Boxes: ' + hold + mi2_shade + toggle + mi2_shade + single + mi2_shade + auto)
 
-		pullkey = ''
-		if (pulling == 'hold'): pullkey = 'Shift   '
-		else: pullkey = 'Spacebar'
-
-		print('\033[u\033[7B\033[0m' + xbgx + '\033[37m' + ' '*32 + 'Box-Pull Key: \033[36m' + pullkey + ' \033[0m')
+		print('\033[u\033[6B\033[0m' + xbgx + '\033[37m' + ' '*4 + 'Hold the \033[36mShift \033[37mkey down to pull boxes.\033[0m')
 
 	def main_menu_2():
 		global mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, BLOCK, block_type, KILLBLOCK, normalyellow, dangerousorange,  play_rows, play_cols
@@ -1126,24 +1114,7 @@ def build_level():
 			toggle = '  toggle  '
 			single = '  single  '
 			auto = '  auto  '
-		if opt == 2:
-			pulling = 'toggle'
-			hold = '  hold  '
-			toggle = '\033[1;37m[\033[1;35m toggle \033[1;37m]\033[0m'
-			single = '  single  '
-			auto = '  auto  '
-		elif opt == 3:
-			pulling = 'single'
-			hold = '  hold  '
-			toggle = '  toggle  '
-			single = '\033[1;37m[\033[1;35m single \033[1;37m]\033[0m'
-			auto = '  auto  '
-		elif opt == 4:
-			pulling = 'auto'
-			hold = '  hold  '
-			toggle = '  toggle  '
-			single = '  single  '
-			auto = '\033[1;37m[\033[1;35m auto \033[1;37m]\033[0m'
+
 
 	def mi8_controls(opt):
 		global block_type, BLOCK, KILLBLOCK, normalyellow, dangerousorange
@@ -1314,19 +1285,19 @@ def build_level():
 						mi1_controls(3)
 					play_audio('menu_item_tick')
 					keypress = 999
-				elif (main_menu_tab == 1) and (item_menu == 2):
-					if (keypress == KEY_LEFT):
-						mi2_opt -= 1
-						if mi2_opt < 1: mi2_opt = 4
-					elif (keypress == KEY_RIGHT):
-						mi2_opt += 1
-						if mi2_opt > 4: mi2_opt = 1
-					if mi2_opt == 1: mi2_controls(1)
-					elif mi2_opt == 2: mi2_controls(2)
-					elif mi2_opt == 3: mi2_controls(3)
-					elif mi2_opt == 4: mi2_controls(4)
-					if item_menu != 3: play_audio('menu_item_tick')
-					keypress = 999
+				#elif (main_menu_tab == 1) and (item_menu == 2):
+					#if (keypress == KEY_LEFT):
+					#	mi2_opt -= 1
+					#	if mi2_opt < 1: mi2_opt = 4
+					#elif (keypress == KEY_RIGHT):
+					#	mi2_opt += 1
+					#	if mi2_opt > 4: mi2_opt = 1
+					#if mi2_opt == 1: mi2_controls(1)
+					#elif mi2_opt == 2: mi2_controls(2)
+					#elif mi2_opt == 3: mi2_controls(3)
+					#elif mi2_opt == 4: mi2_controls(4)
+					#if item_menu != 3: play_audio('menu_item_tick')
+					#keypress = 999
 
 				elif (main_menu_tab == 2) and (item_menu == 3):
 					if (keypress == KEY_LEFT):
@@ -1545,35 +1516,7 @@ def take_input():
 					debug = True
 					set_board_spacing()
 					system('clear')
-			if pulling == 'auto':
-				if keypress == ord(' '):
-					while (keypress == ord(' ')):
-						keypress = gameterm.getch()
-						player[1]['tug'] = not player[1]['tug']
-						if (keypress != ord(' ')):
-							tugspan = keypress # logs the present direction to compare for direction change
-							while (tugspan == keypress): # this ensures the player has pull function until direction key changes.
-								direct_keypress(keypress)
-								player[1]['tug'] = True
-								keypress = gameterm.getch()
-				if keypress != ord(' '):
-					player[1]['tug'] = False
-					direct_keypress(keypress)
-			elif pulling == 'hold':
-				direct_keypress(keypress)
-			elif pulling == 'toggle':
-				if keypress == ord(' '):
-					player[1]['tug'] = not player[1]['tug']
-				direct_keypress(keypress)
-			elif pulling == 'single':
-				if keypress == ord(' '):
-					while (keypress == ord(' ')):
-						keypress = gameterm.getch()
-						player[1]['tug'] = True
-					direct_keypress(keypress)
-				else:
-					player[1]['tug'] = False
-					direct_keypress(keypress)
+			direct_keypress(keypress)
 
 ################################################################################################
 ##################-- This is the beginning of the program's main execution --###################
