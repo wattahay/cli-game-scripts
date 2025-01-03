@@ -56,7 +56,7 @@ Example: `python3 beast.py -w:54 -h:30 -t -k:hjkl`
 ```
 -c...........create/use the default config file
 -c.h.........create config with help comments
--c:file......create/use 'file' config
+-c:file......create/use config with custom filename
 -t...........transparent background
 -f...........fitted to terminal
 -f:2.........additional padding
