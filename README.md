@@ -54,6 +54,8 @@ cd dist/
 Example: `python3 beast.py -w:54 -h:30 -t -k:hjkl`
 
 ```
+-c.........create/use the default config file
+-c:f.ini...create/use f.ini config file
 -t.........transparent background
 -f.........fitted to terminal
 -f:2.......additional padding
