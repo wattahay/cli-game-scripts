@@ -54,17 +54,18 @@ cd dist/
 Example: `python3 beast.py -w:54 -h:30 -t -k:hjkl`
 
 ```
--c.........create/use the default config file
--c:f.ini...create/use f.ini config file
--t.........transparent background
--f.........fitted to terminal
--f:2.......additional padding
+-c...........create/use the default config file
+-c.h.........create config with help comments
+-c:file......create/use 'file' config
+-t...........transparent background
+-f...........fitted to terminal
+-f:2.........additional padding
 	1-to-5 accommodates terminal spacing differences
--k:hjkl....key controls
+-k:hjkl......key controls
 	options: "wasd", "arrows", "hjkl"
--w:50......custom game width
+-w:50........custom game width
 	2-digit number (option trumps fitted width)
--h:30......custom game height
+-h:30........custom game height
 	2-digit number (option trumps fitted height)
 ```
 
