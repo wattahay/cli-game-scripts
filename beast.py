@@ -4,43 +4,96 @@ from os import system, popen, path
 from time import sleep, time
 from threading import Thread
 from sys import exit, argv
+from configparser import ConfigParser
+from ast import literal_eval
+
+###########################################################-- Config File Argv Option
+makeconf = False
+useconf = False
+confname = 'beastconf.ini'
+
+for i in argv:
+	if i[0:3] == '-c:':
+		useconf = True
+		confname = i[3:]
+	elif i[0:2] == '-c' and len(i) == 2:
+		useconf = True
+
+if useconf:
+	if path.isfile(confname): # existing config file
+		bstconf = ConfigParser(allow_no_value=True)
+		bstconf.optionxform = str
+		bstconf.read(confname) # read the config
+	else: ##################### no existing config file
+		bstconf = ConfigParser(allow_no_value=True)
+		bstconf.optionxform = str
+		makeconf = True # make a new config
+
+
+##########################################################-- Config Variable Functions
+def confvar(section, name, default, addcom = ''): # config section, config variable, default value
+	global makeconf, useconf, bstconf
+
+	if len(addcom) > 0:
+		addcom = '    # ' + addcom
+	if not useconf:
+		return default
+	else:
+		if useconf and not makeconf: # if the conf exists, then set the variable to the conf value
+			return literal_eval(bstconf.get(section, name))
+		elif makeconf:# if the conf needs to exist, then export the default value to the conf file
+			sect = False
+			for i in bstconf.sections():
+				if i == section: sect = True
+			if not sect: bstconf.add_section(section)
+			bstconf.set(section, name, str(default) + addcom)
+			return default
+
+def confcom(section, addcom):
+	global makeconf
+	addcom = '# ' + addcom
+	if makeconf: bstconf[section] = {addcom:None}
 
 ################################################################################################
-###########################################################-- Useful Variables --###############
+###########################################################-- Config Variables --###############
 ################################################################################################
-lives = 		5	# starting level lives
-BEAST_SCR = 	6	# points for killing beasts
-EGG_SCR = 		8	# points for killing eggs
-MONSTER_SCR =	10	# points for killing monsters
-NO_LIVES = 		50	# point penalty for losing all lives
-NO_LEVEL = 		3	# level penalty for losing all lives
-WIN_LEVEL =		25	# points for winning a level
-PLR_FLASHES = 	7	# Number of times a spawned player flashes
-SCENT = 		20	# distance at which enemies smell you strongly
-SCENT_EDGE = 	20	# distance past scent for mild scent
+lives = 		confvar('counts', 'lives', 			5, 	'starting level lives')
+BEAST_SCR = 	confvar('counts', 'beast-scr', 		6,	'points for killing beasts')
+EGG_SCR = 		confvar('counts', 'egg-scr', 		8,	'points for killing eggs')
+MONSTER_SCR =	confvar('counts', 'monster-scr', 	10, 'points for killing monsters')
+NO_LIVES = 		confvar('counts', 'lose-pnts', 		50,	'point penalty for losing all lives')
+NO_LEVEL = 		confvar('counts', 'lose-lvls', 		3,	'level penalty for losing all lives')
+WIN_LEVEL =		confvar('counts', 'win-pnts', 		25,	'points for winning a level')
+MIN_BOXES = 	confvar('counts', 'min-boxes', 		15,	'Some boxes are required to play the game')
+PLR_FLASHES = 	confvar('counts', 'plr-flashes', 	7,	'Number of times a spawned player flashes')
 #########################################################-- pawn speeds
-beast_steps = 	4	# (1 - 10), higher is slower
-monster_steps =	3	# (1 - 10), higher is slower
-incubation = 	8	# (1 - 10), higher is slower
-egg_timer = 	7	# (1 - 10), higher is slower
-#########################################################-- game frame time
-LCD_TIME = 		.02	# example: .02 = 1 frame every .02 seconds = 2/100 >>> 100/2 fps = 50 fps
-#########################################################-- size of the board
+confcom('pawn speeds', 'Values can be 1 - 10. (Higher is slower.)')
+beast_steps = 	confvar('pawn speeds', 'beast', 	4)
+monster_steps =	confvar('pawn speeds', 'monster', 	3)
+incubation = 	confvar('pawn speeds', 'incubation', 8)
+egg_timer = 	confvar('pawn speeds', 'egg-timer', 7)
+#########################################################-- game frames per second
+LCD_TIME = 		1 / confvar('game stuff', 'fps', 	50) 	# fps
+#########################################################-- board dimensions
 # Lowest possible values are 15 x 30. Old game was 20 x 40.
-play_rows = 	20	# 15+ Height
-play_cols = 	40	# 30+ Width
+PLAY_ROWS = 	confvar('game stuff', 'game-rows', 	20, '15+ Height')
+PLAY_COLS = 	confvar('game stuff', 'game-columns', 40, '30+ Width')
+SCENT = 		confvar('game stuff', 'scent-range', 20, 'distance at which enemies smell you strongly')
+SCENT_EDGE = 	confvar('game stuff', 'scent-edge', 20, 'distance past scent for mild scent')
 #########################################################-- game levels
-# You can create as many or few levels as you want to here.
-# Each level is surrounded by curly brackets, while the outer brackets are square
-# Make sure all bracketted levels are followed by a comma (except for the last level)
-# Blocks and Boxes:
-#	> Negative Integer: use built-in count formula
-#		> The default formula stays within a pretty small range.
-#	> Positive Integer: specify exact number of blocks or boxes
-#	> Negative decimal: subtracts percentage of blocks/boxes from default formula
-#		> ie: -.15 (has absolute value less than 1)
-#	> Positive decimal: adds percentage of blocks/boxes to default formula
-#		> ie: .15 (has absolute value less than 1)
+confcom('levels',
+'You can create as many or few levels as you want to here.\n# ' +
+'Each level is surrounded by curly brackets, while the outer brackets are square\n# ' +
+'Make sure all bracketted levels are followed by a comma (except for the last level)\n# ' +
+'Blocks and Boxes:\n# ' +
+'	> Negative Integer: use built-in count formula\n# ' +
+'		> The default formula stays within a pretty small range.\n# ' +
+'	> Positive Integer: specify exact number of blocks or boxes\n# ' +
+'	> Negative decimal: subtracts percentage of blocks/boxes from default formula\n# ' +
+'		> ie: -.15 (has absolute value less than 1)\n# ' +
+'	> Positive decimal: adds percentage of blocks/boxes to default formula\n# ' +
+'		> ie: .15 (has absolute value less than 1)\n' )
+
 GAME_LEVELS = [
 		{'beasts':3,	'monsters':0,	'eggs':0, 	'block': 'yellow',	'blocks': -999,	'boxes': -999},	# Level 1
 		{'beasts':5,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 2
@@ -58,51 +111,79 @@ GAME_LEVELS = [
 		{'beasts':0,	'monsters':12,	'eggs':0,	'block': 'orange',	'blocks': -999,	'boxes': -999},	# Level 14
 		{'beasts':15,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -999,	'boxes': -999} 	# Level 15
 	]
-lowest_boxes = 15 # Some boxes are required to play the game
-########################################################-- Pawn Movement Priority Odds
-# These values are the odds of moves for an enemy if those		|---------------------
-# moves are available to it. If a move is not available,		| 5  4  3
-# then its odds are absorbed: 1st by its equal counterpart,		| 4  H  2
-# and then by the next lower priority, etc. Each of the 5 		| 3  2  1
-# priorities is greater or equal to the sum of all lower 		|		 \
-# priority moves' odds.											|	      \
-########################-- Examples								|		   <>
-# Max Randomness	1, 1, 1, 3, 3, 9, 9, 27
-# High				1, 1, 1, 4, 4, 16, 16, 50		1, 2, 2, 6, 6, 18, 18, 55
-# Medium			1, 1, 1, 4, 4, 20, 20, 90		1, 2, 2, 8, 8, 26, 26, 98
-# Low Randomness	1, 3, 3, 12, 12, 40, 40, 200
 
-PRIORITY_ODDS = [
-		[98, False],	# Forward (1st priority)
-		[28, False],	# Front-Side (2nd priority)
-		[28, False],	# Front-Side (2nd priority)
-		[4, False],		# Sideways (3rd priority)
-		[4, False],		# Sideways (3rd priority)
-		[1, False],		# Rear-Side (4th priority)
-		[1, False],		# Rear-Side (4th priority)
-		[1, False] 		# Backwards (5th priority)
-	]
+if makeconf and useconf:
+	x = len(GAME_LEVELS)
+elif useconf:
+	x = len(bstconf.options('levels'))
+
+if useconf:
+	for i in range(x):
+		GAME_LEVELS[i] = confvar('levels', str(i + 1), GAME_LEVELS[i])
+
+
+########################################################-- Pawn Movement Priority Odds
+confcom('enemy move odds',
+'These values are the odds of moves for an enemy if those      |--------------------- \n# ' +
+'moves are available to it. If a move is not available,        | 5  4  3              \n# ' +
+'then its odds are absorbed: 1st by its equal counterpart,     | 4  H  2              \n# ' +
+'and then by the next lower priority, etc. Each of the 5       | 3  2  1              \n# ' +
+'priorities is greater or equal to the sum of all lower        |        \\            \n# ' +
+'priority moves\' odds.                                         |         \\          \n# ' +
+'########################-- Examples                           |         <>            \n# ' +
+'Max Randomness   1, 1, 1, 3, 3, 9, 9, 27 \n# ' +
+'High             1, 1, 1, 4, 4, 16, 16, 50     1, 2, 2, 6, 6, 18, 18, 55\n# ' +
+'Medium           1, 1, 1, 4, 4, 20, 20, 90     1, 2, 2, 8, 8, 26, 26, 98\n# ' +
+'Low Randomness   1, 3, 3, 12, 12, 40, 40, 200 \n')
+
+PRIORITY_ODDS = [ [98, False],[28, False],[28, False],[4, False],
+		[4, False],	[1, False],	[1, False],	[1, False] ]
+
+pocoms = ['Forward (1st priority)','Front-Side (2nd priority)',
+'Front-Side (2nd priority)','Sideways (3rd priority)','Sideways (3rd priority)',
+'Rear-Side (4th priority)','Rear-Side (4th priority)','Backwards (5th priority)']
+
+for i in range(8):
+	PRIORITY_ODDS[i][0] = confvar('enemy move odds', 'move-'+str(i + 1), PRIORITY_ODDS[i][0], pocoms[i])
 #####################################################-- player direction controls
-# Without editing, the default settings option is the middle one.
-# The script only allows for a total of 3 options at a time
-# Customize the 3 options below with key codes from getkeycodes, as well as custom titles.
-# Changing the value of word as in ............ "title":"word"
-#	> changes the script -k option to: ........ -k:word
-#	> changes the settings menu option to: .... [ word ]
+confcom('control key codes',
+'The default settings option is the middle one.\n# ' +
+'The script only allows for a total of 3 options at a time\n# ' +
+'Customize the 3 options below with key codes from getkeycodes, as well as custom titles.\n# ' +
+'Changing the value of word as in ............ "title":"word"\n# ' +
+'	> changes the script -k option to: ........ -k:word\n# ' +
+'	> changes the settings menu option to: .... [ word ]\n ')
 
 KYBD = [
 		{"title":"wasd", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
-		#{"title":"XBOX",  "K_UP":105, "K_DOWN":117, "K_RIGHT":111, "K_LEFT":121, "PK_UP":73, "PK_DOWN":85, "PK_RIGHT":79, "PK_LEFT":89},
 		{"title":"arrows",  "K_UP":259, "K_DOWN":258, "K_RIGHT":261, "K_LEFT":260, "PK_UP":337, "PK_DOWN":336, "PK_RIGHT":402, "PK_LEFT":393},
 		{"title":"hjkl", "K_UP":107, "K_DOWN":106, "K_RIGHT":108, "K_LEFT":104, "PK_UP":75,  "PK_DOWN":74,  "PK_RIGHT":76,  "PK_LEFT":72}
 	]
+
+for i in range(3):
+	 KYBD[i] = confvar('control key codes', 'option-'+str(i + 1), KYBD[i])
+
+confvar('control key codes', 'spare-1', '{"title":"XBOX",  "K_UP":105, "K_DOWN":117, "K_RIGHT":111, "K_LEFT":121, "PK_UP":73, "PK_DOWN":85, "PK_RIGHT":79, "PK_LEFT":89}',
+'(for the AntiMicroX example in the repo)')
+
+################################################-- config file details
+if makeconf:
+	with open(confname, 'w') as cf:
+	   bstconf.write(cf)
+	print('New config file created: ' + str(confname))
+	print('Exiting')
+	exit(0)
+
+
 ################################################################################################
 ###########################################################-- Utility Functions --##############
 ################################################################################################
-######################################-- Linux aplay audio function
-def play_audio(filename): system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
 script_dir = path.abspath( path.dirname( __file__ ) )
-play_audio('menu_item_tick') # Sound test helps "initialize" in some cases
+######################################-- Linux aplay audio function
+def play_audio(filename):
+	global script_dir
+	system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
+#play_audio('menu_item_tick') # Sound test helps "initialize" in some cases
 ######################################-- get terminal size
 def get_rw_cl_tcl(rw, cl, tcl): # get rows, columns, and terminal columns
 	rows, ttycols = [int(x) for x in popen('stty size', 'r').read().split()]
@@ -129,7 +210,7 @@ left_pad = 0	# padding for terminal fitted screen
 top_pad = 0		# padding for terminal fitted screen
 fitted = False	# whether or not the -f option is chosen
 stat_rows = 1	# rows for game stats
-################################################-- argv assignments
+################################################-- remaining argv assignments
 for i in argv:
 	if i[0:3] == '-f:':
 		if(i[3:].isdigit() and len(i[3:]) < 3):
@@ -146,8 +227,8 @@ for i in argv:
 		term_rows, tot_cols = get_rw_cl_tcl(1,0,1)
 		if term_rows % 2 == 0: alt = 0
 		else: alt = 1
-		play_rows = term_rows - 2 - top_pad*2 - stat_rows
-		play_cols = (tot_cols - 4 - left_pad * 2) / 2
+		PLAY_ROWS = term_rows - 2 - top_pad*2 - stat_rows
+		PLAY_COLS = (tot_cols - 4 - left_pad * 2) / 2
 
 for i in argv:
 	if i[0:2] == '-t':
@@ -159,10 +240,12 @@ for i in argv:
 		elif i[3:] == KYBD[2]['title']: dir_keys = 2
 	if i[0:3] == '-h:':
 		if(i[3:].isdigit() and len(i[3:]) < 121):
-			play_rows = int(i[3:]) + top_pad*2
+			PLAY_ROWS = int(i[3:]) + top_pad*2
 	if i[0:3] == '-w:':
 		if(i[3:].isdigit() and len(i[3:]) < 121):
-			play_cols = int(i[3:]) + left_pad
+			PLAY_COLS = int(i[3:]) + left_pad
+
+
 ################################################-- keyboard constants post argv
 KEY_UP = 		KYBD[dir_keys]["K_UP"]
 KEY_DOWN = 		KYBD[dir_keys]["K_DOWN"]
@@ -228,12 +311,12 @@ MOVES = {
 level = 0
 board = []
 blank_board = []
-if (play_rows < 15): play_rows = 15
-if (play_cols < 30): play_cols = 30
-play_rows = int(play_rows)
-play_cols = int(play_cols)
-board_rows = play_rows + 2
-board_cols = play_cols + 2
+if (PLAY_ROWS < 15): PLAY_ROWS = 15
+if (PLAY_COLS < 30): PLAY_COLS = 30
+PLAY_ROWS = int(PLAY_ROWS)
+PLAY_COLS = int(PLAY_COLS)
+board_rows = PLAY_ROWS + 2
+board_cols = PLAY_COLS + 2
 lvl_box_cnt = 0
 ################################################-- spacing variables
 left_margin = 0
@@ -280,7 +363,7 @@ def set_midcent(topcomp, leftcomp):
 ################################################################################################
 ######################################-- get/set game dimensions
 def set_board_spacing(): #{
-	global top_margin, left_margin, board_rows, board_cols, play_rows, play_cols, term_cols, term_rows
+	global top_margin, left_margin, board_rows, board_cols, PLAY_ROWS, PLAY_COLS, term_cols, term_rows
 	global left_stat, statpad, stat_rows, min_rows, stat_grow_limit, level, debug, keypress
 
 	if (board_rows > term_rows - 6):
@@ -322,7 +405,7 @@ def build_the_board(): #{ BUILDS a blank board
 #}
 
 def print_stats():
-	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, play_rows, play_cols, term_cols, term_rows
+	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, PLAY_ROWS, PLAY_COLS, term_cols, term_rows
 	level_stat = chr(9477) + ' LEVEL: ' + str(level) + ' ' + chr(9477)
 	score_stat = chr(9477) + ' SCORE: ' + str(score) + ' ' + chr(9477)
 	lives_stat = chr(9477) + ' LIVES: ' + str(lives) + ' ' + chr(9477)
@@ -333,7 +416,7 @@ def print_stats():
 		'\033[u\033[' + str(board_cols*2 - statpad - len(lives_stat))	+ 'C' 	+ lives_stat + '   ' + '\033[1A')
 
 def print_debug():
-	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, play_rows, play_cols, term_cols, term_rows
+	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, PLAY_ROWS, PLAY_COLS, term_cols, term_rows
 	print('\033[?7l\033[1;1H\033[' + str(top_margin + board_rows + 2) + ';' + str(left_margin) + 'H\033[s\033[0m\033[37m' +
 	'Player: ' + str(player) )
 	for i in range(0, len(eggs)):
@@ -347,7 +430,7 @@ def print_debug():
 		else: print('\033[u' + '\033[' + str(len(eggs) + len(beasts) + 4 + i) + 'B' + '\r\033[K\033[?7l\033[1B\033[K\033[1A\t\033[0m\033[37mMonster ' + str(i) + ': ' + str(monsters[i]))
 
 def egg_debug():
-	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, play_rows, play_cols, term_cols, term_rows
+	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, PLAY_ROWS, PLAY_COLS, term_cols, term_rows
 	print('\033[?25\033[?7l\033[' + str(top_margin + board_rows + 1) + ';' + str(left_margin) + 'H\033[s\033[0m\033[37mEggs: ')
 	for i in range(1, len(eggs)):
 		if( ( player[1]['ro'] == eggs[i]['ro'] ) or ( player[1]['co'] == eggs[i]['co'] ) ):
@@ -357,7 +440,7 @@ def egg_debug():
 
 ########################################################-- print board function
 def print_board(board_array): #{
-	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, play_rows, play_cols, term_cols, term_rows, keypress
+	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, PLAY_ROWS, PLAY_COLS, term_cols, term_rows, keypress
 
 	if(keypress == ord('r')):
 		tot_rows, tot_cols = get_rw_cl_tcl(1,0,1)
@@ -734,7 +817,7 @@ def move_player(direction):
 	player[1]['co'] = fol
 
 def direct_move(tap_move):
-	global player, MOVES, board, lowest_boxes, lvl_box_cnt
+	global player, MOVES, board, MIN_BOXES, lvl_box_cnt
 
 	space = board[player[1]['ro'] + MOVES[tap_move]['ra'] ][ player[1]['co'] + MOVES[tap_move]['ca'] ]
 
@@ -747,7 +830,7 @@ def direct_move(tap_move):
 			kill_player()
 			if space == KILLBLOCK:
 				box_step = 0
-				while(lvl_box_cnt < lowest_boxes):
+				while(lvl_box_cnt < MIN_BOXES):
 					boxrow = randint(1, (board_rows - 1))
 					boxcol = randint(1, (board_cols - 1))
 					if(board[boxrow][boxcol] == BAKGRD):
@@ -831,7 +914,7 @@ def resize_terminal():
 
 def build_level():
 	global GAME_LEVELS, NO_LIVES, NO_LEVEL, incubate, egg_speed, beast_speed, monster_speed, keypress
-	global play_rows, play_cols, board_rows, board_cols, blank_board, board, term_cols, term_rows
+	global PLAY_ROWS, PLAY_COLS, board_rows, board_cols, blank_board, board, term_cols, term_rows
 	global newlevel, level, lives, score, mi1_opt, xbgx, fitted, trnsprnt
 	global lvl_block_cnt, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt, lvl_box_cnt, block_type
 	global BEAST, BAKGRD, BLOCK, KILLBLOCK, game_play_mode, top_margin, left_margin, LCD_TIME
@@ -927,19 +1010,19 @@ def build_level():
 		if (GAME_LEVELS[level - 1]['block'] == 'yellow'): block_type = BLOCK
 		if (GAME_LEVELS[level - 1]['block'] == 'orange'): block_type = KILLBLOCK
 		if (GAME_LEVELS[level - 1]['blocks'] <= -1):
-			lvl_block_cnt = int(play_rows * play_cols * .012)
+			lvl_block_cnt = int(PLAY_ROWS * PLAY_COLS * .012)
 		elif (abs(GAME_LEVELS[level - 1]['blocks']) < 1):
-			lvl_block_cnt = play_rows * play_cols * .012
+			lvl_block_cnt = PLAY_ROWS * PLAY_COLS * .012
 			lvl_block_cnt = int(lvl_block_cnt + (lvl_block_cnt * GAME_LEVELS[level - 1]['blocks']))
 		else:
 			lvl_block_cnt = GAME_LEVELS[level - 1]['blocks']
 		if (GAME_LEVELS[level - 1]['boxes'] <= -1):
-			lower_boxes = int(play_rows * play_cols / 4 - 10)
-			upper_boxes = int(play_rows * play_cols / 4 + 10)
+			lower_boxes = int(PLAY_ROWS * PLAY_COLS / 4 - 10)
+			upper_boxes = int(PLAY_ROWS * PLAY_COLS / 4 + 10)
 			lvl_box_cnt = randint(lower_boxes, upper_boxes) # Default Level Boxes
 		elif (abs(GAME_LEVELS[level - 1]['boxes'] < 1)):
-			lower_boxes = int(play_rows * play_cols / 4 - 10)
-			upper_boxes = int(play_rows * play_cols / 4 + 10)
+			lower_boxes = int(PLAY_ROWS * PLAY_COLS / 4 - 10)
+			upper_boxes = int(PLAY_ROWS * PLAY_COLS / 4 + 10)
 			lvl_box_cnt = randint(lower_boxes, upper_boxes) # Default Level Boxes
 			lvl_box_cnt = int(lvl_box_cnt + (lvl_box_cnt * GAME_LEVELS[level - 1]['boxes']))
 		else:
@@ -954,11 +1037,11 @@ def build_level():
 		elif (level % 3) == 2:
 			lvl_beast_cnt += 1
 			lvl_egg_cnt += 1
-		lvl_block_cnt = int(play_rows * play_cols * .012)
-		lower_boxes = int(play_rows * play_cols / 4 - 10)
+		lvl_block_cnt = int(PLAY_ROWS * PLAY_COLS * .012)
+		lower_boxes = int(PLAY_ROWS * PLAY_COLS / 4 - 10)
 		upper_boxes = lower_boxes + 20
 		lvl_box_cnt = randint(lower_boxes, upper_boxes) # Default Level Boxes
-	if lvl_box_cnt < lowest_boxes: lvl_box_cnt = lowest_boxes # Lowest number of boxes set at beginning of script
+	if lvl_box_cnt < MIN_BOXES: lvl_box_cnt = MIN_BOXES # Lowest number of boxes set at beginning of script
 #################################################################-- Settings Variables
 	main_menu_tab = 0
 	item_menu = 0
@@ -1054,12 +1137,12 @@ def build_level():
 		print('\033[u\033[6B\033[0m' + xbgx + '\033[37m' + ' '*4 + 'Hold the \033[36mShift \033[37mkey down to pull boxes.\033[0m')
 
 	def main_menu_2():
-		global mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, BLOCK, block_type, KILLBLOCK, normalyellow, dangerousorange,  play_rows, play_cols
+		global mi3_shade, mi4_shade, mi5_shade, mi6_shade, mi7_shade, mi8_shade, BLOCK, block_type, KILLBLOCK, normalyellow, dangerousorange,  PLAY_ROWS, PLAY_COLS
 		global lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt
 
-		print('\033[u\033[3B\033[34C' + xbgx + 'Total Spaces: \033[36m' + str(play_rows * play_cols) + ' \033[37m')
+		print('\033[u\033[3B\033[34C' + xbgx + 'Total Spaces: \033[36m' + str(PLAY_ROWS * PLAY_COLS) + ' \033[37m')
 		print('\033[u\033[4B\033[35C' + xbgx + 'Used Spaces: \033[36m' + str(lvl_box_cnt + lvl_block_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt) + ' \033[37m')
-		print('\033[u\033[5B\033[35C' + xbgx + 'Free Spaces: \033[36m' + str((play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)) + ' \033[37m')
+		print('\033[u\033[5B\033[35C' + xbgx + 'Free Spaces: \033[36m' + str((PLAY_ROWS * PLAY_COLS) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)) + ' \033[37m')
 
 		print('\033[u\033[2B' 	+ mi3_shade 	+ BEAST 			+ mi3_shade + xbgx + ' - Beast Count: \033[1;35m' + str(lvl_beast_cnt) + ' \033[37m')
 		print('\033[u\033[4B' 	+ mi4_shade 	+ MONSTER 			+ mi4_shade + xbgx + ' - Monster Count: \033[1;35m' + str(lvl_monster_cnt) + ' \033[37m')
@@ -1133,7 +1216,7 @@ def build_level():
 	#mi2_controls(mi2_opt)
 	mi8_controls(mi8_opt)
 	tab_line = 20
-	if play_cols < 40: tab_line = 24 + play_cols - 40 # Based on smallest playboard size = 16 x 30 (18 x 32 with borders)
+	if PLAY_COLS < 40: tab_line = 24 + PLAY_COLS - 40 # Based on smallest playboard size = 16 x 30 (18 x 32 with borders)
 	else: tab_line = 20
 	if keypress == 9:
 		print_board(blank_board) ######################################################-- print_board
@@ -1260,7 +1343,7 @@ def build_level():
 					elif (item_menu == 11): dim_menus(11)
 					elif (item_menu == 12): dim_menus(12)
 			elif ((keypress == KEY_LEFT) or (keypress == KEY_RIGHT)):
-				maxed_cnt = (play_rows * play_cols) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)
+				maxed_cnt = (PLAY_ROWS * PLAY_COLS) - (lvl_block_cnt + lvl_box_cnt + lvl_monster_cnt + lvl_beast_cnt + lvl_egg_cnt)
 				if (main_menu_tab == 1) and (item_menu == 1):
 					if (keypress == KEY_LEFT):
 						mi1_opt -= 1
