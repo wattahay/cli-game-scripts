@@ -43,17 +43,16 @@ There is an [example xbox360.gamecontroller.amgp file](https://github.com/wattah
 ### Using the provided example.
 
 1. In AntiMicroX, import the [example xbox360.gamecontroller.amgp file](https://github.com/wattahay/cli-game-scripts/blob/master/examples/xbox360.gamecontroller.amgp).
-2. Locate the KYBD array in beast.py, which contains a commented out XBOX dictionary.
-3. Remove the pound sign to uncomment the line.
-4. Add a pound sign to another line to keep the options at 3.
+2. Create a config file using the script's -c option
+3. Locate the [control key codes] options in the config file
+4. Swap names between one of the options and spare-1
 
-> **Note:** The 1st 3 options are used if all 4 are uncommented.
+> Note: Only the 3 options will be used, but you can create as many spares as you want to.
 
 ```
-KYBD = [
-{"title":"wasd", 	"K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
-{"title":"XBOX",  	"K_UP":105, "K_DOWN":117, "K_RIGHT":111, "K_LEFT":121, "PK_UP":73,  "PK_DOWN":85,  "PK_RIGHT":79,  "PK_LEFT":89},
-#{"title":"arrows",	"K_UP":259, "K_DOWN":258, "K_RIGHT":261, "K_LEFT":260, "PK_UP":337, "PK_DOWN":336, "PK_RIGHT":402, "PK_LEFT":393},
-{"title":"hjkl", 	"K_UP":107, "K_DOWN":106, "K_RIGHT":108, "K_LEFT":104, "PK_UP":75,  "PK_DOWN":74,  "PK_RIGHT":76,  "PK_LEFT":72}
-]
+[control key codes]
+option-1 = {'title': 'wasd', 'K_UP': 119, 'K_DOWN': 115, 'K_RIGHT': 100, 'K_LEFT': 97, 'PK_UP': 87, 'PK_DOWN': 83, 'PK_RIGHT': 68, 'PK_LEFT': 65}
+option-2 = {'title': 'arrows', 'K_UP': 259, 'K_DOWN': 258, 'K_RIGHT': 261, 'K_LEFT': 260, 'PK_UP': 337, 'PK_DOWN': 336, 'PK_RIGHT': 402, 'PK_LEFT': 393}
+option-3 = {'title': 'hjkl', 'K_UP': 107, 'K_DOWN': 106, 'K_RIGHT': 108, 'K_LEFT': 104, 'PK_UP': 75, 'PK_DOWN': 74, 'PK_RIGHT': 76, 'PK_LEFT': 72}
+spare-1 = {'title":"XBOX",  "K_UP":105, "K_DOWN":117, "K_RIGHT":111, "K_LEFT":121, "PK_UP":73, "PK_DOWN":85, "PK_RIGHT":79, "PK_LEFT":89}
 ```
