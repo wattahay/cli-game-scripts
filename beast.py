@@ -11,12 +11,20 @@ from ast import literal_eval
 makeconf = False
 useconf = False
 confname = 'beastconf.ini'
+nocoms = True
 
 for i in argv:
 	if i[0:3] == '-c:':
 		useconf = True
 		confname = i[3:]
 	elif i[0:2] == '-c' and len(i) == 2:
+		useconf = True
+	elif i[0:5] == '-c.h:':
+		nocoms = False
+		useconf = True
+		confname = i[5:]
+	elif i[0:4] == '-c.h' and len(i) == 4:
+		nocoms = False
 		useconf = True
 
 if useconf:
@@ -32,10 +40,14 @@ if useconf:
 
 ##########################################################-- Config Variable Functions
 def confvar(section, name, default, addcom = ''): # config section, config variable, default value
-	global makeconf, useconf, bstconf
+	global makeconf, useconf, bstconf, nocoms
 
-	if len(addcom) > 0:
-		addcom = '    # ' + addcom
+	if nocoms == True:
+		addcom = ''
+	else:
+		if len(addcom) > 0:
+			addcom = '    # ' + addcom
+
 	if not useconf:
 		return default
 	else:
@@ -50,9 +62,11 @@ def confvar(section, name, default, addcom = ''): # config section, config varia
 			return default
 
 def confcom(section, addcom):
-	global makeconf
-	addcom = '# ' + addcom
-	if makeconf: bstconf[section] = {addcom:None}
+	global makeconf, nocoms
+
+	if nocoms == False:
+		addcom = '# ' + addcom
+		if makeconf: bstconf[section] = {addcom:None}
 
 ################################################################################################
 ###########################################################-- Config Variables --###############
@@ -155,15 +169,17 @@ confcom('control key codes',
 '	> changes the settings menu option to: .... [ word ]\n ')
 
 KYBD = [
-		{"title":"wasd", "K_UP":119, "K_DOWN":115, "K_RIGHT":100, "K_LEFT":97,  "PK_UP":87,  "PK_DOWN":83,  "PK_RIGHT":68,  "PK_LEFT":65},
-		{"title":"arrows",  "K_UP":259, "K_DOWN":258, "K_RIGHT":261, "K_LEFT":260, "PK_UP":337, "PK_DOWN":336, "PK_RIGHT":402, "PK_LEFT":393},
-		{"title":"hjkl", "K_UP":107, "K_DOWN":106, "K_RIGHT":108, "K_LEFT":104, "PK_UP":75,  "PK_DOWN":74,  "PK_RIGHT":76,  "PK_LEFT":72}
+		{'title':'wasd', 'K_UP':119, 'K_DOWN':115, 'K_RIGHT':100, 'K_LEFT':97,  'PK_UP':87,  'PK_DOWN':83,  'PK_RIGHT':68,  'PK_LEFT':65},
+		{'title':'arrows',  'K_UP':259, 'K_DOWN':258, 'K_RIGHT':261, 'K_LEFT':260, 'PK_UP':337, 'PK_DOWN':336, 'PK_RIGHT':402, 'PK_LEFT':393},
+		{'title':'hjkl', 'K_UP':107, 'K_DOWN':106, 'K_RIGHT':108, 'K_LEFT':104, 'PK_UP':75,  'PK_DOWN':74,  'PK_RIGHT':76,  'PK_LEFT':72}
 	]
 
 for i in range(3):
 	 KYBD[i] = confvar('control key codes', 'option-'+str(i + 1), KYBD[i])
 
-confvar('control key codes', 'spare-1', '{"title":"XBOX",  "K_UP":105, "K_DOWN":117, "K_RIGHT":111, "K_LEFT":121, "PK_UP":73, "PK_DOWN":85, "PK_RIGHT":79, "PK_LEFT":89}',
+spareKYBD = {'title':'XBOX',  'K_UP':105, 'K_DOWN':117, 'K_RIGHT':111, 'K_LEFT':121, 'PK_UP':73, 'PK_DOWN':85, 'PK_RIGHT':79, 'PK_LEFT':89}
+
+confvar('control key codes', 'spare-1', spareKYBD,
 '(for the AntiMicroX example in the repo)')
 
 ################################################-- config file details
