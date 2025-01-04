@@ -19,11 +19,11 @@ for i in argv:
 		confname = i[3:]
 	elif i[0:2] == '-c' and len(i) == 2:
 		useconf = True
-	elif i[0:5] == '-c.h:':
+	elif i[0:5] == '-c.i:':
 		nocoms = False
 		useconf = True
 		confname = i[5:]
-	elif i[0:4] == '-c.h' and len(i) == 4:
+	elif i[0:4] == '-c.i' and len(i) == 4:
 		nocoms = False
 		useconf = True
 
