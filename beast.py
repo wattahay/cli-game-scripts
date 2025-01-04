@@ -97,8 +97,7 @@ SCENT_EDGE = 	confvar('game stuff', 'scent-edge', 20, 'distance past scent for m
 #########################################################-- game levels
 confcom('levels',
 'You can create as many or few levels as you want to here.\n# ' +
-'Each level is surrounded by curly brackets, while the outer brackets are square\n# ' +
-'Make sure all bracketted levels are followed by a comma (except for the last level)\n# ' +
+'Each level is surrounded by curly brackets.\n# ' +
 'Blocks and Boxes:\n# ' +
 '	> Negative Integer: use built-in count formula\n# ' +
 '		> The default formula stays within a pretty small range.\n# ' +
@@ -169,15 +168,15 @@ confcom('control key codes',
 '	> changes the settings menu option to: .... [ word ]\n ')
 
 KYBD = [
-		{'title':'wasd', 'K_UP':119, 'K_DOWN':115, 'K_RIGHT':100, 'K_LEFT':97,  'PK_UP':87,  'PK_DOWN':83,  'PK_RIGHT':68,  'PK_LEFT':65},
+		{'title':'wasd',    'K_UP':119, 'K_DOWN':115, 'K_RIGHT':100, 'K_LEFT':97,  'PK_UP':87,  'PK_DOWN':83,  'PK_RIGHT':68,  'PK_LEFT':65},
 		{'title':'arrows',  'K_UP':259, 'K_DOWN':258, 'K_RIGHT':261, 'K_LEFT':260, 'PK_UP':337, 'PK_DOWN':336, 'PK_RIGHT':402, 'PK_LEFT':393},
-		{'title':'hjkl', 'K_UP':107, 'K_DOWN':106, 'K_RIGHT':108, 'K_LEFT':104, 'PK_UP':75,  'PK_DOWN':74,  'PK_RIGHT':76,  'PK_LEFT':72}
+		{'title':'hjkl',    'K_UP':107, 'K_DOWN':106, 'K_RIGHT':108, 'K_LEFT':104, 'PK_UP':75,  'PK_DOWN':74,  'PK_RIGHT':76,  'PK_LEFT':72}
 	]
 
 for i in range(3):
 	 KYBD[i] = confvar('control key codes', 'option-'+str(i + 1), KYBD[i])
 
-spareKYBD = {'title':'XBOX',  'K_UP':105, 'K_DOWN':117, 'K_RIGHT':111, 'K_LEFT':121, 'PK_UP':73, 'PK_DOWN':85, 'PK_RIGHT':79, 'PK_LEFT':89}
+spareKYBD = {'title':'XBOX',    'K_UP':105, 'K_DOWN':117, 'K_RIGHT':111, 'K_LEFT':121, 'PK_UP':73, 'PK_DOWN':85, 'PK_RIGHT':79, 'PK_LEFT':89}
 
 confvar('control key codes', 'spare-1', spareKYBD,
 '(for the AntiMicroX example in the repo)')
