@@ -12,12 +12,10 @@ makeconf = False
 useconf = False
 confname = 'beastconf.ini' # Path and name of config file
 nocoms = True # True means No comments in configs
-cli_info = ''	#
 show_info = False
 
 for i in argv:
 	if i[0:2] == '-i' and len(i) == 2:
-		cli_info = 'arguments'
 		show_info = True
 	if i[0:3] == '-c:':
 		useconf = True
@@ -331,25 +329,25 @@ try:
 		if cli_info == '1':
 			info_options = '\033[0;0H\033[4m  \033[1m1 gameplay\033[22m  2 installation  3 arguments  4 compile  5 configs  6 about  x exit \033[0m\n\n >>> '
 			print( info_options + '\n\n' +
-			'Pawns kill you when they reach you.\n' +
-			'Move blocks around to squash the enemy pawns. \n' +
-			'Get points. Clear the level to progress.\n' +
-			'There is a large point penalty, and a level panalty, for losing 5 lives.\n\n' + PLAYER + '\033[1m' +
+			' Pawns kill you when they reach you.\n' +
+			' Move blocks around to squash the enemy pawns. \n' +
+			' Get points. Clear the level to progress.\n' +
+			' There is a large point penalty, and a level panalty, for losing 5 lives.\n\n ' + PLAYER + '\033[1m' +
 			' Player...................move it around with the direction keys\n' + '\033[0m' +
-			'	> Pull boxes by holding the \'Shift\' key during movement.\n' + BOX + '\033[1m' +
+			'	> Pull boxes by holding the \'Shift\' key during movement.\n ' + BOX + '\033[1m' +
 			' Green Blocks.............can be pushed and pulled\n' + '\033[0m' +
-			'	> "Boxes" are the main instrument of gameplay.\n' + BLOCK  + '\033[1m' +
+			'	> "Boxes" are the main instrument of gameplay.\n ' + BLOCK  + '\033[1m' +
 			' Yellow Blocks............immovable.\n' + '\033[0m' +
 			'	> Eggs and monsters can be squashed against yellow blocks\n' +
-			'	> The game border is made of yellow blocks.\n' + KILLBLOCK + '\033[1m' +
+			'	> The game border is made of yellow blocks.\n ' + KILLBLOCK + '\033[1m' +
 			' Orange Blocks............immovable and destructive.\n' + '\033[0m' +
 			'	> Orange blocks destroy boxes\n' +
 			'	> Orange blocks take a life if you walk into them\n' +
-			'	> When boxes are gone, walk into an orange block to get more.\n' + BEAST + '\033[1m' +
+			'	> When boxes are gone, walk into an orange block to get more.\n ' + BEAST + '\033[1m' +
 			' Beasts...................red \'H\'s\n' + '\033[0m' +
-			'	> Beasts can be squashed using regular green blocks\n' + MONSTER + '\033[1m' +
+			'	> Beasts can be squashed using regular green blocks\n ' + MONSTER + '\033[1m' +
 			' Monsters.................double-lined red \'H\'s\n' + '\033[0m' +
-			'	> Monsters must be squashed against yellow/orange blocks\n' + EGG(32) + '\033[1m' +
+			'	> Monsters must be squashed against yellow/orange blocks\n ' + EGG(32) + '\033[1m' +
 			' Eggs.....................hatch into monsters\n' + '\033[0m' +
 			'	> Eggs can only be moved using green blocks.\n' +
 			'	> Like Monsters, they must be squashed against yellow or orange blocks.\n' +
@@ -357,78 +355,78 @@ try:
 		elif cli_info == '2':
 			info_options = '\033[0;0H\033[4m  1 gameplay  \033[1m2 installation\033[22m  3 arguments  4 compile  5 configs  6 about  x exit \033[0m\n\n >>> '
 			print( info_options  + '\n\n'+
-			'"installation" largely means preparing the right terminal\n\n' +
-			'> The terminal should have a dark tango color theme.\n' +
-			'> You might want to lighten some colors or change font style and size.\n' +
-			'> Some terminals do not show the bold/dim text, or other styling.\n\n' +
-			'1. download the repository, and unpack its contents\n' +
+			' "installation" largely means preparing the right terminal\n\n' +
+			' > The terminal should have a dark tango color theme.\n' +
+			' > You might want to lighten some colors or change font style and size.\n' +
+			' > Some terminals do not show the bold/dim text, or other styling.\n\n' +
+			' 1. download the repository, and unpack its contents\n' +
 			'	> repo: \033[7m https://github.com/wattahay/cli-game-scripts \033[0m\n' +
-			'2. change into the unpacked directory \n' +
+			' 2. change into the unpacked directory \n' +
 			'	> \033[7m $ cd cli-game-scripts  \033[0m\n' +
-			'3. run the script\n' +
+			' 3. run the script\n' +
 			'	> \033[7m $ python3 beast.py -args \033[0m\n\n' +
-			'* If you compile the script with pyinstaller, then it runs like this:\n'
+			' * If you compile the script with pyinstaller, then it runs like this:\n'
 			'	> \033[7m $ ./beast.py -args \033[0m\n')
 
 		elif cli_info == '3':
 			info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  \033[1m3 arguments\033[22m  4 compile  5 configs  6 about  x exit \033[0m\n\n >>> '
 			print( info_options  + '\n\n'+
-			'Example 1: \033[7m $ python3 beast.py -k:hjkl -w:50 -h:30 -t \033[0m\n\n' +
-			'Example 2: \033[7m $ ./beast -k:wasd -f:1 -h:25 \033[0m\n\n' +
-			'-i...........shows help information\n' +
-			'-c...........create/use the default config file\n' +
-			'-c.h.........create config with help comments\n' +
-			'-c:file......create/use config with custom filename\n' +
-			'-t...........transparent background\n' +
-			'-f...........fitted to terminal\n' +
-			'-f:2.........additional padding\n' +
+			' Example 1: \033[7m $ python3 beast.py -k:hjkl -w:50 -h:30 -t \033[0m\n\n' +
+			' Example 2: \033[7m $ ./beast -k:wasd -f:1 -h:25 \033[0m\n\n' +
+			' -i...........shows help information\n' +
+			' -c...........create/use the default config file\n' +
+			' -c.h.........create config with help comments\n' +
+			' -c:file......create/use config with custom filename\n' +
+			' -t...........transparent background\n' +
+			' -f...........fitted to terminal\n' +
+			' -f:2.........additional padding\n' +
 			'	> 1-to-5 accommodates terminal spacing differences\n' +
-			'-k:hjkl......key controls\n' +
+			' -k:hjkl......key controls\n' +
 			'	> options: "wasd", "arrows", "hjkl"\n' +
-			'-w:50........custom game width\n' +
+			' -w:50........custom game width\n' +
 			'	> 2-digit number (option trumps fitted width)\n' +
-			'-h:30........custom game height\n' +
+			' -h:30........custom game height\n' +
 			'	> 2-digit number (option trumps fitted height)\n' )
 		elif cli_info == '4':
 			info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  3 arguments  \033[1m4 compile\033[22m  5 configs  6 about  x exit \033[0m\n\n >>> '
 			print( info_options  + '\n\n'+
-			'Compile beast.py for a single executable file.\n' +
-			'This example uses the python program, pyinstaller.\n\n' +
-			'1. install pyinstaller\n' +
+			' Compile beast.py for a single executable file.\n' +
+			' This example uses the python program, pyinstaller.\n\n' +
+			' 1. install pyinstaller\n' +
 			'	> \033[7m $ pip3 install --upgrade --user install pyinstaller \033[0m\n' +
-			'2. download the repository, and unpack its contents\n' +
+			' 2. download the repository, and unpack its contents\n' +
 			'	> repo: \033[7m https://github.com/wattahay/cli-game-scripts \033[0m\n' +
-			'3. change into the upacked directory\n' +
+			' 3. change into the upacked directory\n' +
 			'	> \033[7m $ cd path/cli-game-scripts/ \033[0m\n' +
-			'4. run pyinstaller on beast.py\n' +
+			' 4. run pyinstaller on beast.py\n' +
 			'	> \033[7m $ pyinstaller -F --add-data audio:audio beast.py \033[0m\n' +
 			'	> the executable will be in the dist/ directory\n' +
-			'5. run the executable with all the same script options\n' +
+			' 5. run the executable with all the same script options\n' +
 			'	> e.g. \033[7m $ ./beast -k:hjkl -t \033[0m\n\n' +
-			'* the single executable file can be moved on its own.\n')
+			' * the single executable file can be moved on its own.\n')
 		elif cli_info == '5':
 			info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  3 arguments  4 compile  \033[1m5 configs\033[22m  6 about  x exit \033[0m\n\n >>> '
 			print( info_options  + '\n\n'+
-			'Create and use configuration files to customize settings.\n\n' +
-			'Example 1: \033[7m $ python3 beast.py -c.i:conf.ini \033[0m\n' +
+			' Create and use configuration files to customize settings.\n\n' +
+			' Example 1: \033[7m $ python3 beast.py -c.i:conf.ini \033[0m\n' +
 			'	> On the first use, this command creates a config.ini file, and exits.\n' +
 			'	> If that specified config.ini already exists, then it will then use\n' +
 			'		the specified file to configure the program.\n' +
 			'	> Using the .i option leaves in a bunch of info comments.\n\n' +
-			'Example 2: \033[7m $ python3 beast.py -c \033[0m\n' +
+			' Example 2: \033[7m $ python3 beast.py -c \033[0m\n' +
 			'	> This example uses the default \'beastconf.ini\' filename\n' +
 			'	> The lack of the .i means the file is cleaned of all info comments\n\n' +
-			'* In all cases, the .ini file extension helps with syntax highlighting\n' +
+			' * In all cases, the .ini file extension helps with syntax highlighting\n' +
 			'	in text editors, but it is not necessary for the config to function.\n')
 		elif cli_info == '6':
 			info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  3 arguments  4 compile  5 configs  \033[1m6 about\033[22m  x exit \033[0m\n\n >>> '
 			print( info_options  + '\n\n' +
-			'This is a little GitHub project.\n' +
+			' This is a little GitHub project.\n' +
 			'	> \033[7m https://github.com/wattahay/cli-game-scripts \033[0m\n\n' +
-			'Beast was a DOS game not so different from this script.\n' +
-			'Released: 1984\n' +
-			'Developers: Dan Baker, Alan Brown, Mark Hamilton, Derrick Shadel\n\n' +
-			'Links:\n' +
+			' Beast was a DOS game not so different from this script.\n' +
+			' Released: 1984\n' +
+			' Developers: Dan Baker, Alan Brown, Mark Hamilton, Derrick Shadel\n\n' +
+			' Links:\n' +
 			'	> https://www.myabandonware.com/game/beast-3d\n' +
 			'	> https://www.dosgames.com/game/beast/#dosbox-div\n' +
 			'	> https://en.wikipedia.org/wiki/Beast_(video_game)\n' )
