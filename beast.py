@@ -7,13 +7,18 @@ from sys import exit, argv
 from configparser import ConfigParser
 from ast import literal_eval
 
-###########################################################-- Config File Argv Option
+###########################################################-- Config Argv Options
 makeconf = False
 useconf = False
-confname = 'beastconf.ini'
-nocoms = True
+confname = 'beastconf.ini' # Path and name of config file
+nocoms = True # True means No comments in configs
+cli_info = ''	#
+show_info = False
 
 for i in argv:
+	if i[0:2] == '-i' and len(i) == 2:
+		cli_info = 'arguments'
+		show_info = True
 	if i[0:3] == '-c:':
 		useconf = True
 		confname = i[3:]
@@ -36,6 +41,14 @@ if useconf:
 		bstconf = ConfigParser(allow_no_value=True)
 		bstconf.optionxform = str
 		makeconf = True # make a new config
+
+if show_info:
+	bstconf = ConfigParser(allow_no_value=True)
+	bstconf.optionxform = str
+	nocoms = False
+	makeconf = True
+	useconf = True
+	confname = 'info.txt'
 
 
 ##########################################################-- Config Variable Functions
@@ -182,14 +195,13 @@ confvar('control key codes', 'spare-1', spareKYBD,
 '(for the AntiMicroX example in the repo)')
 
 ################################################-- config file details
-if makeconf:
+if makeconf and not show_info:
+	filevar = ''
 	with open(confname, 'w') as cf:
 	   bstconf.write(cf)
 	print('New config file created: ' + str(confname))
 	print('Exiting')
 	exit(0)
-
-
 ################################################################################################
 ###########################################################-- Utility Functions --##############
 ################################################################################################
@@ -217,6 +229,21 @@ def tbg(rtrn): # tbg(1)
 	if rtrn == 1: return xbgx
 xbgx = '\033[40m'
 trnsprnt = False
+#########################################################-- close game
+def close_game(): # close game function
+	system('clear')
+	print('\033[?25\033[0;0H')
+	try:
+		raise KeyboardInterrupt
+	except KeyboardInterrupt:
+		print('\033[?25\033[0;0H')
+		system('clear')
+		system('reset')
+	finally:
+		print('\033[?25\033[0;0H')
+		system('clear')
+		system('reset')
+		exit(0)
 ################################################################################################
 ######################################################-- More Global Variables --###############
 ################################################################################################
@@ -240,8 +267,6 @@ for i in argv:
 	if i[0:2] == '-f':
 		fitted = True
 		term_rows, tot_cols = get_rw_cl_tcl(1,0,1)
-		if term_rows % 2 == 0: alt = 0
-		else: alt = 1
 		PLAY_ROWS = term_rows - 2 - top_pad*2 - stat_rows
 		PLAY_COLS = (tot_cols - 4 - left_pad * 2) / 2
 
@@ -249,17 +274,16 @@ for i in argv:
 	if i[0:2] == '-t':
 		xbgx = '\033[49m'
 		trnsprnt = True
-	if i[0:3] == '-k:':	# "wasd", "arrows", "hjkl"
+	elif i[0:3] == '-k:':	# "wasd", "arrows", "hjkl"
 		if i[3:] == KYBD[0]['title']: dir_keys = 0
 		elif i[3:] == KYBD[1]['title']: dir_keys = 1
 		elif i[3:] == KYBD[2]['title']: dir_keys = 2
-	if i[0:3] == '-h:':
+	elif i[0:3] == '-h:':
 		if(i[3:].isdigit() and len(i[3:]) < 121):
 			PLAY_ROWS = int(i[3:]) + top_pad*2
-	if i[0:3] == '-w:':
+	elif i[0:3] == '-w:':
 		if(i[3:].isdigit() and len(i[3:]) < 121):
 			PLAY_COLS = int(i[3:]) + left_pad
-
 
 ################################################-- keyboard constants post argv
 KEY_UP = 		KYBD[dir_keys]["K_UP"]
@@ -271,7 +295,6 @@ KEY_P_DOWN = 	KYBD[dir_keys]["PK_DOWN"]
 KEY_P_RIGHT = 	KYBD[dir_keys]["PK_RIGHT"]
 KEY_P_LEFT = 	KYBD[dir_keys]["PK_LEFT"]
 ################################################-- other game variables
-#fps_avg_frames = LCD_TIME
 mi1_opt = dir_keys + 1 # initial keyboard setting
 keypress = 999
 debug = False
@@ -296,7 +319,139 @@ def EGG(sub):
 # The below function is used to detect an egg independent of its changing subscript
 def deteggt(chegg):
 	if (chegg[0:12] == '\033[0m\033[0m\033[0m'): return True
-################################################-- adapt speed variables
+
+################################################################################################
+##########################################################-- script help information --#########
+################################################################################################
+try:
+	system('clear')
+	cli_info = '1'
+	info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  3 arguments  4 compile  5 configs  6 about  x exit \033[0m\n\n >>> '
+	while(show_info):
+		if cli_info == '1':
+			info_options = '\033[0;0H\033[4m  \033[1m1 gameplay\033[22m  2 installation  3 arguments  4 compile  5 configs  6 about  x exit \033[0m\n\n >>> '
+			print( info_options + '\n\n' +
+			'Pawns kill you when they reach you.\n' +
+			'Move blocks around to squash the enemy pawns. \n' +
+			'Get points. Clear the level to progress.\n' +
+			'There is a large point penalty, and a level panalty, for losing 5 lives.\n\n' + PLAYER + '\033[1m' +
+			' Player...................move it around with the direction keys\n' + '\033[0m' +
+			'	> Pull boxes by holding the \'Shift\' key during movement.\n' + BOX + '\033[1m' +
+			' Green Blocks.............can be pushed and pulled\n' + '\033[0m' +
+			'	> "Boxes" are the main instrument of gameplay.\n' + BLOCK  + '\033[1m' +
+			' Yellow Blocks............immovable.\n' + '\033[0m' +
+			'	> Eggs and monsters can be squashed against yellow blocks\n' +
+			'	> The game border is made of yellow blocks.\n' + KILLBLOCK + '\033[1m' +
+			' Orange Blocks............immovable and destructive.\n' + '\033[0m' +
+			'	> Orange blocks destroy boxes\n' +
+			'	> Orange blocks take a life if you walk into them\n' +
+			'	> When boxes are gone, walk into an orange block to get more.\n' + BEAST + '\033[1m' +
+			' Beasts...................red \'H\'s\n' + '\033[0m' +
+			'	> Beasts can be squashed using regular green blocks\n' + MONSTER + '\033[1m' +
+			' Monsters.................double-lined red \'H\'s\n' + '\033[0m' +
+			'	> Monsters must be squashed against yellow/orange blocks\n' + EGG(32) + '\033[1m' +
+			' Eggs.....................hatch into monsters\n' + '\033[0m' +
+			'	> Eggs can only be moved using green blocks.\n' +
+			'	> Like Monsters, they must be squashed against yellow or orange blocks.\n' +
+			'	> New eggs appear when Monsters group together\n' )
+		elif cli_info == '2':
+			info_options = '\033[0;0H\033[4m  1 gameplay  \033[1m2 installation\033[22m  3 arguments  4 compile  5 configs  6 about  x exit \033[0m\n\n >>> '
+			print( info_options  + '\n\n'+
+			'"installation" largely means preparing the right terminal\n\n' +
+			'> The terminal should have a dark tango color theme.\n' +
+			'> You might want to lighten some colors or change font style and size.\n' +
+			'> Some terminals do not show the bold/dim text, or other styling.\n\n' +
+			'1. download the repository, and unpack its contents\n' +
+			'	> repo: \033[7m https://github.com/wattahay/cli-game-scripts \033[0m\n' +
+			'2. change into the unpacked directory \n' +
+			'	> \033[7m $ cd cli-game-scripts  \033[0m\n' +
+			'3. run the script\n' +
+			'	> \033[7m $ python3 beast.py -args \033[0m\n\n' +
+			'* If you compile the script with pyinstaller, then it runs like this:\n'
+			'	> \033[7m $ ./beast.py -args \033[0m\n')
+
+		elif cli_info == '3':
+			info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  \033[1m3 arguments\033[22m  4 compile  5 configs  6 about  x exit \033[0m\n\n >>> '
+			print( info_options  + '\n\n'+
+			'Example 1: \033[7m $ python3 beast.py -k:hjkl -w:50 -h:30 -t \033[0m\n\n' +
+			'Example 2: \033[7m $ ./beast -k:wasd -f:1 -h:25 \033[0m\n\n' +
+			'-i...........shows help information\n' +
+			'-c...........create/use the default config file\n' +
+			'-c.h.........create config with help comments\n' +
+			'-c:file......create/use config with custom filename\n' +
+			'-t...........transparent background\n' +
+			'-f...........fitted to terminal\n' +
+			'-f:2.........additional padding\n' +
+			'	> 1-to-5 accommodates terminal spacing differences\n' +
+			'-k:hjkl......key controls\n' +
+			'	> options: "wasd", "arrows", "hjkl"\n' +
+			'-w:50........custom game width\n' +
+			'	> 2-digit number (option trumps fitted width)\n' +
+			'-h:30........custom game height\n' +
+			'	> 2-digit number (option trumps fitted height)\n' )
+		elif cli_info == '4':
+			info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  3 arguments  \033[1m4 compile\033[22m  5 configs  6 about  x exit \033[0m\n\n >>> '
+			print( info_options  + '\n\n'+
+			'Compile beast.py for a single executable file.\n' +
+			'This example uses the python program, pyinstaller.\n\n' +
+			'1. install pyinstaller\n' +
+			'	> \033[7m $ pip3 install --upgrade --user install pyinstaller \033[0m\n' +
+			'2. download the repository, and unpack its contents\n' +
+			'	> repo: \033[7m https://github.com/wattahay/cli-game-scripts \033[0m\n' +
+			'3. change into the upacked directory\n' +
+			'	> \033[7m $ cd path/cli-game-scripts/ \033[0m\n' +
+			'4. run pyinstaller on beast.py\n' +
+			'	> \033[7m $ pyinstaller -F --add-data audio:audio beast.py \033[0m\n' +
+			'	> the executable will be in the dist/ directory\n' +
+			'5. run the executable with all the same script options\n' +
+			'	> e.g. \033[7m $ ./beast -k:hjkl -t \033[0m\n\n' +
+			'* the single executable file can be moved on its own.\n')
+		elif cli_info == '5':
+			info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  3 arguments  4 compile  \033[1m5 configs\033[22m  6 about  x exit \033[0m\n\n >>> '
+			print( info_options  + '\n\n'+
+			'Create and use configuration files to customize settings.\n\n' +
+			'Example 1: \033[7m $ python3 beast.py -c.i:conf.ini \033[0m\n' +
+			'	> On the first use, this command creates a config.ini file, and exits.\n' +
+			'	> If that specified config.ini already exists, then it will then use\n' +
+			'		the specified file to configure the program.\n' +
+			'	> Using the .i option leaves in a bunch of info comments.\n\n' +
+			'Example 2: \033[7m $ python3 beast.py -c \033[0m\n' +
+			'	> This example uses the default \'beastconf.ini\' filename\n' +
+			'	> The lack of the .i means the file is cleaned of all info comments\n\n' +
+			'* In all cases, the .ini file extension helps with syntax highlighting\n' +
+			'	in text editors, but it is not necessary for the config to function.\n')
+		elif cli_info == '6':
+			info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  3 arguments  4 compile  5 configs  \033[1m6 about\033[22m  x exit \033[0m\n\n >>> '
+			print( info_options  + '\n\n' +
+			'This is a little GitHub project.\n' +
+			'	> \033[7m https://github.com/wattahay/cli-game-scripts \033[0m\n\n' +
+			'Beast was a DOS game not so different from this script.\n' +
+			'Released: 1984\n' +
+			'Developers: Dan Baker, Alan Brown, Mark Hamilton, Derrick Shadel\n\n' +
+			'Links:\n' +
+			'	> https://www.myabandonware.com/game/beast-3d\n' +
+			'	> https://www.dosgames.com/game/beast/#dosbox-div\n' +
+			'	> https://en.wikipedia.org/wiki/Beast_(video_game)\n' )
+		elif cli_info == 'x':
+			show_info = False
+			close_game()
+		else:
+			info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  3 arguments  4 compile  5 configs  6 about  x exit \033[0m\n\n $ '
+			print(info_options  + '\n\n        no option . . .')
+		ci_back = cli_info
+		cli_info = input(info_options)
+		if len(cli_info) == 0:
+			cli_info = ci_back
+		cli_info = cli_info[-1]
+		ci_back = cli_info
+		system('clear')
+except KeyboardInterrupt:
+	close_game()
+
+################################################################################################
+##########################################################-- Final Variables --#################
+################################################################################################
+################################################-- adapt config speed variables
 beast_speed = 	.5 + .2 * (beast_steps - 1)
 monster_speed =	.5 + .2 * (monster_steps - 1)
 incubate = 		 4 +  4 * (incubation - 1)
@@ -342,20 +497,7 @@ min_rows = board_rows + stat_rows
 ################################################################################################
 ###########################################################-- Utility Functions --##############
 ################################################################################################
-def close_game(): # close game function
-	system('clear')
-	print('\033[?25\033[0;0H')
-	try:
-		raise KeyboardInterrupt
-	except KeyboardInterrupt:
-		print('\033[?25\033[0;0H')
-		system('clear')
-		system('reset')
-	finally:
-		print('\033[?25\033[0;0H')
-		system('clear')
-		system('reset')
-		exit(0)
+
 ########################################################-- cursor preset functions
 def set_topleft(top, left):
 	global top_margin, left_margin, xbgx
@@ -419,6 +561,8 @@ def build_the_board(): #{ BUILDS a blank board
 	return screen_board
 #}
 
+########################################################-- print board functions
+
 def print_stats():
 	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, PLAY_ROWS, PLAY_COLS, term_cols, term_rows
 	level_stat = chr(9477) + ' LEVEL: ' + str(level) + ' ' + chr(9477)
@@ -453,7 +597,6 @@ def egg_debug():
 		else:
 			print('\033[u' + '\033[' + str(i) + 'B' + '\r\033[K\033[1B\033[K\033[?7l\033[1A\t\033[0m\033[37mEgg ' + str(i))
 
-########################################################-- print board function
 def print_board(board_array): #{
 	global top_margin, left_margin, score, lives, level, board_rows, board_cols, statpad, PLAY_ROWS, PLAY_COLS, term_cols, term_rows, keypress
 
@@ -474,8 +617,6 @@ def print_board(board_array): #{
 
 	if debug: print_debug()
 	#if debug: egg_debug()
-
-
 
 ##########################################-- place the pieces
 def place_beasts(count):
@@ -672,7 +813,6 @@ def move_enemies(pawns): #{
 							place_eggs(1)
 
 			#######################################################################-- Add count of each available move to a list to create final odds
-
 			if (vdistance <= SCENT): # if the player is within the strong scent range
 				for prioddi in range(8): # loop through priorities to add them to likely_moves if available
 					if (PRIORITY_ODDS[prioddi][1] == True): # if it is true that the priority move is a blank space, then loop through and fill out the likely_moves list
