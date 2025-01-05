@@ -54,19 +54,21 @@ cd dist/
 Example: `python3 beast.py -w:54 -h:30 -t -k:hjkl`
 
 ```
--c...........create/use the default config file
--c.h.........create config with help comments
--c:file......create/use config with custom filename
--t...........transparent background
--f...........fitted to terminal
--f:2.........additional padding
-	1-to-5 accommodates terminal spacing differences
--k:hjkl......key controls
-	options: "wasd", "arrows", "hjkl"
--w:50........custom game width
-	2-digit number (option trumps fitted width)
--h:30........custom game height
-	2-digit number (option trumps fitted height)
+-i................information and instructions mode
+-c................create/use the default config file
+	> -c.i..............include information comments in new config file
+	> -c:file.ini.......create/use config with custom filename
+	> -c.i:file.ini.....include information comments in new config file
+-t................transparent background
+-f................fitted to terminal
+-f:2..............additional padding
+	> 1-to-5 accommodates terminal spacing differences
+-k:hjkl...........key controls
+	> options: "wasd", "arrows", "hjkl"
+-w:50.............custom game width
+	> 2-digit number (option trumps fitted width)
+-h:30.............custom game height
+	> 2-digit number (option trumps fitted height)
 ```
 
 See: [Terminal Fitting Options](https://github.com/wattahay/cli-game-scripts/wiki/Terminal-Fitting-Options)
@@ -86,35 +88,10 @@ shift.........pull blocks
 r.............restore screen for a resized terminal
 ```
 
-Player movement control has 3 options in the settings menu, or as script options.
-
-```
-wasd
-arrows
-hjkl
-```
-These options can be customized in the beast.py file, in the KYBD array. The getkeycodes.py script identifies the codes for the keys you want to use.
+These options can be customized in a config file, using -c options. The getkeycodes.py script identifies the codes for the keys you want to use.
 
 Also see: [Adding Controller Option](https://github.com/wattahay/cli-game-scripts/blob/master/examples/controller.md)
 
-### Change Many Default Settings in the beast.py Script
-
-**Useful Variables**
-
-If you open the script in a text editor, you will see the commented section: **Useful Variables**
-
-```
-Change level presets
-Enemy kill points
-Enemy speeds
-Point loss penalty
-Level penalty
-Game clock speed
-Default player controls setting
-Enemies per level
-Randomness of enemy movement
-OS keyboard codes
-```
 
 ### Best Terminals
 
