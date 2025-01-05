@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from curses import initscr, noecho
 from random import randint, choices
 from os import system, popen, path
