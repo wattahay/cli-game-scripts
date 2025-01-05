@@ -360,20 +360,20 @@ try:
 			print( info_options  + '\n\n'+
 			' Example 1: \033[7m $ python3 beast.py -k:hjkl -w:50 -h:30 -t \033[0m\n\n' +
 			' Example 2: \033[7m $ ./beast -k:wasd -f:1 -h:25 \033[0m\n\n' +
-			' -i...........shows help information\n' +
-			' -c...........create/use the default config file\n' +
-			' -c.h.........create config with help comments\n' +
-			' -c:file......create/use config with custom filename\n' +
-			' -t...........transparent background\n' +
-			' -f...........fitted to terminal\n' +
-			' -f:2.........additional padding\n' +
-			'	> 1-to-5 accommodates terminal spacing differences\n' +
-			' -k:hjkl......key controls\n' +
+			'-i................information and instructions mode\n' +
+			'-c................create/use the default config file\n' +
+			'	> -c.i..............include information comments in new config file\n' +
+			'	> -c:file.ini.......create/use config with custom filename\n' +
+			'	> -c.i:file.ini.....include information comments in new config file\n' +
+			'-t................transparent background\n' +
+			'-f................fitted to terminal\n' +
+			'	> -f:2..............additional padding\n' +
+			'-k:hjkl...........key controls\n' +
 			'	> options: "wasd", "arrows", "hjkl"\n' +
-			' -w:50........custom game width\n' +
+			'-w:50.............custom game width\n' +
 			'	> 2-digit number (option trumps fitted width)\n' +
-			' -h:30........custom game height\n' +
-			'	> 2-digit number (option trumps fitted height)\n' )
+			'-h:30.............custom game height\n' +
+			'	> 2-digit number (option trumps fitted height) ' )
 		elif cli_info == '4':
 			info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  3 arguments  \033[1m4 compile\033[22m  5 configs  6 about  x exit \033[0m\n\n >>> '
 			print( info_options  + '\n\n'+
