@@ -364,9 +364,9 @@ try:
 			' 2. change into the unpacked directory \n' +
 			'	> \033[7m $ cd cli-game-scripts  \033[0m\n' +
 			' 3. run the script\n' +
-			'	> \033[7m $ python3 beast.py -args \033[0m\n\n' +
+			'	> \033[7m $ python3 beast.py -k:wasd \033[0m\n\n' +
 			' * If you compile the script with pyinstaller, then it runs like this:\n'
-			'	> \033[7m $ ./beast.py -args \033[0m\n')
+			'	> \033[7m $ ./beast.py -k:arrows -f:1 -t \033[0m\n')
 
 		elif cli_info == '3':
 			info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  \033[1m3 arguments\033[22m  4 compile  5 configs  6 about  x exit \033[0m\n\n >>> '
@@ -1577,8 +1577,8 @@ def build_level():
 				elif (main_menu_tab == 2) and (item_menu == 6):
 					if (keypress == KEY_LEFT):
 						lvl_box_cnt -= 1
-						if lvl_box_cnt < 0:
-							lvl_box_cnt = 0
+						if lvl_box_cnt < MIN_BOXES:
+							lvl_box_cnt = MIN_BOXES
 							play_audio('flatten')
 						else:
 							play_audio('menu_item_tick')
