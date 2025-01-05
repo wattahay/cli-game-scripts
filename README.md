@@ -61,8 +61,7 @@ Example: `python3 beast.py -w:54 -h:30 -t -k:hjkl`
 	> -c.i:file.ini.....include information comments in new config file
 -t................transparent background
 -f................fitted to terminal
--f:2..............additional padding
-	> 1-to-5 accommodates terminal spacing differences
+	> -f:2..............additional padding
 -k:hjkl...........key controls
 	> options: "wasd", "arrows", "hjkl"
 -w:50.............custom game width
