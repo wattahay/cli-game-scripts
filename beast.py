@@ -12,7 +12,6 @@ useconf = False
 confname = 'beastconf.ini' # Path and name of config file
 nocoms = True # True means No comments in configs
 show_info = False
-
 for i in argv:
 	if i[0:2] == '-i' and len(i) == 2:
 		show_info = True
@@ -28,7 +27,6 @@ for i in argv:
 	elif i[0:4] == '-c.i' and len(i) == 4:
 		nocoms = False
 		useconf = True
-
 if useconf:
 	if path.isfile(confname): # existing config file
 		bstconf = ConfigParser(allow_no_value=True)
@@ -38,7 +36,6 @@ if useconf:
 		bstconf = ConfigParser(allow_no_value=True)
 		bstconf.optionxform = str
 		makeconf = True # make a new config
-
 if show_info:
 	bstconf = ConfigParser(allow_no_value=True)
 	bstconf.optionxform = str
@@ -55,7 +52,6 @@ def confvar(section, name, default, addcom = ''): # config section, config varia
 	else:
 		if len(addcom) > 0:
 			addcom = '    # ' + addcom
-
 	if not useconf:
 		return default
 	else:
