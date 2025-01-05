@@ -6,7 +6,6 @@ from threading import Thread
 from sys import exit, argv
 from configparser import ConfigParser
 from ast import literal_eval
-
 ###########################################################-- Config Argv Options
 makeconf = False
 useconf = False
@@ -47,8 +46,6 @@ if show_info:
 	makeconf = True
 	useconf = True
 	confname = 'info.txt'
-
-
 ##########################################################-- Config Variable Functions
 def confvar(section, name, default, addcom = ''): # config section, config variable, default value
 	global makeconf, useconf, bstconf, nocoms
@@ -78,7 +75,6 @@ def confcom(section, addcom):
 	if nocoms == False:
 		addcom = '# ' + addcom
 		if makeconf: bstconf[section] = {addcom:None}
-
 ################################################################################################
 ###########################################################-- Config Variables --###############
 ################################################################################################
@@ -144,8 +140,6 @@ elif useconf:
 if useconf:
 	for i in range(x):
 		GAME_LEVELS[i] = confvar('levels', str(i + 1), GAME_LEVELS[i])
-
-
 ########################################################-- Pawn Movement Priority Odds
 confcom('enemy move odds',
 'These values are the odds of moves for an enemy if those      |--------------------- \n# ' +
@@ -282,7 +276,6 @@ for i in argv:
 	elif i[0:3] == '-w:':
 		if(i[3:].isdigit() and len(i[3:]) < 121):
 			PLAY_COLS = int(i[3:]) + left_pad
-
 ################################################-- keyboard constants post argv
 KEY_UP = 		KYBD[dir_keys]["K_UP"]
 KEY_DOWN = 		KYBD[dir_keys]["K_DOWN"]
@@ -317,7 +310,6 @@ def EGG(sub):
 # The below function is used to detect an egg independent of its changing subscript
 def deteggt(chegg):
 	if (chegg[0:12] == '\033[0m\033[0m\033[0m'): return True
-
 ################################################################################################
 ##########################################################-- script help information --#########
 ################################################################################################
@@ -367,7 +359,6 @@ try:
 			'	> \033[7m $ python3 beast.py -k:wasd \033[0m\n\n' +
 			' * If you compile the script with pyinstaller, then it runs like this:\n'
 			'	> \033[7m $ ./beast.py -k:arrows -f:1 -t \033[0m\n')
-
 		elif cli_info == '3':
 			info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  \033[1m3 arguments\033[22m  4 compile  5 configs  6 about  x exit \033[0m\n\n >>> '
 			print( info_options  + '\n\n'+
@@ -445,7 +436,6 @@ try:
 		system('clear')
 except KeyboardInterrupt:
 	close_game()
-
 ################################################################################################
 ##########################################################-- Final Variables --#################
 ################################################################################################
@@ -495,7 +485,6 @@ min_rows = board_rows + stat_rows
 ################################################################################################
 ###########################################################-- Utility Functions --##############
 ################################################################################################
-
 ########################################################-- cursor preset functions
 def set_topleft(top, left):
 	global top_margin, left_margin, xbgx
@@ -505,7 +494,7 @@ def set_topleft(top, left):
 def set_botleft(bottom, left):
 	global top_margin, left_margin, board_cols, board_rows, xbgx
 	print('\033[?25l\033[?7l\033[' + str(top_margin + int(board_rows - bottom - 3)) + ';' + str(4 + left_margin + left) + 'H\033[s\033[0m' + xbgx)
-
+	
 #def set_topcent(top, leftcomp):
 #	global top_margin, left_margin, board_cols
 #	print('\033[?25l\033[' + str(2 + top_margin + top) + ';' + str(left_margin + int(board_cols) - leftcomp) + 'H\033[s\033[0m')
@@ -523,17 +512,14 @@ def set_board_spacing(): #{
 
 	if (board_rows > term_rows - 6):
 		debug = False
-
 	if (debug):
 		top_margin = 0
 		left_margin = 0
 	else:
 		left_margin = int((term_cols - (board_cols*2)) / 2)
 		top_margin = int((term_rows - min_rows) / 2)
-
 	left_margin += 1
 	top_margin += 1
-
 	if board_cols <= stat_grow_limit:
 		statpad = left_stat
 	else:
@@ -544,18 +530,15 @@ def build_the_board(): #{ BUILDS a blank board
 	global board_cols, board_rows
 
 	screen_board = []
-
 	for rowi in range(board_rows): # builds the board based on 'board_rows' and 'board_cols' which includes room for borders
 		screen_board.append([])
 		for coli in range(board_cols):
 			screen_board[rowi].append([])
 			screen_board[rowi][coli] = BAKGRD
-
 	for rowi in range(board_rows): # draws the game boarders on the board
 		for coli in range(board_cols):
 			if(rowi == 0) or (rowi == (board_rows - 1)) or (coli == 0) or (coli == (board_cols - 1)):
 				screen_board[rowi][coli] = BLOCK
-
 	return screen_board
 #}
 
@@ -566,7 +549,6 @@ def print_stats():
 	level_stat = chr(9477) + ' LEVEL: ' + str(level) + ' ' + chr(9477)
 	score_stat = chr(9477) + ' SCORE: ' + str(score) + ' ' + chr(9477)
 	lives_stat = chr(9477) + ' LIVES: ' + str(lives) + ' ' + chr(9477)
-
 	print('\033[?7l\033[' + str(top_margin + board_rows) + ';' + str(left_margin) + 'H\033[s\033[0m\033[37m' +
 		'\033[s\033[' + str(statpad) 									+ 'C'	+ level_stat + '   ' +
 		'\033[u\033[' + str(board_cols - int(len(score_stat)/2))		+ 'C' 	+ score_stat + '   ' +
@@ -604,15 +586,11 @@ def print_board(board_array): #{
 			term_rows = tot_rows
 			term_cols = tot_cols
 			set_board_spacing()
-
 	print('\033[0m\033[1;1H\033[?25l\033[?7l\033[' + str(top_margin) + ';' + str(left_margin) + 'H\033[s\033[0m\033[?7l')
-
 	for rowi in range(board_rows):
 		if (rowi == 0): print('\033[0m\033[u\033[?7l' + ''.join(board_array[rowi]))
 		else: print('\033[0m\033[u\033[?7l\033[' + str(rowi) +  'B' + ''.join(board_array[rowi]))
-
 	if level > 0: print_stats()
-
 	if debug: print_debug()
 	#if debug: egg_debug()
 
@@ -679,7 +657,6 @@ def hatch_eggs():
 	global eggs, board, egg_speed, LCD_TIME, audio
 
 	di = 0 # keeps track of index to accomodate for egg deletions
-
 	if eggs[0]['frame'] >= eggs[0]['frames']:
 		eggs[0]['frame'] = 0
 	else:
@@ -709,7 +686,6 @@ def flash_player():
 	global player, PLAYER, PLR_FLASHES, plr_flash, plr_frames, plr_frame
 
 	PLAYER_negative = '\033[0m\033[7m\033[34m' + xbgx + chr(9664) + chr(9654) + '\033[0m'
-
 	if plr_flash <= PLR_FLASHES:
 		if plr_frame < plr_frames:
 			plr_frame += 1
@@ -722,7 +698,6 @@ def flash_player():
 			plr_flash += 1
 	elif board[player[1]['ro']][player[1]['co']] == PLAYER_negative:
 		board[player[1]['ro']][player[1]['co']] = PLAYER
-
 
 def place_player():
 	global player, PLAYER, plr_flash
@@ -746,7 +721,6 @@ def kill_player():
 	del player[1]
 	if lives > 0:
 		place_player()
-
 	play_audio('death')
 
 def move_enemies(pawns): #{
@@ -756,11 +730,9 @@ def move_enemies(pawns): #{
 		pawns[0]['frame'] = 0
 	else:
 		pawns[0]['frame'] += 1
-
 	move_priority = []
 	move = ''
 	likely_moves = []
-
 	for pwni in range(1, (len(pawns))): # in a given frame, loops through all pawns in a list if the pawn is staggered to move in the present frame, the pawn moves to a space
 		if (pawns[pwni]['stg'] == pawns[0]['frame']):
 			rdistance = player[1]['ro'] - pawns[pwni]['ro'] # player row minus beast row
@@ -809,7 +781,6 @@ def move_enemies(pawns): #{
 					if ((pawns[0]['chr'] == MONSTER) and ((board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == MONSTER) or (board[ ((pawns[pwni]['ro']) + (MOVES[move_priority[0]]['ra'])) ][ ((pawns[pwni]['co']) + (MOVES[move_priority[0]]['ca'])) ] == BEAST))):
 						if (choices([True, False], [3, 127], k=1)) == [True]:
 							place_eggs(1)
-
 			#######################################################################-- Add count of each available move to a list to create final odds
 			if (vdistance <= SCENT): # if the player is within the strong scent range
 				for prioddi in range(8): # loop through priorities to add them to likely_moves if available
@@ -829,7 +800,6 @@ def move_enemies(pawns): #{
 				for prioddi in range(8):
 					if (PRIORITY_ODDS[prioddi][1] == True):
 						likely_moves.append(move_priority[prioddi])
-
 			#######################################################################-- the move is finally decided out of the available set in the list
 			if (len(likely_moves) > 0):
 				move = likely_moves[randint(0, (len(likely_moves)) - 1)]
@@ -843,7 +813,6 @@ def move_enemies(pawns): #{
 				pawns[pwni]['ro'] = pawns[pwni]['ro'] + MOVES[move]['ra']
 				pawns[pwni]['co'] = pawns[pwni]['co'] + MOVES[move]['ca']
 #}
-
 def push_loop(intent):
 	global player, eggs, board, BLOCK, MOVES, BAKGRD, BOX, PLAYER, lvl_box_cnt
 
@@ -901,10 +870,8 @@ def push_loop(intent):
 	loop = True
 	while (loop):
 		space = board[probe_r(probe)][probe_c(probe)]
-
 		if (((probe_r(probe) != 0) and (probe_r(probe) != (len(board) - 1))) and ((probe_c(probe) != 0) and (probe_c(probe) != len(board[0]) - 1))):
 			wall_space = board[wall_r(probe)][wall_c(probe)]
-
 		if (space == BOX):		# if space is a box
 			probe += 1 			# start loop over
 		elif (space == BAKGRD): # if space is
@@ -973,7 +940,6 @@ def direct_move(tap_move):
 	global player, MOVES, board, MIN_BOXES, lvl_box_cnt
 
 	space = board[player[1]['ro'] + MOVES[tap_move]['ra'] ][ player[1]['co'] + MOVES[tap_move]['ca'] ]
-
 	if (space == BAKGRD):
 		move_player(tap_move)
 	elif (space == BOX):
@@ -1018,35 +984,29 @@ def direct_keypress(tap):
 		direct_move('D')
 		player[1]['tug'] = False
 
-
 def pause():
 	global board_rows, board_cols, left_margin, top_margin, keypress, term_cols, term_rows, game_play_mode
 
 	game_play_mode = False
-
 	def print_pause():
 		print('\033[u\033[1B' + xbgx + chr(9556) + chr(9552)*12 + chr(9559))
 		print('\033[u\033[2B' + xbgx + chr(9553) + '\033[12C' + chr(9553))
 		print('\033[u\033[3B' + xbgx + chr(9553) + '\033[3CPAUSED\033[3C' + chr(9553))
 		print('\033[u\033[4B' + xbgx + chr(9553) + '\033[12C' + chr(9553))
 		print('\033[u\033[5B' + xbgx + chr(9562) + chr(9552)*12 + chr(9565))
-
 	play_audio('pause')
 	tbg(0) # handles transparent background
 	set_midcent(6, 8)
 	print_pause()
 	keypress = 999
-
 	while(True):
 		if (keypress == ord('p')): break
 		elif (keypress == 27):
 			close_game()
 		sleep(LCD_TIME)
-
 	keypress = 999
 	play_audio('pause')
 	game_play_mode = True
-
 
 def resize_terminal():
 	global term_rows, term_cols, game_play_mode, keypress, xbgx, board
@@ -1060,7 +1020,6 @@ def resize_terminal():
 		sleep(LCD_TIME)
 		if game_play_mode:
 			break
-
 ################################################################################################
 ############################################################-- Level Function --################
 ################################################################################################
@@ -1114,7 +1073,6 @@ def build_level():
 		print('\033[u\033[37m' + xbgx + 'Player defeated. . .\033[u\033[2B' + xbgx + 'You lost \033[36m' + str(NO_LIVES) + ' points\033[37m and got held back \033[36m' + str(lostlevels) + wordvar + '.\033[37m\033[0m')
 	else:
 		newlevel = level + 1
-
 	tbg(0)
 	print_note()
 ################################################################-- Keyboard, Resize, Print, Loop
@@ -1144,7 +1102,6 @@ def build_level():
 				term_cols = tot_cols
 		sleep(LCD_TIME)
 #################################################################-- Prep New Level
-
 	if (lives == 0): ############### If the player lost the last level
 		lives = 5
 		for i in range(1, len(player)): del player[1]
@@ -1342,7 +1299,6 @@ def build_level():
 
 	#def mi2_controls(opt):
 
-
 	def mi8_controls(opt):
 		global block_type, BLOCK, KILLBLOCK, normalyellow, dangerousorange
 
@@ -1362,8 +1318,6 @@ def build_level():
 		print('\033[u\033[0m' + xbgx + '\033[37mPress \033[36mspacebar\033[37m to play \033[1;35mlevel ' + str(newlevel) + '\033[0m')
 		set_botleft(0,0)
 		print('\033[u\033[0m' + xbgx + '\033[37mPress \033[36mtab \033[37mto switch settings tabs\033[0m')
-
-
 	dim_menus(0)
 	mi1_controls(mi1_opt)
 	#mi2_controls(mi2_opt)
@@ -1377,7 +1331,6 @@ def build_level():
 		################################################################################################
 		while (True):######################################-- Settings Menu Frame-Draw Loop --##########
 		################################################################################################
-
 			if keypress == ord(' '): # spacebar exits the settings menu
 				keypress = 999
 				sleep(.3) # delay for effect, before exiting the settings menu
@@ -1440,10 +1393,8 @@ def build_level():
 				main_menu_2()
 			elif main_menu_tab == 3:
 				main_menu_3()
-
 			if ((keypress == KEY_UP) or (keypress == KEY_DOWN)):
 				if (main_menu_tab == 1):
-
 					main_menu_1()
 					if (keypress == KEY_UP):
 						item_menu -= 1
@@ -1685,11 +1636,9 @@ def build_level():
 							play_audio('menu_item_tick')
 					timer_arrows = int((egg_speed - timer_min ) / timer_inc)
 					keypress = 999
-
 ########################################################################################################
 #######################################################################-- End of Settings Loop --#######
 ########################################################################################################
-
 	box_step = 0
 	block_step = 0
 	blockrow = 0
@@ -1702,26 +1651,21 @@ def build_level():
 		if(board[blockrow][blockcol] == BAKGRD):
 			board[blockrow][blockcol] = block_type
 			block_step += 1
-
 	while(box_step < lvl_box_cnt):
 		boxrow = randint(1, (board_rows - 1))
 		boxcol = randint(1, (board_cols - 1))
 		if(board[boxrow][boxcol] == BAKGRD):
 			board[boxrow][boxcol] = BOX
 			box_step += 1
-
 	place_beasts(lvl_beast_cnt)
 	place_monsters(lvl_monster_cnt)
 	place_eggs(lvl_egg_cnt)
 	place_player()
-
 	game_play_mode = False
-
 	play_audio('begin')
 ################################################################################################
 ###########################################################-- Input Function --#################
 ################################################################################################
-
 def take_input():
 	global gameterm, debug, keypress, player, top_margin, left_margin, key_move, game_play_mode, term_cols, term_rows
 
@@ -1742,11 +1686,9 @@ def take_input():
 					set_board_spacing()
 					system('clear')
 			direct_keypress(keypress)
-
 ################################################################################################
 ##################-- This is the beginning of the program's main execution --###################
 ################################################################################################
-
 try:
 	print('\033[?25')
 	gameterm = initscr()
@@ -1766,7 +1708,6 @@ try:
 	exec_start = 0
 	exec_end = 0
 	exec_time = 0
-
 	while(True):
 		if(lives == 0) or ((len(beasts) == 1) and (len(monsters) == 1) and (len(eggs) == 1)):
 			game_play_mode = False
