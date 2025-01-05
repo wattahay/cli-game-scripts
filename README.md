@@ -14,18 +14,18 @@ There is a large point penalty, and a level panalty, for losing 5 lives.
 
 ```
 Beasts...................red 'H's
-	Beasts can be squashed using regular green blocks
+	> Beasts can be squashed using regular green blocks
 Monsters.................double-lined red 'H's
-	Monsters must be squashed against yellow/orange blocks
+	> Monsters must be squashed against yellow/orange blocks
 Eggs.....................hatch into monsters
-	Eggs can only be moved using green blocks.
-	Like Monsters, they must be squashed against yellow or orange blocks.
-	New eggs appear when Monsters group together
+	> Eggs can only be moved using green blocks.
+	> Like Monsters, they must be squashed against yellow or orange blocks.
+	> New eggs appear when Monsters group together
 Green Blocks (Boxes).....can be pushed and pulled
 Yellow/Orange Blocks.....immovable
-	Orange blocks destroy green blocks that are pushed into them.
-	Orange blocks take a life if you walk into them
-	Walking into an orange block gives you some green boxes if you are low.
+	> Orange blocks destroy green blocks that are pushed into them.
+	> Orange blocks take a life if you walk into them
+	> Walking into an orange block gives you some green boxes if you are low.
 ```
 
 ### Runs in Linux Terminal
