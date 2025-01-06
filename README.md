@@ -77,7 +77,7 @@ See: [Terminal Fitting Options](https://github.com/wattahay/cli-game-scripts/wik
 ### Controls
 
 ```
-spacebar......enter level / exit settings / toggle pulling blocks
+spacebar......enter level / exit settings
 esc...........quit the game
 ctrl-c........quit the game
 tab...........enter options menu / switch tabs in options menu
