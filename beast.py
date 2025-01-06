@@ -40,7 +40,6 @@ if useconf or show_info:
 		nocoms = False
 		makeconf = True
 		useconf = True
-		confname = 'info.txt'
 ##########################################################-- Config Variable Functions
 def confvar(section, name, default, addcom = ''): # config section, config variable, default value
 	global makeconf, useconf, bstconf, nocoms
