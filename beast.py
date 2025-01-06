@@ -16,7 +16,7 @@ show_info = False
 for i in argv:
 	if i[0:2] == '-i' and len(i) == 2:
 		show_info = True
-	if i[0:3] == '-c:':
+	elif i[0:3] == '-c:':
 		useconf = True
 		confname = i[3:]
 	elif i[0:2] == '-c' and len(i) == 2:
@@ -28,22 +28,19 @@ for i in argv:
 	elif i[0:4] == '-c.i' and len(i) == 4:
 		nocoms = False
 		useconf = True
-if useconf:
-	if path.isfile(confname): # existing config file
-		bstconf = ConfigParser(allow_no_value=True)
-		bstconf.optionxform = str
-		bstconf.read(confname) # read the config
-	else: ##################### no existing config file
-		bstconf = ConfigParser(allow_no_value=True)
-		bstconf.optionxform = str
-		makeconf = True # make a new config
-if show_info:
+if useconf or show_info:
 	bstconf = ConfigParser(allow_no_value=True)
 	bstconf.optionxform = str
-	nocoms = False
-	makeconf = True
-	useconf = True
-	confname = 'info.txt'
+	if useconf:
+		if path.isfile(confname): # existing config file
+			bstconf.read(confname) # read the config
+		else: ##################### no existing config file
+			makeconf = True # make a new config
+	if show_info:
+		nocoms = False
+		makeconf = True
+		useconf = True
+		confname = 'info.txt'
 ##########################################################-- Config Variable Functions
 def confvar(section, name, default, addcom = ''): # config section, config variable, default value
 	global makeconf, useconf, bstconf, nocoms
