@@ -344,14 +344,16 @@ try:
 			' > The terminal should have a dark tango color theme.\n' +
 			' > You might want to lighten some colors or change font style and size.\n' +
 			' > Some terminals do not show the bold/dim text, or other styling.\n\n' +
-			' 1. download the repository, and unpack its contents\n' +
-			'	> repo: \033[7m https://github.com/wattahay/cli-game-scripts \033[0m\n' +
-			' 2. change into the unpacked directory \n' +
-			'	> \033[7m $ cd cli-game-scripts  \033[0m\n' +
-			' 3. run the script\n' +
-			'	> \033[7m $ python3 beast.py -k:wasd \033[0m\n\n' +
-			' * If you compile the script with pyinstaller, then it runs like this:\n'
-			'	> \033[7m $ ./beast.py -k:arrows -f:1 -t \033[0m\n')
+			'1. On the git page, click the green Clone/Download button to get the .zip file\n' +
+			'2. Extract the zipped files, maintaining the same directory structure\n' +
+			'3. Set up a terminal with an increased font size, and a Dark Tango color palette\n' +
+			'4. In the terminal, cd into the newly unzipped directory\n' +
+			'5. Set executable permissions on beast.py\n' +
+			'	> \033[7m chmod +x beast.py\n\033[0m' +
+			'6. Run the script\n' +
+			'	> \033[7m ./beast.py \033[0m\n\n' +
+			'If making the script executable does not work, then you might run the script like this:\n' +
+			'	> \033[7m python3 beast.py \033[0m' )
 		elif cli_info == '3':
 			info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  \033[1m3 arguments\033[22m  4 compile  5 configs  6 about  x exit \033[0m\n\n >>> '
 			print( info_options  + '\n\n'+
@@ -487,7 +489,7 @@ def set_topleft(top, left):
 def set_botleft(bottom, left):
 	global top_margin, left_margin, board_cols, board_rows, xbgx
 	print('\033[?25l\033[?7l\033[' + str(top_margin + int(board_rows - bottom - 3)) + ';' + str(4 + left_margin + left) + 'H\033[s\033[0m' + xbgx)
-	
+
 #def set_topcent(top, leftcomp):
 #	global top_margin, left_margin, board_cols
 #	print('\033[?25l\033[' + str(2 + top_margin + top) + ';' + str(left_margin + int(board_cols) - leftcomp) + 'H\033[s\033[0m')
