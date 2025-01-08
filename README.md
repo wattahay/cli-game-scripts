@@ -43,7 +43,7 @@ Yellow/Orange Blocks.....immovable
 
 > After you run the game, the intro should show up. At this point you can adjust the terminal size, and the board will center itself.
 
-### Compile a Portable Version
+### To Compile a Portable Version
 
 This creates a portable executable for your architecture about 9MB.
 
