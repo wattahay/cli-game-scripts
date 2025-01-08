@@ -35,7 +35,7 @@ Yellow/Orange Blocks.....immovable
 3. Set up a terminal with an increased font size, and a **Dark Tango** color palette
 4. In the terminal, cd into the newly unzipped directory
 5. Set executable permissions on beast.py
-   * `chmod a+x beast.py`
+   * `chmod +x beast.py`
 6. Run the script
    * `./beast.py`
 
