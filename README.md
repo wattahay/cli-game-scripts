@@ -34,9 +34,14 @@ Yellow/Orange Blocks.....immovable
 2. Extract the zipped files, maintaining the same directory structure
 3. Set up a terminal with an increased font size, and a **Dark Tango** color palette
 4. In the terminal, cd into the newly unzipped directory
-5. Run the game: `python3 beast.py`
+5. Set executable permissions on beast.py
+   * `chmod a+x beast.py`
+6. Run the script
+   * `./beast.py`
 
-> Resizing the terminal just after the intro will adjust the board to the center of the terminal.
+> If making the script executable does not work, then try: `python3 beast.py`
+
+> After you run the game, the intro should show up. At this point you can adjust the terminal size, and the board will center itself.
 
 ### Compile a Portable Version
 
