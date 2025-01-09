@@ -56,7 +56,7 @@ cd dist/
 
 ### Script Options
 
-Example: `python3 beast.py -w:54 -h:30 -t -k:hjkl`
+Example: `./beast.py -w:54 -h:30 -t -k:hjkl`
 
 ```
 -i................information and instructions mode
