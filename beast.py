@@ -128,16 +128,24 @@ GAME_LEVELS = [
 		{'beasts':15,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -999,	'boxes': -999} 	# Level 15
 	]
 
-if useconf:
-	if not makeconf:
-		x = len(bstconf.options('levels'))
-	elif makeconf:
-		x = len(GAME_LEVELS)
-	tmplvls = []
-	for i in range(x):
-		tmplvls.append(confvar('levels', str(i + 1), GAME_LEVELS[i]))
-	GAME_LEVELS = tmplvls
-	del tmplvls, x
+try:
+	if useconf:
+		if not makeconf:
+			x = len(bstconf.options('levels'))
+		elif makeconf:
+			x = len(GAME_LEVELS)
+		tmplvls = []
+		for i in range(x):
+			tmplvls.append(confvar('levels', str(i + 1), GAME_LEVELS[i]))
+		GAME_LEVELS = tmplvls
+		del tmplvls, x
+except:
+	print('Levels are incorrect in the ' + confname + ' file.\n' +
+		'Levels must start with 1, and continue consecutively.\n' +
+		'Numbered levels must be the only settings in the [levels] section.\n' +
+		'Mind commas, brackets, quotes, and spelling.\n' +
+		'Exiting')
+	exit(0)
 
 ########################################################-- Pawn Movement Priority Odds
 confcom('enemy move odds',
@@ -485,7 +493,7 @@ stat_grow_limit = 52 # greatest board width of centered stats
 left_stat = 6
 min_rows = board_rows + stat_rows
 ################################################-- remove leftover variables
-delvars = ['beast_steps', 'monster_steps', 'incubation', 'egg_timer', 'spareKYBD', 'makeconf', 'info_mode', 'top_pad', 'left_pad', 'pocoms', 'filevar', 'fitted', 'cli_info', 'ci_back', 'info_options', 'x']
+delvars = ['beast_steps', 'monster_steps', 'incubation', 'egg_timer', 'spareKYBD', 'makeconf', 'conf_name', 'info_mode', 'top_pad', 'left_pad', 'pocoms', 'filevar', 'fitted', 'cli_info', 'ci_back', 'info_options', 'x']
 for i in delvars:
 	try:
 		del globals()[i]
