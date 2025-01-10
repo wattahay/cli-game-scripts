@@ -8,27 +8,27 @@ from sys import exit, argv
 from configparser import ConfigParser
 from ast import literal_eval
 ###########################################################-- Config Argv Options
-makeconf = False
-useconf = False
+makeconf = False # make a new config file
+useconf = False # deal with a config file at all (making or implementing)
 confname = 'beastconf.ini' # Path and name of config file
-nocoms = True # True means No comments in configs
-show_info = False
+confcoms = False # True means No comments in configs
+info_mode = False
 for i in argv:
 	if i[0:2] == '-i' and len(i) == 2:
-		show_info = True
+		info_mode = True
 	elif i[0:3] == '-c:':
 		useconf = True
 		confname = i[3:]
 	elif i[0:2] == '-c' and len(i) == 2:
 		useconf = True
 	elif i[0:5] == '-c.i:':
-		nocoms = False
+		confcoms = True
 		useconf = True
 		confname = i[5:]
 	elif i[0:4] == '-c.i' and len(i) == 4:
-		nocoms = False
+		confcoms = True
 		useconf = True
-if useconf or show_info:
+if useconf or info_mode:
 	bstconf = ConfigParser(allow_no_value=True)
 	bstconf.optionxform = str
 	if useconf:
@@ -36,15 +36,15 @@ if useconf or show_info:
 			bstconf.read(confname) # read the config
 		else: ##################### no existing config file
 			makeconf = True # make a new config
-	if show_info:
-		nocoms = False
+	if info_mode:
+		confcoms = True
 		makeconf = True
 		useconf = True
 ##########################################################-- Config Variable Functions
 def confvar(section, name, default, addcom = ''): # config section, config variable, default value
-	global makeconf, useconf, bstconf, nocoms
+	global makeconf, useconf, bstconf, confcoms
 
-	if nocoms == True:
+	if confcoms == False:
 		addcom = ''
 	else:
 		if len(addcom) > 0:
@@ -63,9 +63,9 @@ def confvar(section, name, default, addcom = ''): # config section, config varia
 			return default
 
 def confcom(section, addcom):
-	global makeconf, nocoms
+	global makeconf, confcoms
 
-	if nocoms == False:
+	if confcoms == True:
 		addcom = '# ' + addcom
 		if makeconf: bstconf[section] = {addcom:None}
 ################################################################################################
@@ -96,8 +96,11 @@ SCENT = 		confvar('game stuff', 'scent-range', 20, 'distance at which enemies sm
 SCENT_EDGE = 	confvar('game stuff', 'scent-edge', 20, 'distance past scent for mild scent')
 #########################################################-- game levels
 confcom('levels',
-'You can create as many or few levels as you want to here.\n# ' +
-'Each level is surrounded by curly brackets.\n# ' +
+'Only numbered levels can exist in this section.\n# ' +
+'You can create as many or few levels as you want to.\n# ' +
+'These will replace all default levels.\n# ' +
+'Start with 1, and continue consecutively.\n# ' +
+'Each level is surrounded by curly brackets.\n\n# ' +
 'Blocks and Boxes:\n# ' +
 '	> Negative Integer: use built-in count formula\n# ' +
 '		> The default formula stays within a pretty small range.\n# ' +
@@ -125,14 +128,17 @@ GAME_LEVELS = [
 		{'beasts':15,	'monsters':0,	'eggs':0,	'block': 'orange',	'blocks': -999,	'boxes': -999} 	# Level 15
 	]
 
-if makeconf and useconf:
-	x = len(GAME_LEVELS)
-elif useconf:
-	x = len(bstconf.options('levels'))
-
 if useconf:
+	if not makeconf:
+		x = len(bstconf.options('levels'))
+	elif makeconf:
+		x = len(GAME_LEVELS)
+	tmplvls = []
 	for i in range(x):
-		GAME_LEVELS[i] = confvar('levels', str(i + 1), GAME_LEVELS[i])
+		tmplvls.append(confvar('levels', str(i + 1), GAME_LEVELS[i]))
+	GAME_LEVELS = tmplvls
+	del tmplvls, x
+
 ########################################################-- Pawn Movement Priority Odds
 confcom('enemy move odds',
 'These values are the odds of moves for an enemy if those      |--------------------- \n# ' +
@@ -180,11 +186,13 @@ confvar('control key codes', 'spare-1', spareKYBD,
 '(for the AntiMicroX example in the repo)')
 
 ################################################-- config file details
-if makeconf and not show_info:
+if makeconf and not info_mode:
 	filevar = ''
 	with open(confname, 'w') as cf:
 	   bstconf.write(cf)
 	print('New config file created: ' + str(confname))
+	if confcoms: print('Comments Included')
+	else: print('Comments Omitted')
 	print('Exiting')
 	exit(0)
 ################################################################################################
@@ -195,7 +203,6 @@ script_dir = path.abspath( path.dirname( __file__ ) )
 def play_audio(filename):
 	global script_dir
 	system('aplay -q ' + script_dir + '/audio/' + filename + '.wav &')
-#play_audio('menu_item_tick') # Sound test helps "initialize" in some cases
 ######################################-- get terminal size
 def get_rw_cl_tcl(rw, cl, tcl): # get rows, columns, and terminal columns
 	rows, ttycols = [int(x) for x in popen('stty size', 'r').read().split()]
@@ -310,7 +317,7 @@ try:
 	system('clear')
 	cli_info = '1'
 	info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  3 arguments  4 compile  5 configs  6 about  x exit \033[0m\n\n >>> '
-	while(show_info):
+	while(info_mode):
 		if cli_info == '1':
 			info_options = '\033[0;0H\033[4m  \033[1m1 gameplay\033[22m  2 installation  3 arguments  4 compile  5 configs  6 about  x exit \033[0m\n\n >>> '
 			print( info_options + '\n\n' +
@@ -417,7 +424,7 @@ try:
 			'	> https://www.dosgames.com/game/beast/#dosbox-div\n' +
 			'	> https://en.wikipedia.org/wiki/Beast_(video_game)\n' )
 		elif cli_info == 'x':
-			show_info = False
+			info_mode = False
 			close_game()
 		else:
 			info_options = '\033[0;0H\033[4m  1 gameplay  2 installation  3 arguments  4 compile  5 configs  6 about  x exit \033[0m\n\n $ '
@@ -477,6 +484,14 @@ top_margin = 0 # 1 is the lowest that the top margin can be, because of a specif
 stat_grow_limit = 52 # greatest board width of centered stats
 left_stat = 6
 min_rows = board_rows + stat_rows
+################################################-- remove leftover variables
+delvars = ['beast_steps', 'monster_steps', 'incubation', 'egg_timer', 'spareKYBD', 'makeconf', 'info_mode', 'top_pad', 'left_pad', 'pocoms', 'filevar', 'fitted', 'cli_info', 'ci_back', 'info_options', 'x']
+for i in delvars:
+	try:
+		del globals()[i]
+	except:
+		pass
+del delvars
 ################################################################################################
 ###########################################################-- Utility Functions --##############
 ################################################################################################
@@ -1022,7 +1037,7 @@ def resize_terminal():
 def build_level():
 	global GAME_LEVELS, NO_LIVES, NO_LEVEL, incubate, egg_speed, beast_speed, monster_speed, keypress
 	global PLAY_ROWS, PLAY_COLS, board_rows, board_cols, blank_board, board, term_cols, term_rows
-	global newlevel, level, lives, score, mi1_opt, xbgx, fitted, trnsprnt
+	global newlevel, level, lives, score, mi1_opt, xbgx, trnsprnt
 	global lvl_block_cnt, lvl_beast_cnt, lvl_monster_cnt, lvl_egg_cnt, lvl_box_cnt, block_type
 	global BEAST, BAKGRD, BLOCK, KILLBLOCK, game_play_mode, top_margin, left_margin, LCD_TIME
 	global KEY_UP, KEY_DOWN, KEY_RIGHT, KEY_LEFT, KEY_P_UP, KEY_P_DOWN, KEY_P_LEFT, KEY_P_RIGHT
@@ -1043,6 +1058,7 @@ def build_level():
 		set_botleft(0,0)
 		print('\033[u\033[37m' + xbgx + 'Press \033[36mtab\033[37m for \033[1;35msettings\033[37m\033[0m')
 
+
 	newlevel = 1
 	lostlevels = 0
 	wordvar = ''
@@ -1056,7 +1072,7 @@ def build_level():
 		sleep(.5) # delay to show options
 #################################################################-- Clear Last Level
 	if (lives == 0): ############### If the player lost the last level
-		newlevel = level+1 - NO_LEVEL ### Death Level Penalty
+		newlevel = level + 1 - NO_LEVEL ### Death Level Penalty
 		if newlevel < 1:
 			newlevel = 1
 			lostlevels = level+1 - newlevel
@@ -1108,10 +1124,10 @@ def build_level():
 	level = newlevel
 	board = build_the_board()	# clears the board after end of level
 	print_board(board)			# prints cleared board after end of level
-	if (level <= (len(GAME_LEVELS) - 1)):
-		lvl_beast_cnt = GAME_LEVELS[level-1]['beasts']
-		lvl_monster_cnt = GAME_LEVELS[level-1]['monsters']
-		lvl_egg_cnt = GAME_LEVELS[level-1]['eggs']
+	if (level <= len(GAME_LEVELS)):
+		lvl_beast_cnt = GAME_LEVELS[level - 1]['beasts']
+		lvl_monster_cnt = GAME_LEVELS[level - 1]['monsters']
+		lvl_egg_cnt = GAME_LEVELS[level - 1]['eggs']
 		if (GAME_LEVELS[level - 1]['block'] == 'yellow'): block_type = BLOCK
 		if (GAME_LEVELS[level - 1]['block'] == 'orange'): block_type = KILLBLOCK
 		if (GAME_LEVELS[level - 1]['blocks'] <= -1):
@@ -1123,11 +1139,11 @@ def build_level():
 			lvl_block_cnt = GAME_LEVELS[level - 1]['blocks']
 		if (GAME_LEVELS[level - 1]['boxes'] <= -1):
 			lower_boxes = int(PLAY_ROWS * PLAY_COLS / 4 - 10)
-			upper_boxes = int(PLAY_ROWS * PLAY_COLS / 4 + 10)
+			upper_boxes = lower_boxes + 20
 			lvl_box_cnt = randint(lower_boxes, upper_boxes) # Default Level Boxes
 		elif (abs(GAME_LEVELS[level - 1]['boxes'] < 1)):
 			lower_boxes = int(PLAY_ROWS * PLAY_COLS / 4 - 10)
-			upper_boxes = int(PLAY_ROWS * PLAY_COLS / 4 + 10)
+			upper_boxes = lower_boxes + 20
 			lvl_box_cnt = randint(lower_boxes, upper_boxes) # Default Level Boxes
 			lvl_box_cnt = int(lvl_box_cnt + (lvl_box_cnt * GAME_LEVELS[level - 1]['boxes']))
 		else:
