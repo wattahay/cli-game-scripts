@@ -92,7 +92,7 @@ shift.........pull blocks
 r.............restore screen for a resized terminal
 ```
 
-These options can be customized in a config file, using -c options. The getkeycodes.py script identifies the codes for the keys you want to use.
+The direction keys can be customized in a config file created using -c options. The getkeycodes.py script identifies codes for the keys you want to use.
 
 Also see: [Adding Controller Option](https://github.com/wattahay/cli-game-scripts/blob/master/examples/controller.md)
 
